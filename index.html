@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inventory Registration</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; }
+    input, textarea, button { width: 100%; padding: 10px; margin-top: 10px; }
+    #qrCanvas, img { display: block; margin: 1rem auto; }
+  </style>
+</head>
+<body>
+  <h2>Register New Product</h2>
+  <form id="productForm">
+    <input type="text" id="productName" placeholder="Product Name" required />
+    <input type="text" id="productRef" placeholder="Product Reference" required />
+    <input type="text" id="supplier" placeholder="Supplier" />
+    <input type="text" id="category" placeholder="Category" />
+    <input type="number" id="quantity" placeholder="Quantity" />
+    <textarea id="description" placeholder="Description"></textarea>
+    <input type="file" id="productImage" accept="image/*" />
+    <button type="submit">Register Product</button>
+  </form>
+  <canvas id="qrCanvas"></canvas>
+  <div id="imagePreview"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyCOwLEv21k5i63laJF86qGOBMoucJMp4Gw",
+      authDomain: "skills-vault.firebaseapp.com",
+      databaseURL: "https://skills-vault-default-rtdb.firebaseio.com",
+      projectId: "skills-vault",
+      storageBucket: "skills-vault.appspot.com",
+      messagingSenderId: "16675638838",
+      appId: "1:16675638838:web:056d0131cfb48fcd581297",
+      measurementId: "G-0JS13FPGDV"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    const analytics = getAnalytics(app);
+    document.getElementById("productForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = productName.value.trim();
+      const refId = productRef.value.trim();
+      const imageFile = productImage.files[0];
+      let imageUrl = "";
+      if (imageFile) {
+        const storageRef = ref(storage, `product-images/${refId}`);
+        await uploadBytes(storageRef, imageFile);
+        imageUrl = await getDownloadURL(storageRef);
+        document.getElementById("imagePreview").innerHTML = `<img src="${imageUrl}" width="200"/>`;
+      }
+      const data = {
+        name, ref: refId,
+        supplier: supplier.value.trim(),
+        category: category.value.trim(),
+        quantity: +quantity.value,
+        description: description.value.trim(),
+        imageUrl,
+        createdAt: new Date().toISOString()
+      };
+      await setDoc(doc(db, "inventory", refId), data);
+      new QRious({ element: qrCanvas, value: refId, size: 200 });
+      alert("✅ Product Registered!");
+      productForm.reset();
+    });
+  </script>
+</body>
+</html>

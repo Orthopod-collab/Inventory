@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Scan Product QR</title>
+  <style>
+    video { width: 100%; max-width: 400px; display: block; margin: auto; }
+    #result { text-align: center; margin-top: 1rem; }
+    img { width: 150px; display: block; margin: auto; }
+  </style>
+</head>
+<body>
+  <h2>Scan QR Code</h2>
+  <video id="preview"></video>
+  <div id="result"></div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import QrScanner from "https://unpkg.com/qr-scanner@1.4.2/qr-scanner.min.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyCOwLEv21k5i63laJF86qGOBMoucJMp4Gw",
+      authDomain: "skills-vault.firebaseapp.com",
+      projectId: "skills-vault"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const video = document.getElementById("preview");
+    const resultDiv = document.getElementById("result");
+    const scanner = new QrScanner(video, async result => {
+      scanner.stop();
+      const docSnap = await getDoc(doc(db, "inventory", result));
+      if (docSnap.exists()) {
+        const p = docSnap.data();
+        resultDiv.innerHTML = `
+          <h3>${p.name}</h3>
+          <p><strong>Ref:</strong> ${p.ref}</p>
+          <p><strong>Supplier:</strong> ${p.supplier}</p>
+          <p><strong>Category:</strong> ${p.category}</p>
+          <p><strong>Qty:</strong> ${p.quantity}</p>
+          <img src="${p.imageUrl}" alt="Product Image"/>`;
+      } else {
+        resultDiv.textContent = "Product not found.";
+      }
+    });
+    QrScanner.hasCamera().then(() => scanner.start());
+  </script>
+</body>
+</html>

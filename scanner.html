@@ -1,47 +1,331 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Scan Product QR</title>
-  <style>
-    video { width: 100%; max-width: 400px; display: block; margin: auto; }
-    #result { text-align: center; margin-top: 1rem; }
-    img { width: 150px; display: block; margin: auto; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OrthoPod Scanner</title>
+<style>
+  :root{ --bg:#0b0f14; --panel:#0f1720; --border:#223042; --text:#e5eef9; --muted:#9fb2c7; --accent:#4ea3ff; --ok:#19c37d; --warn:#ff5e57; }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  header{padding:16px;background:var(--panel);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+  h1{margin:0;font-size:18px;letter-spacing:.3px}
+  main{padding:14px;display:grid;gap:12px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:12px;display:grid;gap:12px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .btn{appearance:none;border:1px solid var(--border);background:#142034;color:var(--text);padding:14px 16px;border-radius:12px;font-weight:800;cursor:pointer}
+  .btn:disabled{opacity:.5}
+  .btn.primary{background:var(--accent);border-color:transparent;color:#071423}
+  .btn.ok{background:#12261c;border-color:#1e3a2f;color:#7ff0bb}
+  .btn.warn{background:#2a1520;border-color:#57233a;color:#ff6b8b}
+  select,input[type=number]{background:#0a131f;color:var(--text);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+  #view{position:relative;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#000}
+  video{display:block;width:100%;max-height:62vh}
+  #overlay{position:absolute;inset:0;pointer-events:none}
+  #overlay:after{content:'';position:absolute;inset:8% 10%;border:2px solid rgba(255,255,255,0.9);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.35) inset}
+  .pill{font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;color:var(--muted)}
+  .kv{display:grid;grid-template-columns:110px 1fr;gap:8px 10px}
+  .mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;word-break:break-all}
+  .actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .toggle{display:flex;align-items:center;gap:8px}
+  .switch{position:relative;width:50px;height:28px;border-radius:999px;background:#223042;border:1px solid #2b3d52;cursor:pointer}
+  .switch input{opacity:0;width:0;height:0}
+  .knob{position:absolute;top:2px;left:2px;width:24px;height:24px;background:#fff;border-radius:50%;transition:transform .2s}
+  .switch input:checked + .knob{transform:translateX(22px)}
+  #diag pre{white-space:pre-wrap;word-break:break-word;margin:0}
+  @media (min-width:720px){ .actions{grid-template-columns:repeat(6,minmax(0,1fr));} }
+</style>
 </head>
 <body>
-  <h2>Scan QR Code</h2>
-  <video id="preview"></video>
-  <div id="result"></div>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import QrScanner from "https://unpkg.com/qr-scanner@1.4.2/qr-scanner.min.js";
-    const firebaseConfig = {
-      apiKey: "AIzaSyCOwLEv21k5i63laJF86qGOBMoucJMp4Gw",
-      authDomain: "skills-vault.firebaseapp.com",
-      projectId: "skills-vault"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const video = document.getElementById("preview");
-    const resultDiv = document.getElementById("result");
-    const scanner = new QrScanner(video, async result => {
-      scanner.stop();
-      const docSnap = await getDoc(doc(db, "inventory", result));
-      if (docSnap.exists()) {
-        const p = docSnap.data();
-        resultDiv.innerHTML = `
-          <h3>${p.name}</h3>
-          <p><strong>Ref:</strong> ${p.ref}</p>
-          <p><strong>Supplier:</strong> ${p.supplier}</p>
-          <p><strong>Category:</strong> ${p.category}</p>
-          <p><strong>Qty:</strong> ${p.quantity}</p>
-          <img src="${p.imageUrl}" alt="Product Image"/>`;
-      } else {
-        resultDiv.textContent = "Product not found.";
-      }
+<header><h1>OrthoPod Scanner</h1></header>
+<main>
+  <div class="card">
+    <div class="row">
+      <select id="camera"></select>
+      <button id="start" class="btn primary">Start Camera</button>
+      <button id="stop" class="btn" disabled>Stop</button>
+      <button id="torch" class="btn" disabled>Torch</button>
+      <div class="toggle">
+        <label class="switch">
+          <input id="continuous" type="checkbox" checked><span class="knob"></span>
+        </label>
+        <span class="pill">Continuous</span>
+      </div>
+      <span id="status" class="pill">Idle</span>
+      <button id="check" class="btn">Check Camera</button>
+    </div>
+    <div id="view">
+      <video id="video" playsinline autoplay muted webkit-playsinline></video>
+      <canvas id="canvas" style="display:none"></canvas>
+      <div id="overlay"></div>
+    </div>
+    <div id="diag" class="card" style="display:none">
+      <strong>Diagnostics</strong>
+      <pre id="diagText"></pre>
+    </div>
+  </div>
+
+  <div class="card" id="result">
+    <div class="kv">
+      <div>Decoded</div><div id="decoded" class="mono">—</div>
+      <div>Match</div><div id="matched" class="mono">—</div>
+      <div>Product</div><div id="prod" class="mono">—</div>
+      <div>SKU</div><div id="sku" class="mono">—</div>
+      <div>Supplier</div><div id="sup" class="mono">—</div>
+    </div>
+    <div class="row" style="gap:10px;align-items:center">
+      <label>Qty <input id="qty" type="number" step="1" value="1" min="1" style="width:90px"></label>
+      <div class="actions" style="flex:1">
+        <button id="actOrder" class="btn">Order</button>
+        <button id="actReceive" class="btn ok">Receive</button>
+        <button id="actUse" class="btn warn">Use</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  // jsQR fallback
+  let jsQRReady=false;
+  function ensureJsQR(){
+    return new Promise((resolve)=>{
+      if (window.jsQR){ jsQRReady=true; return resolve(true); }
+      const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+      s.onload=()=>{ jsQRReady=true; resolve(true); };
+      s.onerror=()=>resolve(false);
+      document.head.appendChild(s);
     });
-    QrScanner.hasCamera().then(() => scanner.start());
-  </script>
+  }
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, updateDoc, getDocs, query, where, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCOwLEv21k5i63laJF86qGOBMoucJMp4Gw",
+    authDomain: "skills-vault.firebaseapp.com",
+    databaseURL: "https://skills-vault-default-rtdb.firebaseio.com",
+    projectId: "skills-vault",
+    storageBucket: "skills-vault.firebasestorage.app",
+    messagingSenderId: "16675638838",
+    appId: "1:16675638838:web:960abec1b6c526c7581297",
+    measurementId: "G-BHRBKRLZ1C"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const $ = s => document.querySelector(s);
+  const video = $('#video');
+  const canvas = $('#canvas');
+  const ctx = canvas.getContext('2d');
+  const statusEl = $('#status');
+  const camSel = $('#camera');
+  const btnStart = $('#start');
+  const btnStop = $('#stop');
+  const btnTorch = $('#torch');
+  const chkCont = $('#continuous');
+  const btnCheck = $('#check');
+  const diag = $('#diag');
+  const diagText = $('#diagText');
+
+  const decodedEl = $('#decoded');
+  const matchedEl = $('#matched');
+  const prodEl = $('#prod');
+  const skuEl = $('#sku');
+  const supEl = $('#sup');
+  const qtyEl = $('#qty');
+
+  const btnOrder = $('#actOrder');
+  const btnReceive = $('#actReceive');
+  const btnUse = $('#actUse');
+
+  let stream=null, track=null, scanning=false, detector=null, useBD=('BarcodeDetector' in window);
+  let lastText=null, lastProduct=null;
+
+  function setStatus(t){ statusEl.textContent=t; }
+  function logDiag(msg){ diag.style.display='grid'; diagText.textContent += (msg + "\\n"); }
+
+  async function listCameras(){
+    try{
+      const devs = await navigator.mediaDevices.enumerateDevices();
+      const vids = devs.filter(d=>d.kind==='videoinput');
+      camSel.innerHTML = vids.map(d=>`<option value="${d.deviceId}">${d.label || 'Camera '+(vids.indexOf(d)+1)}</option>`).join('');
+      logDiag('Cameras: ' + vids.length);
+    }catch(e){ logDiag('enumerateDevices error: ' + (e.message||e)); }
+  }
+
+  async function start(){
+    try{
+      const constraints = {
+        video: {
+          // Prefer rear camera aggressively
+          facingMode: { ideal: 'environment' },
+          advanced: [{ facingMode: 'environment' }],
+          deviceId: camSel.value ? { exact: camSel.value } : undefined,
+          width: { ideal: 1920 }, height: { ideal: 1080 }
+        }, audio: false
+      };
+      logDiag('Requesting camera with constraints: ' + JSON.stringify(constraints.video));
+      stream = await navigator.mediaDevices.getUserMedia(constraints);
+      video.srcObject = stream;
+      await video.play();
+      track = stream.getVideoTracks()[0];
+      btnTorch.disabled = !track.getCapabilities || !track.getCapabilities().torch;
+      btnStart.disabled = true; btnStop.disabled = false;
+      scanning = true; setStatus('Scanning…');
+      if(useBD){
+        try{ detector = new BarcodeDetector({formats:['qr_code']}); logDiag('BarcodeDetector ready'); }catch(e){ useBD=false; logDiag('BarcodeDetector failed: ' + (e.message||e)); }
+      }
+      requestAnimationFrame(loop);
+      await listCameras();
+    }catch(err){
+      console.error(err);
+      setStatus('Camera blocked');
+      logDiag('getUserMedia error: ' + (err.name||'') + ' - ' + (err.message||err));
+      logDiag('Secure context: ' + (window.isSecureContext ? 'yes' : 'NO (use https or localhost)'));
+      logDiag('Permissions: check browser settings for this site.');
+      alert('Camera access failed. Use HTTPS (or localhost) and allow camera permission. See Diagnostics below.');
+    }
+  }
+  async function stop(){
+    scanning=false;
+    if(track){ try{ track.stop(); }catch{} }
+    if(stream){ stream.getTracks().forEach(t=>t.stop()); }
+    btnStart.disabled=false; btnStop.disabled=true;
+    setStatus('Idle');
+  }
+  async function toggleTorch(){
+    if(!track?.getCapabilities) return;
+    const caps = track.getCapabilities(); if(!caps.torch) return;
+    const settings = track.getSettings();
+    const next = !settings.torch;
+    try{ await track.applyConstraints({ advanced: [{ torch: next }] }); }catch{}
+  }
+
+  async function decodeFrame(){
+    const w = video.videoWidth, h = video.videoHeight;
+    if(!w || !h) return null;
+    canvas.width=w; canvas.height=h;
+    ctx.drawImage(video, 0, 0, w, h);
+
+    if(useBD && detector){
+      try{
+        const bmp = await createImageBitmap(canvas);
+        const codes = await detector.detect(bmp);
+        if(codes && codes.length) return codes[0].rawValue;
+      }catch(e){ /* fallback */ }
+    }
+    if(!(await ensureJsQR())) return null;
+    const data = ctx.getImageData(0,0,canvas.width,canvas.height);
+    const qr = window.jsQR(data.data, data.width, data.height);
+    return qr?.data || null;
+  }
+
+  async function loop(){
+    if(!scanning) return;
+    const txt = await decodeFrame();
+    if(txt && txt !== lastText){
+      lastText = txt;
+      setStatus('Decoded');
+      await onDecoded(txt);
+      if(!chkCont.checked){
+        await stop();
+        return;
+      } else {
+        setTimeout(()=>setStatus('Scanning…'), 300);
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  async function onDecoded(txt){
+    decodedEl.textContent = txt;
+    let j=null, pid=null, sku=null;
+    try{ j = JSON.parse(txt); pid = j.id || null; sku = j.sku || null; }catch{}
+    lastProduct = null;
+    if(pid){
+      const q = await getDocs(query(collection(db,'inventoryProducts'), where('__name__','==', pid)));
+      if(!q.empty){ lastProduct = { id: q.docs[0].id, ...q.docs[0].data() }; }
+    }
+    if(!lastProduct && sku){
+      const q2 = await getDocs(query(collection(db,'inventoryProducts'), where('sku','==', sku)));
+      if(!q2.empty){ lastProduct = { id: q2.docs[0].id, ...q2.docs[0].data() }; }
+    }
+    if(lastProduct){
+      matchedEl.textContent = '✔ matched';
+      prodEl.textContent = lastProduct.productName || '—';
+      skuEl.textContent = lastProduct.sku || '—';
+      supEl.textContent = lastProduct.supplier || '—';
+      if(navigator.vibrate) navigator.vibrate(60);
+    }else{
+      matchedEl.textContent = '✖ not matched';
+      prodEl.textContent = skuEl.textContent = supEl.textContent = '—';
+      if(navigator.vibrate) navigator.vibrate([40,40,40]);
+    }
+  }
+
+  // Actions
+  $('#actOrder').addEventListener('click', async ()=>{
+    if(!lastProduct) return alert('Scan a product first.');
+    const qty = Math.max(1, Number(qtyEl.value||1));
+    await addDoc(collection(db,'orders'), {
+      productId: lastProduct.id, supplier: lastProduct.supplier||'',
+      system:lastProduct.system||lastProduct.category||'', productName:lastProduct.productName||'',
+      sku:lastProduct.sku||'', qty, orderedBy:'(scanner)', po:'', notes:'OrthoPod Scanner',
+      orderedAt: Date.now(), createdAt: serverTimestamp()
+    });
+    alert('Order logged: '+qty);
+  });
+  $('#actReceive').addEventListener('click', async ()=>{
+    if(!lastProduct) return alert('Scan a product first.');
+    const qty = Math.max(1, Number(qtyEl.value||1));
+    const newStock = Math.max(0, Number(lastProduct.stock||0) + qty);
+    await updateDoc(doc(db,'inventoryProducts',lastProduct.id), { stock:newStock, updatedAt: Date.now(), lastChecked: Date.now() });
+    await addDoc(collection(db,'deliveries'), {
+      productId:lastProduct.id, supplier:lastProduct.supplier||'',
+      system:lastProduct.system||lastProduct.category||'', productName:lastProduct.productName||'',
+      sku:lastProduct.sku||'', qty, po:'', ref:'OrthoPod Scanner', receivedBy:'(scanner)',
+      createdAt: serverTimestamp()
+    });
+    alert('Received +'+qty+' (stock '+newStock+')');
+    lastProduct.stock = newStock;
+  });
+  $('#actUse').addEventListener('click', async ()=>{
+    if(!lastProduct) return alert('Scan a product first.');
+    const qty = Math.max(1, Number(qtyEl.value||1));
+    const newStock = Math.max(0, Number(lastProduct.stock||0) - qty);
+    await updateDoc(doc(db,'inventoryProducts',lastProduct.id), { stock:newStock, updatedAt: Date.now(), lastChecked: Date.now() });
+    await addDoc(collection(db,'stockAdjustments'), { productId:lastProduct.id, delta: -qty, note:'OrthoPod Scanner', at: serverTimestamp() });
+    alert('Used −'+qty+' (stock '+newStock+')');
+    lastProduct.stock = newStock;
+  });
+
+  // Controls
+  $('#start').addEventListener('click', start);
+  $('#stop').addEventListener('click', stop);
+  $('#torch').addEventListener('click', toggleTorch);
+  $('#camera').addEventListener('change', async ()=>{ if(stream){ await stop(); await start(); }});
+  document.addEventListener('touchstart', oneTapStart, {once:true});
+  document.addEventListener('click', oneTapStart, {once:true});
+  async function oneTapStart(){ if(!stream) await start(); }
+
+  // Diagnostics
+  $('#check').addEventListener('click', async ()=>{
+    diag.style.display='grid'; diagText.textContent='';
+    logDiag('Secure context: ' + (window.isSecureContext ? 'yes' : 'NO (use https or localhost)'));
+    logDiag('MediaDevices: ' + (navigator.mediaDevices ? 'present' : 'missing'));
+    await listCameras();
+    try{
+      const perm = await navigator.permissions?.query?.({name:'camera'});
+      if(perm) logDiag('Permission state: ' + perm.state);
+    }catch(e){ logDiag('Permissions API error: ' + (e.message||e)); }
+  });
+
+  // Init
+  if(navigator.mediaDevices?.enumerateDevices){ listCameras(); }
+</script>
 </body>
 </html>

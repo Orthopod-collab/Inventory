@@ -49,31 +49,30 @@
   .hint{color:var(--muted)}
   .actions{display:flex;gap:8px;flex-wrap:wrap}
 
-  /* Status chips (inventory health) */
+  
   .status-chip{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:900;border:1px solid var(--border);background:#eef2f7}
-  .status-ok{background:#e8f7ef;border-color:#caeede;color:#0f7a43}          /* Stock ok */
-  .status-over{background:#e7f1ff;border-color:#cfe3ff;color:#0b5ed7}       /* Overstocked */
-  .status-under{background:#fff3cd;border-color:#ffe8a1;color:#8a6d3b}      /* Understocked */
-  .status-reorder{background:#fde2e3;border-color:#f8c7ca;color:#b02a37}    /* Reorder Now */
+  .status-ok{background:#e8f7ef;border-color:#caeede;color:#0f7a43}          
+  .status-over{background:#e7f1ff;border-color:#cfe3ff;color:#0b5ed7}       
+  .status-under{background:#fff3cd;border-color:#ffe8a1;color:#8a6d3b}      
+  .status-reorder{background:#fde2e3;border-color:#f8c7ca;color:#b02a37}    
 
-  /* Usage pills (ordering strategy) */
+  
   .usage-pill{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:900;color:#fff}
   .usage-high{background:#198754}
   .usage-medium{background:#ffc107;color:#000}
   .usage-low{background:#dc3545}
 
-  /* Modals */
+  
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:20px}
   .modal.open{display:flex}
   .modal .panel{background:#fff;border-radius:14px;border:1px solid var(--border);max-width:620px;width:100%;padding:18px;display:grid;gap:14px}
 
-  /* QR cards */
+  
   .qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
   .qr-card{border:1px solid var(--border);border-radius:10px;padding:8px;display:grid;gap:6px;justify-items:center}
   .qr-small{width:128px;height:128px}
   .qr-title{font-size:.82rem;text-align:center}
 
-/* Hide per-row Actions column in Supplier table */
 #invTable th:last-child,
 #invTable td.actions { display: none !important; }
 </style>
@@ -146,19 +145,16 @@ textarea {
 }
 </style>
 
-
 <style>
-/* Hide per-row Actions column; we'll use a bottom toolbar instead */
+
 #invTable2 th:last-child,
 #invTable2 td.actions { display: none !important; }
 
-/* Clickable rows + selection highlight */
 #invTable2 tbody.subrows tr { cursor: pointer; }
 #invTable2 tbody.subrows tr.selected { background: rgba(0,0,0,0.04); }
 #invToolbar { display:flex; gap:8px; align-items:center; padding:8px 0; }
 #invToolbar .btn[disabled] { opacity:0.5; cursor:not-allowed; }
 
-/* Right-click context menu */
 #rowCtxMenu {
   position: fixed; z-index: 10000; display:none; min-width: 180px;
   background:#fff; border:1px solid #ddd; border-radius:12px; box-shadow:0 6px 24px rgba(0,0,0,0.12);
@@ -169,7 +165,6 @@ textarea {
 }
 #rowCtxMenu button:hover { background: rgba(0,0,0,0.06); }
 </style>
-
 
 <style>
 #cellCtxMenu {
@@ -184,7 +179,6 @@ textarea {
 }
 #cellCtxMenu button:hover { background: rgba(0,0,0,0.06); }
 
-/* Force QR modal above all sticky headers and UI elements */
 #qrModal{
   position: fixed !important;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -211,10 +205,10 @@ body.modal-open{ overflow:hidden; touch-action:none; }
 
   <main>
 
-    <!-- Register + Receive (split) -->
+    
     <section id="registerTab" class="stack">
       <div class="split2">
-        <!-- Left: Register -->
+        
         <div class="card stack">
           <h2>Register Product</h2>
           <div class="grid3">
@@ -276,7 +270,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
           <span class="hint">Usage pill: <span class="usage-pill usage-high">High</span>  <span class="usage-pill usage-medium">Medium</span>  <span class="usage-pill usage-low">Low</span> (affects order allowance). Status reflects stock vs levels.</span>
         </div>
 
-        <!-- Right: Recent Activities -->
+        
         <div class="card stack">
           <h2>Recent Activities</h2>
           <div class="table-wrap">
@@ -296,7 +290,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
         
       </div>
 
-      <!-- Supplier table -->
+      
       <div class="card stack">
         <div class="row" style="justify-content:space-between">
           <h2>Suppliers</h2>
@@ -333,7 +327,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
       </div>
     </section>
 
-    <!-- Inventory -->
+    
     <section id="inventoryTab" class="stack" style="display:none">
       <div class="card stack">
         <div class="row" style="justify-content:space-between">
@@ -373,13 +367,16 @@ body.modal-open{ overflow:hidden; touch-action:none; }
       </div>
     </section>
 
-    <!-- Orders -->
+    
     <section id="ordersTab" class="stack" style="display:none">
       <div class="card stack">
         <h2>Place / Log an Order</h2>
         <label>Scan here (barcode/QR keyboard-wedge) — press Enter
           <input id="orderScan" placeholder='Scan QR Code…' />
         </label>
+<div class="row" style="margin-top:8px">
+  <button class="btn ghost" id="ordOpenCam" type="button">Open Camera Scanner</button>
+</div>
 
         <div class="grid3">
           <label>Supplier
@@ -444,13 +441,16 @@ body.modal-open{ overflow:hidden; touch-action:none; }
       </div>
     </section>
 
-    <!-- Received -->
+    
     <section id="receivedTab" class="stack" style="display:none">
       <div class="card stack">
         <h2>Receive (Simple Scan)</h2>
         <label>Scan here (press Enter)
           <input id="rxScan" placeholder="Scan QR Code…" />
         </label>
+<div class="row" style="margin-top:8px">
+  <button class="btn ghost" id="rxOpenCam" type="button">Open Camera Scanner</button>
+</div>
         <div class="grid3">
           <label>Quantity Received
             <input id="rxQty" type="number" min="1" step="1" value="1" />
@@ -508,7 +508,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
       </div>
 </section>
 
-    <!-- QR & Labels -->
+    
     <section id="qrTab" class="stack" style="display:none">
       <div class="card stack">
         <div class="row" style="justify-content:space-between">
@@ -525,7 +525,6 @@ body.modal-open{ overflow:hidden; touch-action:none; }
   </main>
 </div>
 
-<!-- Modals: duplicate, adjust, QR -->
 <div class="modal" id="dupModal">
   <div class="panel">
     <h3>Possible duplicate</h3>
@@ -575,7 +574,6 @@ body.modal-open{ overflow:hidden; touch-action:none; }
   </div>
 </div>
 
-<!-- QR generator -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 
 <script type="module">
@@ -599,27 +597,27 @@ body.modal-open{ overflow:hidden; touch-action:none; }
   const $ = (q, r=document) => r.querySelector(q);
   const $$ = (q, r=document) => Array.from(r.querySelectorAll(q));
 
-  // Collections
+  
   const productsRef   = collection(db, 'inventoryProducts');
   const suppliersRef  = collection(db, 'suppliers');
   const deliveriesRef = collection(db, 'deliveries');
   const adjustmentsRef= collection(db, 'stockAdjustments');
   const ordersRef     = collection(db, 'orders');
 
-  // State
+  
   let products = [];
   let suppliers = [];
   let editId = null;
   let pendingDup = null;
   let adjustTarget = null;
-  let qr; // qrcode instance (modal)
-  let rxSelectedProduct = null; // product set by simple scan
+  let qr; 
+  let rxSelectedProduct = null; 
 
-  // Caches for Notes column
-  let lastOrderByProductId = new Map();     // productId -> order
-  let lastDeliveryByProductId = new Map();  // productId -> delivery
+  
+  let lastOrderByProductId = new Map();     
+  let lastDeliveryByProductId = new Map();  
 
-  // Tabs
+  
   $$('.side .tab').forEach(btn=>btn.onclick=()=>{
     $$('.side .tab').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
@@ -633,7 +631,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     renderTables();
   });
 
-  // Load suppliers list
+  
   async function loadSuppliers(){
     const snap = await getDocs(query(suppliersRef, orderBy('name')));
     suppliers = snap.docs.map(d=>({id:d.id, ...d.data()}));
@@ -641,15 +639,22 @@ body.modal-open{ overflow:hidden; touch-action:none; }
   }
   loadSuppliers();
 
-  // Real-time products
-  onSnapshot(productsRef, snap => {
-    products = snap.docs.map(d=>({id:d.id, ...d.data()}));
-    renderTables();
-    if($('.side .tab.active')?.dataset.tab==='qrTab') renderQrSearch();
-    if($('.side .tab.active')?.dataset.tab==='ordersTab') rebuildOrderProductList();
-  });
+  
+  
+let skuIndex = new Map();
+onSnapshot(productsRef, snap => {
+  products = snap.docs.map(d=>({id:d.id, ...d.data()}));
+  skuIndex.clear();
+  for (const p of products) {
+    const key = String(p.sku || '').trim().toLowerCase();
+    if (key) skuIndex.set(key, p);
+  }
+  renderTables();
+  if($('.side .tab.active')?.dataset.tab==='qrTab') renderQrSearch();
+  if($('.side .tab.active')?.dataset.tab==='ordersTab') rebuildOrderProductList();
+});
 
-  // Recent orders map + Orders table
+  
   onSnapshot(query(ordersRef, orderBy('orderedAt','desc')), snap=>{
     lastOrderByProductId.clear();
     snap.docs.forEach(d=>{
@@ -676,7 +681,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     $('#ordersTbody').innerHTML = rows;
   });
 
-  // Recent deliveries map + Received table (full list, date-filtered)
+  
   let deliveriesCache = [];
   onSnapshot(query(deliveriesRef, orderBy('createdAt','desc')), snap=>{
     deliveriesCache = snap.docs.map(d=>({id:d.id, ...d.data()}));
@@ -689,15 +694,36 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     renderTables();
   });
 
-  // Helpers
+  
   const n = v => Number(v||0);
   function escapeHtml(str=''){return String(str).replace(/[&<>"']/g, s=>({"&":"&amp;","<":"&lt;","|": "&#124;","—":"—",">":"&gt;","\"":"&quot;","'":"&#39;"}[s]||s))}
   function fmtTS(v){
     try { return v?.toDate ? v.toDate().toLocaleString() : (v ? new Date(v).toLocaleString() : '—'); }
-    catch { return '—'; }
+    
+function findProductByScanText(text){
+  let j=null;
+  try { j = JSON.parse(text); } catch {}
+  let pid = j?.id || null;
+  let sku = (j?.sku || '').trim().toLowerCase();
+  if (pid) {
+    const byId = products.find(p => p.id === pid);
+    if (byId) return byId;
+  }
+  if (sku) {
+    const bySku = skuIndex.get(sku);
+    if (bySku) return bySku;
+  }
+  const t = String(text || '').trim();
+  const byId2 = products.find(p => p.id === t);
+  if (byId2) return byId2;
+  const bySku2 = skuIndex.get(t.toLowerCase());
+  if (bySku2) return bySku2;
+  return null;
+}
+catch { return '—'; }
   }
 
-  // Status rules -> labels
+  
   function statusBadge(p){
     const max = n(p.maxLevel), min = n(p.minLevel), stock = n(p.stock), rop = n(p.reorderPoint);
     if (!max && !min) return `<span class="status-chip">—</span>`;
@@ -734,7 +760,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     return Object.keys(g).sort((a,b)=>a.localeCompare(b)).map(s=>({supplier:s,items:g[s].sort((a,b)=>a.productName.localeCompare(b.productName))}));
   }
 
-  // Render tables
+  
   function renderTables(){
     const q1 = $('#supplierFilter')?.value?.toLowerCase()?.trim()||'';
     const q2 = $('#invFilter')?.value?.toLowerCase()?.trim()||'';
@@ -788,7 +814,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
       table.appendChild(sub);
     });
 
-    // Expand/collapse
+    
     $$(tableSel+' .grp').forEach(r=>{
       r.onclick=()=>{
         r.classList.toggle('open');
@@ -798,14 +824,14 @@ body.modal-open{ overflow:hidden; touch-action:none; }
       };
     });
 
-    // Product name link -> QR modal
+    
     $$(tableSel+' a[data-qr]').forEach(a=>a.onclick=(e)=>{
       e.preventDefault();
       const p = products.find(x=>x.id===a.dataset.qr);
       if(p) openQrModal(p);
     });
 
-    // Actions
+    
     $$(tableSel+' button[data-del]').forEach(b=>b.onclick=async e=>{
       e.stopPropagation();
       if(!confirm('Delete this product?')) return;
@@ -843,11 +869,11 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     });
   }
 
-  // Filters
+  
   $('#supplierFilter')?.addEventListener('input', renderTables);
   $('#invFilter')?.addEventListener('input', renderTables);
 
-  // Duplicate check + Save
+  
   $('#saveProduct').onclick = async ()=>{
     const payload = collectForm();
     if(!payload) return;
@@ -883,23 +909,23 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     clearForm();
   }
 
-  // Return rich duplicate info
+  
   async function findPotentialDuplicate({supplier, sku, system, productName}){
-    // 1) Exact SKU duplicate? (same supplier + same sku)
+    
     let r1 = await getDocs(query(productsRef, where('supplier','==',supplier), where('sku','==',sku)));
     if(!r1.empty){
       return { type:'sku_match', doc:r1.docs[0], canCreateNew:false };
     }
-    // 2) Same supplier + same name/system (but different ref) => can create new
+    
     let r2 = await getDocs(query(productsRef, where('supplier','==',supplier), where('system','==',system), where('productName','==',productName)));
     if(!r2.empty){
       return { type:'name_match', doc:r2.docs[0], canCreateNew:true };
     }
-    // None
+    
     return { type:'none', doc:null, canCreateNew:true };
   }
 
-  // Duplicate modal buttons
+  
   $('#dupCreate').onclick = async ()=>{
     if(!pendingDup) return;
     if(!pendingDup.canCreateNew){
@@ -920,7 +946,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     $('#dupModal').classList.remove('open');
   };
 
-  // Collect form
+  
   function collectForm(){
     const supplier = $('#supplier').value.trim();
     const productName = $('#productName').value.trim();
@@ -946,7 +972,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     $('#usageLevel').value='';
   };
 
-  // Adjust modal
+  
   $('#adjCancel').onclick = ()=> $('#adjustModal').classList.remove('open');
   $('#adjSave').onclick = async ()=>{
     const q = Math.round(n($('#adjQty').value));
@@ -959,7 +985,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     $('#adjustModal').classList.remove('open');
   };
 
-  // ----- QR GENERATION (modal) -----
+  
   $('#closeQr').onclick = ()=> $('#qrModal').classList.remove('open');
   $('#previewQr').onclick = ()=>{
     const tmp = collectForm(); if(!tmp) return;
@@ -972,7 +998,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     document.body.classList.add('modal-open');
     const holder = $('#qrHolder'); holder.innerHTML='';
     if(!window.QRCode){ alert('QR lib not loaded yet.'); return; }
-    // eslint-disable-next-line no-undef
+    
     qr = new QRCode(holder, { text: makeQrPayload(p), width:256, height:256, correctLevel: QRCode.CorrectLevel.M });
     $('#qrMeta').textContent = `${p.productName} — ${p.supplier} (${p.sku})`;
     $('#qrModal').classList.add('open');
@@ -991,7 +1017,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     const a=document.createElement('a'); a.href=dataUrl; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
   }
 
-  // ----- QR & Labels tab (mini) -----
+  
   function renderQrSearch(){
     const q = $('#qrFilter').value?.toLowerCase()?.trim()||'';
     const list = !q ? [] :
@@ -1006,10 +1032,10 @@ body.modal-open{ overflow:hidden; touch-action:none; }
       </div>
     `).join('');
 
-    // render minis
+    
     list.forEach(p=>{
       const el = document.querySelector(`.qr-small[data-mini="${CSS.escape(p.id)}"]`);
-      // eslint-disable-next-line no-undef
+      
       const mini = new QRCode(el, {text: makeQrPayload(p), width:128, height:128, correctLevel: QRCode.CorrectLevel.M});
       const btn = document.querySelector(`[data-mini-dl="${CSS.escape(p.id)}"]`);
       btn.onclick = ()=>{
@@ -1033,10 +1059,10 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     }
   });
 
-  // ===== Receive (Simple Scan) logic =====
+  
   function setRxStatus(msg){ $('#rxStatus').textContent = msg; }
 
-  // Single scan input: Enter to decode & match product
+  
   $('#rxScan').addEventListener('keydown', (e)=>{
     if(e.key === 'Enter'){
       e.preventDefault();
@@ -1047,14 +1073,22 @@ body.modal-open{ overflow:hidden; touch-action:none; }
   });
 
   function handleReceiveScan(text){
-    // Accept JSON {id, sku, ...} or plain text (id or sku)
+  const p = findProductByScanText(text);
+  if (p){
+    rxSelectedProduct = p;
+    setRxStatus(`Linked: ${p.productName} — ${p.supplier} (${p.sku})`);
+  } else {
+    rxSelectedProduct = null;
+    setRxStatus('No matching product');
+  }
+} or plain text (id or sku)
     let j=null;
     try{ j = JSON.parse(text); }catch{}
     let pid = j?.id || null;
     let sku = j?.sku || null;
 
     if(!pid && !sku){
-      // treat as plain token; try id first, then sku
+      
       const byId = products.find(p=>p.id===text);
       if(byId){ pid = byId.id; sku = byId.sku; }
       else {
@@ -1075,7 +1109,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     }
   }
 
-  // Apply receipt to stock + log delivery
+  
   $('#rxApply').addEventListener('click', async ()=>{
     try{
       const qty = Math.max(1, n($('#rxQty').value));
@@ -1100,7 +1134,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     }
   });
 
-  // ===== Orders logic =====
+  
   function rebuildOrderProductList(){
     const sup = $('#ordSupplier').value?.toLowerCase()?.trim()||'';
     const sys = $('#ordSystem').value?.toLowerCase()?.trim()||'';
@@ -1125,7 +1159,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     $('#ordSku').value = p.sku||'';
   });
 
-  // Save Order
+  
   $('#ordSave')?.addEventListener('click', async ()=>{
     const id = $('#ordProduct').value;
     const p = products.find(x=>x.id===id);
@@ -1134,7 +1168,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     const ordBy = $('#ordBy').value.trim();
     const po = $('#ordPO').value.trim();
     const notes = $('#ordNotes').value.trim();
-    const atRaw = $('#ordAt').value; // yyyy-mm-ddThh:mm
+    const atRaw = $('#ordAt').value; 
     const orderedAt = atRaw ? new Date(atRaw).getTime() : Date.now();
 
     await addDoc(ordersRef, {
@@ -1150,7 +1184,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     $('#ordQty').value = 1; $('#ordPO').value=''; $('#ordNotes').value=''; $('#ordBy').value='';
   });
 
-  // Orders keyboard-wedge scan (simple)
+  
   const scanBox = $('#orderScan');
   if (scanBox) {
     scanBox.addEventListener('keydown', (e)=>{
@@ -1162,8 +1196,10 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     });
   }
   function handleOrderScan(text){
-    let j=null;
-    try{ j = JSON.parse(text); }catch{}
+  const p = findProductByScanText(text);
+  if (p) return fillOrderFromProduct(p);
+  alert('No matching product for this scan.');
+}catch{}
     let id = j?.id || null;
     let sku = j?.sku || null;
 
@@ -1182,7 +1218,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     $('#ordQty').focus();
   }
 
-  // ===== Received table render with date filters =====
+  
   function paintReceivedTable(){
     const fromRaw = $('#recFrom').value;
     const toRaw = $('#recTo').value;
@@ -1262,16 +1298,16 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     }
   }
 
-  // Toolbar buttons
+  
   document.getElementById('actEdit')?.addEventListener('click', ()=>triggerAction('edit'));
   document.getElementById('actAdjust')?.addEventListener('click', ()=>triggerAction('adjust'));
   document.getElementById('actQr')?.addEventListener('click', ()=>triggerAction('qr'));
   document.getElementById('actDelete')?.addEventListener('click', ()=>triggerAction('delete'));
 
-  // Click selection (event delegation)
+  
   document.getElementById('invTable2')?.addEventListener('click', handleRowClick);
 
-  // Context menu
+  
   const menu = document.getElementById('rowCtxMenu');
   document.getElementById('invTable2')?.addEventListener('contextmenu', function(e){
     const row = e.target.closest('tbody.subrows tr');
@@ -1311,15 +1347,15 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     menu.style.display='none';
   });
 
-  // After initial render, selection is off
+  
   setToolbarEnabled(false);
 
-  // Optional: if tables re-render, keep delegation; selection will clear on filter
+  
   document.getElementById('invFilter')?.addEventListener('input', ()=>{
     if(selectedRow){ selectedRow.classList.remove('selected'); selectedRow=null; setToolbarEnabled(false); }
   });
 
-  // Keyboard shortcut: Ctrl + Delete to delete selected row and Firebase doc
+  
   document.addEventListener('keydown', function(e){
     if(e.ctrlKey && (e.key === 'Delete')){
       if(selectedRow){
@@ -1330,10 +1366,9 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
 })();
 </script>
 
-
 <script>
 (function(){
-  // Helpers: map columns to doc fields
+  
   const EDIT_MAP = {
     'Supplier': {key:'supplier', type:'text'},
     'Product': {key:'productName', type:'text'},
@@ -1341,14 +1376,14 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     'Type': {key:'type', type:'text'},
     'Usage': {key:'usageLevel', type:'select', options:['High','Medium','Low','']},
     'Notes': {key:'notes', type:'text'},
-    // Special compound field for Consignment Level (min/max)
+    
     'Consignment Level': {type:'consignment'},
-    // Stock handled by Stock Adjust modal you already have
+    
     'Stock Qty': {type:'stockAdjust'}
-    // 'Status' and 'Last Checked' are derived; not editable
+    
   };
 
-  // Build a quick header index for #invTable2
+  
   function headerIndex(){
     const ths = Array.from(document.querySelectorAll('#invTable2 thead th'));
     return ths.map(th => th.textContent.trim());
@@ -1357,20 +1392,20 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
   let cellMenu = document.getElementById('cellCtxMenu');
   let rowMenu = document.getElementById('rowCtxMenu');
 
-  // Return the product id from a row by peeking at the hidden actions cell buttons
+  
   function getRowProductId(row){
     const b = row.querySelector('button[data-edit]');
     return b ? b.dataset.edit : null;
   }
 
-  // Mount listeners: right click on any cell (but ignore header/group rows)
+  
   const table = document.getElementById('invTable2');
   if(!table) return;
 
   function openCellMenu(e, row, colName, cell){
     const conf = EDIT_MAP[colName];
-    if(!conf) return; // non-editable column
-    // Build menu html
+    if(!conf) return; 
+    
     let title = `<div class="ctx-title">Edit <em>${colName}</em></div><hr/>`;
     let btns = '';
     if(conf.type === 'stockAdjust'){
@@ -1386,17 +1421,17 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     cellMenu.style.display = 'block';
     cellMenu.style.left = e.pageX + 'px';
     cellMenu.style.top = e.pageY + 'px';
-    // Save context
+    
     cellMenu.dataset.rowId = getRowProductId(row) || '';
     cellMenu.dataset.col = colName;
     cellMenu.dataset.cellIndex = [...cell.parentNode.children].indexOf(cell);
   }
 
-  // Delegate right-click on cells
+  
   table.addEventListener('contextmenu', function(e){
     const cell = e.target.closest('td');
     const row = e.target.closest('tbody.subrows tr');
-    if(!cell || !row) return; // ignore headers or group rows
+    if(!cell || !row) return; 
     e.preventDefault();
     const colIdx = [...cell.parentNode.children].indexOf(cell);
     const headers = headerIndex();
@@ -1404,7 +1439,7 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     openCellMenu(e, row, colName, cell);
   });
 
-  // Dismiss menus
+  
   document.addEventListener('click', function(e){
     if(rowMenu) rowMenu.style.display = 'none';
     if(cellMenu && !cellMenu.contains(e.target)) cellMenu.style.display = 'none';
@@ -1416,24 +1451,24 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     }
   });
 
-  // Core edit action
+  
   async function performCellEdit(rowId, colName){
     const conf = EDIT_MAP[colName];
     if(!conf) return;
 
-    // Use hidden action buttons where appropriate
+    
     const row = [...document.querySelectorAll('#invTable2 tbody.subrows tr, #invTable tbody.subrows tr')]
       .find(tr => (tr.querySelector('button[data-edit]')||{}).dataset?.edit === rowId);
     if(!row) return;
 
     if(conf.type === 'stockAdjust'){
-      // Trigger the existing modal via its button
+      
       row.querySelector('button[data-adjust]')?.click();
       return;
     }
 
     if(conf.type === 'consignment'){
-      // Prompt two values
+      
       const min = prompt('Set MIN level (integer):');
       if(min===null) return;
       const max = prompt('Set MAX level (integer):');
@@ -1468,7 +1503,7 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
       return;
     }
 
-    // default text edit
+    
     const curr = row.querySelector('td:nth-child(' + (headerIndex().indexOf(colName)+1) + ')')?.textContent?.trim() || '';
     const next = prompt('Edit ' + colName + ':', curr);
     if(next===null) return;
@@ -1479,7 +1514,7 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     }
   }
 
-  // Cell menu click handler
+  
   cellMenu?.addEventListener('click', function(e){
   const btn = e.target.closest('button[data-cact]');
   if(!btn) return;
@@ -1487,7 +1522,7 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
   const colName = cellMenu.dataset.col;
   cellMenu.style.display = 'none';
   if (btn.dataset.cact === 'delete') {
-    // Find the row and click its existing Delete button (which already has confirmation + Firestore logic)
+    
     const row = [...document.querySelectorAll('#invTable2 tbody.subrows tr, #invTable tbody.subrows tr')]
       .find(tr => (tr.querySelector('button[data-edit]')||{}).dataset?.edit === rowId);
     row?.querySelector('button[data-del]')?.click();
@@ -1498,10 +1533,9 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
 })();
 </script>
 
-
 <script>
 (function(){
-  // Attach cell-level context menu for #invTable mirroring #invTable2
+  
   const table = document.getElementById('invTable');
   const cellMenu = document.getElementById('cellCtxMenu');
   const EDIT_MAP = window.EDIT_MAP || {
@@ -1535,7 +1569,7 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
       const colName = headers[colIdx];
       const conf = EDIT_MAP[colName];
       if(!conf) return;
-      // Build and show menu
+      
       let title = `<div class="ctx-title">Edit <em>${colName}</em></div><hr/>`;
       let btns = '';
       if(conf.type === 'stockAdjust') btns += `<button data-cact="stockAdjust">Adjust Stock…</button>`;
@@ -1552,19 +1586,18 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     }, {passive:false});
   }
 
-  // Reuse existing click handler on #cellCtxMenu which calls performCellEdit and triggers row delete button
-  // Also ensure performCellEdit can find rows in both tables
+  
+  
   if (!window.__multiTablePatched) {
     window.__multiTablePatched = true;
     const oldPerform = window.performCellEdit;
-    // If performCellEdit is scoped, we cannot override; instead append a helper.
+    
     try{
-      // no-op, rely on existing handler that queries '#invTable2 tbody...' only; we will add a broader query below by injecting helper
+      
     }catch(e){}
   }
 })();
 </script>
-
 
 <script>
 (function(){
@@ -1606,7 +1639,6 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
 })();
 </script>
 
-
 <script id="scanner-hash-listener">
 (function(){
   if (window.__scannerHashListenerInstalled) return;
@@ -1640,7 +1672,7 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
       window.handleOrderScan(scan);
       return;
     }
-    // Fallback: open QR modal if it's a product payload
+    
     try{
       const j = JSON.parse(scan);
       const id = j.id || null, sku = j.sku || null;
@@ -1655,12 +1687,135 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     const m = parseHash();
     if(!m.tab && !m.scan) return;
     const ok = selectTab(m.tab);
-    // If tab selection rerenders async, delay scan handling slightly
+    
     setTimeout(()=>handleScan(m.tab, m.scan), ok ? 60 : 0);
   }
   window.addEventListener('hashchange', applyFromHash);
-  // Run once on load
+  
   applyFromHash();
+})();
+</script>
+
+<div class="modal" id="camModal" aria-hidden="true">
+  <div class="panel" style="max-width:720px">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <h2>Camera Scanner</h2>
+      <div class="row" style="gap:8px">
+        <select id="camDevice" class="form-select" style="min-width:220px"></select>
+        <button class="btn ghost" id="camTorch" type="button" disabled>Toggle Torch</button>
+        <button class="btn secondary" id="camClose" type="button">Close</button>
+      </div>
+    </div>
+    <div style="position:relative; background:#000; border-radius:12px; overflow:hidden">
+      <video id="camVideo" playsinline autoplay muted style="width:100%;height:auto;display:block"></video>
+      <canvas id="camCanvas" style="display:none"></canvas>
+      <div style="position:absolute;inset:0;pointer-events:none;border:2px solid rgba(255,255,255,0.25);margin:10%"></div>
+    </div>
+    <div class="hint" id="camHint">Point at a QR or barcode. It auto-captures.</div>
+  </div>
+</div>
+
+<script type="module">
+  let camStream=null, scanning=false, useZXing=false, codeReader=null, currentTrack=null, torchOn=false;
+  let onScan=(t)=>{};
+  const el = (id)=>document.getElementById(id);
+  const has = (id)=>document.getElementById(id) != null;
+
+  if (has('rxOpenCam')) el('rxOpenCam').addEventListener('click', ()=>{ onScan=(t)=>{ try{handleReceiveScan(t)}catch(e){console.error(e)} }; openCamModal(); });
+  if (has('ordOpenCam')) el('ordOpenCam').addEventListener('click', ()=>{ onScan=(t)=>{ try{handleOrderScan(t)}catch(e){console.error(e)} }; openCamModal(); });
+  if (has('camClose')) el('camClose').addEventListener('click', closeCamModal);
+  if (has('camTorch')) el('camTorch').addEventListener('click', toggleTorch);
+
+  async function openCamModal(){ document.body.classList.add('modal-open'); el('camModal').classList.add('open'); await startCamera(); }
+  function closeCamModal(){ stopCamera(); el('camModal').classList.remove('open'); document.body.classList.remove('modal-open'); }
+
+  async function listVideoDevices(){ const ds=await navigator.mediaDevices.enumerateDevices(); return ds.filter(d=>d.kind==='videoinput'); }
+  async function startCamera(deviceId){
+    try{
+      const constraints = deviceId ? { video:{deviceId:{exact:deviceId}} } : { video:{ facingMode:{ideal:'environment'} } };
+      camStream = await navigator.mediaDevices.getUserMedia(constraints);
+      const v = el('camVideo'); v.srcObject = camStream; await v.play();
+      currentTrack = camStream.getVideoTracks()[0];
+      const caps = currentTrack.getCapabilities?.() || {}; el('camTorch').disabled = !caps.torch;
+
+      const select = el('camDevice');
+      if(select && !select.dataset.loaded){
+        const inputs = await listVideoDevices();
+        select.innerHTML = inputs.map(d=>`<option value="${d.deviceId}">${d.label||'Camera'}</option>`).join('');
+        select.dataset.loaded='1';
+        select.onchange = async ()=>{ stopCamera(); await startCamera(select.value); };
+      }
+
+      useZXing = !(window.BarcodeDetector && await isDetectorSupported());
+      if(useZXing){ await loadZXing(); startZXingLoop(); } else { startNativeLoop(); }
+    }catch(err){ console.error(err); if (el('camHint')) el('camHint').textContent='Camera unavailable. Use HTTPS or grant permission.'; }
+  }
+  function stopCamera(){ scanning=false; if(codeReader){ try{codeReader.reset()}catch{} codeReader=null; } if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; } currentTrack=null; torchOn=false; if (el('camTorch')) el('camTorch').disabled=true; }
+  async function toggleTorch(){ if(!currentTrack) return; try{ torchOn=!torchOn; await currentTrack.applyConstraints({advanced:[{torch:torchOn}]}); }catch{} }
+  async function isDetectorSupported(){ try{ const f=await BarcodeDetector.getSupportedFormats(); return f.length>0; }catch{ return false; } }
+
+  function startNativeLoop(){
+    const v=el('camVideo'), c=el('camCanvas'), ctx=c.getContext('2d');
+    const det = new BarcodeDetector({ formats:['qr_code','ean_13','code_128','code_39','upc_a','upc_e','ean_8'] });
+    scanning=true;
+    const tick = async ()=>{
+      if(!scanning) return;
+      if(v && v.readyState===4){
+        c.width=v.videoWidth; c.height=v.videoHeight; ctx.drawImage(v,0,0,c.width,c.height);
+        try{
+          const hits = await det.detect(c);
+          if(hits?.length){
+            const text = (hits[0].rawValue||'').trim();
+            if(text){ scanning=false; onScan(text); closeCamModal(); return; }
+          }
+        }catch{}
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+  async function loadZXing(){ if(window.ZXing) return; await import('https://unpkg.com/@zxing/library@0.20.2/esm/index.min.js'); }
+  function startZXingLoop(){
+    const v=el('camVideo'); codeReader = new ZXing.BrowserMultiFormatReader(); scanning=true;
+    codeReader.decodeFromVideoDevice(null, v, (result, err)=>{
+      if(!scanning) return;
+      if(result?.getText){ scanning=false; onScan(result.getText().trim()); closeCamModal(); }
+    });
+  }
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && el('camModal')?.classList.contains('open')) closeCamModal(); });
+</script>
+
+
+<script>
+(function(){
+  function bindTabs(){
+    var tabs = document.querySelectorAll('.side .tab');
+    if(!tabs || !tabs.length) return;
+    tabs.forEach(function(btn){
+      btn.onclick = function(){
+        document.querySelectorAll('.side .tab').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById('registerTab').style.display = (btn.dataset.tab==='registerTab') ? 'grid' : 'none';
+        document.getElementById('inventoryTab').style.display = (btn.dataset.tab==='inventoryTab') ? 'grid' : 'none';
+        document.getElementById('ordersTab').style.display = (btn.dataset.tab==='ordersTab') ? 'grid' : 'none';
+        document.getElementById('receivedTab').style.display = (btn.dataset.tab==='receivedTab') ? 'grid' : 'none';
+        document.getElementById('qrTab').style.display = (btn.dataset.tab==='qrTab') ? 'grid' : 'none';
+      };
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindTabs);
+  } else {
+    bindTabs();
+  }
+  var rx = document.getElementById('rxOpenCam');
+  var ord = document.getElementById('ordOpenCam');
+  [rx, ord].forEach(function(b){
+    if(!b) return;
+    b.addEventListener('click', function(){
+      try { window.scrollTo({top:0, behavior:'smooth'}); } catch(e){}
+    });
+  });
 })();
 </script>
 

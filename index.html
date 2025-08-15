@@ -2,74 +2,406 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Inventory Registration</title>
-  <style>
-    body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; }
-    input, textarea, button { width: 100%; padding: 10px; margin-top: 10px; }
-    #qrCanvas, img { display: block; margin: 1rem auto; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Procedure Card Collection Form with AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h2>Register New Product</h2>
-  <form id="productForm">
-    <input type="text" id="productName" placeholder="Product Name" required />
-    <input type="text" id="productRef" placeholder="Product Reference" required />
-    <input type="text" id="supplier" placeholder="Supplier" />
-    <input type="text" id="category" placeholder="Category" />
-    <input type="number" id="quantity" placeholder="Quantity" />
-    <textarea id="description" placeholder="Description"></textarea>
-    <input type="file" id="productImage" accept="image/*" />
-    <button type="submit">Register Product</button>
+<body class="bg-gray-50 p-8">
+  <form id="procedureForm" class="bg-white rounded shadow p-6 max-w-6xl mx-auto space-y-6">
+    <h1 class="text-2xl font-bold text-purple-700">Procedure Card Collection Form with AI</h1>
+
+    <!-- Procedure Name -->
+    <div>
+      <label class="block font-bold mb-1">Procedure Name</label>
+      <input type="text" name="procedureName" id="procedureName" placeholder="Enter procedure name..." class="w-full border rounded px-3 py-2" required />
+    </div>
+
+    <!-- Grid for Searchable Dropdowns -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Anatomy -->
+      <div class="relative">
+        <label class="block font-bold mb-1">Anatomy</label>
+        <input type="text" id="anatomyInput" class="w-full border rounded px-3 py-2" placeholder="Type to search anatomy..." autocomplete="off" />
+        <ul id="anatomyList" class="absolute z-10 bg-white border w-full rounded mt-1 hidden max-h-40 overflow-y-auto"></ul>
+      </div>
+
+      <!-- Supplier -->
+      <div class="relative">
+        <label class="block font-bold mb-1">Supplier</label>
+        <input type="text" id="supplierInput" class="w-full border rounded px-3 py-2" placeholder="Type to search supplier..." autocomplete="off" />
+        <ul id="supplierList" class="absolute z-10 bg-white border w-full rounded mt-1 hidden max-h-40 overflow-y-auto"></ul>
+      </div>
+
+      <!-- Surgeon Preference -->
+      <div class="relative">
+        <label class="block font-bold mb-1">Preference (Surgeon)</label>
+        <input type="text" id="preferenceInput" class="w-full border rounded px-3 py-2" placeholder="Type to search surgeon..." autocomplete="off" />
+        <ul id="preferenceList" class="absolute z-10 bg-white border w-full rounded mt-1 hidden max-h-40 overflow-y-auto"></ul>
+      </div>
+    </div>
+
+    <!-- Description Section -->
+    <div>
+      <details open class="mt-6">
+        <summary class="text-lg font-bold text-purple-700 cursor-pointer">Description</summary>
+        <div class="mt-4 space-y-6">
+          <details open>
+            <summary class="text-md font-semibold text-gray-800 cursor-pointer">Overview</summary>
+            <div class="pl-4 mt-2 space-y-4">
+              <div>
+                <label class="block font-bold mb-1">Procedure Summary</label>
+                <textarea name="description.overview" id="overview" rows="3" class="w-full border rounded px-3 py-2" placeholder="General procedure summary..."></textarea>
+              </div>
+              <div>
+                <label class="block font-bold mb-1">Indications</label>
+                <textarea name="description.indications" id="indications" rows="3" class="w-full border rounded px-3 py-2" placeholder="Why the procedure is done..."></textarea>
+              </div>
+              <div>
+                <label class="block font-bold mb-1">Desired Outcome</label>
+                <textarea name="description.outcome" id="outcome" rows="3" class="w-full border rounded px-3 py-2" placeholder="What is expected after procedure..."></textarea>
+              </div>
+              <div>
+                <label class="block font-bold mb-1">Important Considerations</label>
+                <textarea name="description.considerations" id="considerations" rows="3" class="w-full border rounded px-3 py-2" placeholder="Warnings, challenges, or key tips..."></textarea>
+              </div>
+            </div>
+          </details>
+
+          <details open>
+            <summary class="text-md font-semibold text-gray-800 cursor-pointer">Steps Outline</summary>
+            <div class="pl-4 mt-2 space-y-4">
+              <div>
+                <textarea name="description.steps" id="stepsOutline" rows="4" class="w-full border rounded px-3 py-2" placeholder="Step-by-step surgical steps..."></textarea>
+              </div>
+            </div>
+          </details>
+        </div>
+      </details>
+    </div>
+
+    
+<!-- Prep & Drape Section -->
+<div class="mt-10">
+  <details open>
+    <summary class="text-lg font-bold text-purple-700 cursor-pointer">Prep & Drape</summary>
+    <div class="mt-4 space-y-4">
+
+      <div>
+        <label class="block font-semibold mb-2">Sterile Drape Pack</label>
+        <table class="w-full table-auto border border-gray-300">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-2 py-1 text-left">Item Description</th>
+              <th class="border px-2 py-1 text-left">Product Reference</th>
+              <th class="border px-2 py-1 text-left">Location</th>
+              <th class="border px-2 py-1 text-left">Supplier</th>
+              <th class="border px-2 py-1 text-left">Image Upload</th>
+              <th class="border px-2 py-1 text-left">Preview</th>
+              <th class="border px-2 py-1 text-left">Remove</th>
+            </tr>
+          </thead>
+          <tbody id="sterileDrapePackTable" class="bg-white">
+          </tbody>
+        </table>
+        
+    <div class="flex items-center gap-4 mt-2">
+      <button type="button" onclick="addRow('sterileDrapePackTable')" class="text-blue-600">+ Add Entry</button>
+      <button type="button" onclick="removeLastRow('sterileDrapePackTable')" class="text-red-600">Remove Last Entry</button>
+    </div>
+    
+      </div>
+
+    </div>
+  </details>
+</div>
+
+<!-- Submit Button -->
+    <div class="pt-4">
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Submit Procedure Card</button>
+    </div>
   </form>
-  <canvas id="qrCanvas"></canvas>
-  <div id="imagePreview"></div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
-    const firebaseConfig = {
-      apiKey: "AIzaSyCOwLEv21k5i63laJF86qGOBMoucJMp4Gw",
-      authDomain: "skills-vault.firebaseapp.com",
-      databaseURL: "https://skills-vault-default-rtdb.firebaseio.com",
-      projectId: "skills-vault",
-      storageBucket: "skills-vault.appspot.com",
-      messagingSenderId: "16675638838",
-      appId: "1:16675638838:web:056d0131cfb48fcd581297",
-      measurementId: "G-0JS13FPGDV"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-    const analytics = getAnalytics(app);
-    document.getElementById("productForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const name = productName.value.trim();
-      const refId = productRef.value.trim();
-      const imageFile = productImage.files[0];
-      let imageUrl = "";
-      if (imageFile) {
-        const storageRef = ref(storage, `product-images/${refId}`);
-        await uploadBytes(storageRef, imageFile);
-        imageUrl = await getDownloadURL(storageRef);
-        document.getElementById("imagePreview").innerHTML = `<img src="${imageUrl}" width="200"/>`;
+
+  <!-- FIREBASE + SEARCHABLE DROPDOWNS -->
+  
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
+  import {
+    getFirestore, doc, getDoc, updateDoc, arrayUnion,
+    collection, addDoc, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBclxbJKfToHPiKjR361LmonbBNSx_wGZ0",
+    authDomain: "procedure-cards-246a4.firebaseapp.com",
+    projectId: "procedure-cards-246a4",
+    storageBucket: "procedure-cards-246a4.firebasestorage.app",
+    messagingSenderId: "98133126950",
+    appId: "1:98133126950:web:a77d390b85eaba55af9be7",
+    measurementId: "G-6FNS3R6XDV"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const dropdownRef = doc(db, "settings", "dropdownOptions");
+
+  async function setupSearch(inputId, listId, key) {
+    let items = [];
+
+    try {
+      const docSnap = await getDoc(dropdownRef);
+      if (docSnap.exists()) {
+        items = docSnap.data()[key] || [];
       }
-      const data = {
-        name, ref: refId,
-        supplier: supplier.value.trim(),
-        category: category.value.trim(),
-        quantity: +quantity.value,
-        description: description.value.trim(),
-        imageUrl,
-        createdAt: new Date().toISOString()
-      };
-      await setDoc(doc(db, "inventory", refId), data);
-      new QRious({ element: qrCanvas, value: refId, size: 200 });
-      alert("✅ Product Registered!");
-      productForm.reset();
+    } catch (err) {
+      console.error("Firestore error:", err);
+    }
+
+    const input = document.getElementById(inputId);
+    const list = document.getElementById(listId);
+
+    const showMatches = (value) => {
+      const query = value.toLowerCase();
+      list.innerHTML = "";
+      const matches = items.filter(item => item.toLowerCase().includes(query));
+
+      if (matches.length === 0 && value.trim()) {
+        const li = document.createElement("li");
+        li.textContent = `Add "${value}"`;
+        li.className = "px-3 py-1 text-blue-600 hover:bg-blue-50 cursor-pointer font-semibold";
+        li.onclick = async () => {
+          try {
+            await updateDoc(dropdownRef, { [key]: arrayUnion(value) });
+            items.push(value);
+            input.value = value;
+            list.classList.add("hidden");
+          } catch (e) {
+            console.error(`❌ Failed to add ${value}:`, e);
+          }
+        };
+        list.appendChild(li);
+      } else {
+        matches.forEach(match => {
+          const li = document.createElement("li");
+          li.textContent = match;
+          li.className = "px-3 py-1 hover:bg-purple-100 cursor-pointer";
+          li.onclick = () => {
+            input.value = match;
+            list.classList.add("hidden");
+          };
+          list.appendChild(li);
+        });
+      }
+
+      list.classList.toggle("hidden", list.children.length === 0);
+    };
+
+    input.addEventListener("input", () => showMatches(input.value));
+    input.addEventListener("focus", () => showMatches(input.value));
+    input.addEventListener("blur", () => setTimeout(() => list.classList.add("hidden"), 200));
+
+    input.addEventListener("keydown", async (e) => {
+      if (e.key === "Enter" && !items.includes(input.value.trim())) {
+        e.preventDefault();
+        const newValue = input.value.trim();
+        if (newValue) {
+          try {
+            await updateDoc(dropdownRef, { [key]: arrayUnion(newValue) });
+            items.push(newValue);
+            list.classList.add("hidden");
+          } catch (err) {
+            console.error(`❌ Could not add ${newValue}:`, err);
+          }
+        }
+      }
     });
-  </script>
+  }
+
+  setupSearch("anatomyInput", "anatomyList", "anatomy");
+  setupSearch("supplierInput", "supplierList", "supplier");
+  setupSearch("preferenceInput", "preferenceList", "preference");
+
+  document.getElementById("procedureForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const procedureName = document.getElementById("procedureName").value.trim();
+    const anatomy = document.getElementById("anatomyInput").value.trim();
+    const supplier = document.getElementById("supplierInput").value.trim();
+    const preference = document.getElementById("preferenceInput").value.trim();
+    const overview = document.getElementById("overview").value.trim();
+    const indications = document.getElementById("indications").value.trim();
+    const outcome = document.getElementById("outcome").value.trim();
+    const considerations = document.getElementById("considerations").value.trim();
+    const steps = document.getElementById("stepsOutline").value.trim();
+
+    const data = {
+      procedureName,
+      tags: { anatomy, supplier, preference },
+      description: {
+        overview,
+        indications,
+        outcome,
+        considerations,
+        steps
+      },
+      timestamp: serverTimestamp()
+    };
+
+    try {
+      const snap = await getDoc(dropdownRef);
+      const existing = snap.exists() ? snap.data() : {};
+      const ensure = async (key, value) => {
+        if (value && !(existing[key] || []).includes(value)) {
+          await updateDoc(dropdownRef, { [key]: arrayUnion(value) });
+        }
+      };
+      await Promise.all([
+        ensure("anatomy", anatomy),
+        ensure("supplier", supplier),
+        ensure("preference", preference)
+      ]);
+    } catch (err) {
+      console.warn("⚠️ Could not update dropdowns:", err);
+    }
+
+    try {
+      await addDoc(collection(db, "procedureCards"), data);
+      alert("✅ Procedure saved successfully!");
+      e.target.reset();
+    } catch (err) {
+      console.error("❌ Submission failed:", err);
+      alert("Submission failed. See console for details.");
+    }
+  });
+</script>
+
+
+<script>
+function addRow(tableId) {
+  const table = document.getElementById(tableId);
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td class="border px-2 py-1"><input type="text" class="w-full border px-1 py-1" placeholder="Item..." /></td>
+    <td class="border px-2 py-1"><input type="text" class="w-full border px-1 py-1" placeholder="Ref..." /></td>
+    <td class="border px-2 py-1"><input type="text" class="w-full border px-1 py-1" placeholder="Location..." /></td>
+    <td class="border px-2 py-1"><input type="text" class="w-full border px-1 py-1" placeholder="Supplier..." /></td>
+    <td class="border px-2 py-1">
+      <input type="file" accept="image/*" onchange="previewImage(event, this)" />
+    </td>
+    <td class="border px-2 py-1">
+      <img src="" class="max-h-16" />
+    </td>
+    <td class="border px-2 py-1">
+      <button type="button" onclick="this.closest('tr').remove()" class="text-red-500">Remove</button>
+    </td>
+  `;
+  table.appendChild(row);
+}
+
+function previewImage(event, input) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = input.parentElement.nextElementSibling.querySelector("img");
+    img.src = reader.result;
+  };
+  if (input.files[0]) {
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+</script>
+
+
+<script>
+
+const supplierList = [];
+
+async function loadSupplierOptions() {
+  const docRef = doc(db, "settings", "dropdownOptions");
+  const snap = await getDoc(docRef);
+  if (snap.exists()) {
+    const data = snap.data();
+    supplierList.length = 0;
+    (data.supplier || []).forEach(s => supplierList.push(s));
+  }
+}
+
+function attachSupplierSearch(input) {
+  const datalist = document.createElement("ul");
+  datalist.className = "absolute z-10 bg-white border rounded shadow w-full max-h-40 overflow-y-auto hidden";
+  input.parentElement.appendChild(datalist);
+
+  input.addEventListener("input", () => {
+    const query = input.value.toLowerCase();
+    datalist.innerHTML = "";
+    const matches = supplierList.filter(s => s.toLowerCase().includes(query));
+    if (matches.length === 0 && query) {
+      const addOption = document.createElement("li");
+      addOption.textContent = `Add "${input.value}"`;
+      addOption.className = "px-3 py-1 text-blue-600 hover:bg-blue-50 cursor-pointer";
+      addOption.onclick = async () => {
+        const docRef = doc(db, "settings", "dropdownOptions");
+        await updateDoc(docRef, { supplier: arrayUnion(input.value) });
+        supplierList.push(input.value);
+        input.value = input.value;
+        datalist.classList.add("hidden");
+      };
+      datalist.appendChild(addOption);
+    } else {
+      matches.forEach(s => {
+        const item = document.createElement("li");
+        item.textContent = s;
+        item.className = "px-3 py-1 hover:bg-purple-100 cursor-pointer";
+        item.onclick = () => {
+          input.value = s;
+          datalist.classList.add("hidden");
+        };
+        datalist.appendChild(item);
+      });
+    }
+    datalist.classList.toggle("hidden", datalist.children.length === 0);
+  });
+
+  input.addEventListener("focus", () => input.dispatchEvent(new Event("input")));
+  input.addEventListener("blur", () => setTimeout(() => datalist.classList.add("hidden"), 200));
+}
+
+
+function addRow(tableId) {
+  const table = document.getElementById(tableId);
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td class="border px-2 py-1"><input type="text" class="w-full border px-1 py-1" placeholder="Item..." /></td>
+    <td class="border px-2 py-1"><input type="text" class="w-full border px-1 py-1" placeholder="Ref..." /></td>
+    <td class="border px-2 py-1"><input type="text" class="w-full border px-1 py-1" placeholder="Location..." /></td>
+    <td class="border px-2 py-1 relative"><input type="text" class="w-full border px-1 py-1 supplier-field" placeholder="Supplier..." /></td>
+    <td class="border px-2 py-1">
+      <input type="file" accept="image/*" onchange="previewImage(event, this)" />
+    </td>
+    <td class="border px-2 py-1">
+      <img src="" class="max-h-16" />
+    </td>
+  `;
+  table.appendChild(row);
+  attachSupplierSearch(row.querySelector('.supplier-field'));
+}
+
+function removeLastRow(tableId) {
+  const table = document.getElementById(tableId);
+  if (table.lastChild) table.removeChild(table.lastChild);
+}
+
+function previewImage(event, input) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = input.parentElement.nextElementSibling.querySelector("img");
+    img.src = reader.result;
+  };
+  if (input.files[0]) {
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+window.addEventListener("DOMContentLoaded", loadSupplierOptions);
+</script>
+
 </body>
 </html>

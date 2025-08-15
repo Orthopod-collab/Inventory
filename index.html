@@ -1,8 +1,9 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>Inventory Manager </title>
 <style>
   :root{
@@ -76,7 +77,6 @@
 #invTable th:last-child,
 #invTable td.actions { display: none !important; }
 </style>
-
 <style>
 :root {
   --field-border: #ccc;
@@ -144,7 +144,6 @@ textarea {
   resize: vertical !important;
 }
 </style>
-
 <style>
 
 #invTable2 th:last-child,
@@ -165,7 +164,6 @@ textarea {
 }
 #rowCtxMenu button:hover { background: rgba(0,0,0,0.06); }
 </style>
-
 <style>
 #cellCtxMenu {
   position: fixed; z-index: 10001; display:none; min-width: 220px;
@@ -190,392 +188,374 @@ textarea {
 }
 body.modal-open{ overflow:hidden; touch-action:none; }
 </style>
-
-</head>
+<style>
+.scanit-dock{
+  position: fixed; right: 16px; bottom: 16px; z-index: 2147483600;
+  background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:12px; width: min(420px, 96vw);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+.scanit-dock .title{ font-weight:800; margin-bottom:8px; }
+.scanit-dock .controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+.scanit-dock input[type="text"]{ width:100%; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; }
+.scanit-dock .hint{ font-size:12px; color:#6b7280; margin-top:6px; }
+@media (max-width: 640px){
+  .scanit-dock{ left: 16px; right: 16px; bottom: 12px; }
+}
+</style></head>
 <body>
 <header>RLH Trauma and Orthopaedic Theatres Inventory Manager</header>
 <div class="layout">
-  <aside class="side">
-    <button class="tab active" data-tab="registerTab">Register</button>
-    <button class="tab" data-tab="inventoryTab">Inventory</button>
-    <button class="tab" data-tab="ordersTab">Orders</button>
-    <button class="tab" data-tab="receivedTab">Received</button>
-    <button class="tab" data-tab="qrTab">QR & Labels</button>
-  </aside>
-
-  <main>
-
-    
-    <section id="registerTab" class="stack">
-      <div class="split2">
-        
-        <div class="card stack">
-          <h2>Register Product</h2>
-          <div class="grid3">
-            <label>Supplier
-              <input list="supplierList" id="supplier" placeholder="Type or pick supplier" />
-              <datalist id="supplierList"></datalist>
-            </label>
-            <label>Product Name
-              <input id="productName" type="text" placeholder="e.g. 3.5mm Cortical Screw" />
-            </label>
-            <label>Product Ref / SKU
-              <input id="sku" type="text" placeholder="e.g. 214.832" />
-            </label>
-          </div>
-          <div class="grid3">
-            <label>System (by supplier)
-              <input id="system" type="text" placeholder="e.g. Distal Elbow Set" />
-            </label>
-            <label>Type
-              <input id="type" type="text" placeholder="e.g. Implant, Consumable" />
-            </label>
-            <label>Location
-              <input id="location" type="text" placeholder="e.g. Cupboard A, Shelf 3" />
-            </label>
-          </div>
-          <div class="grid3">
-            <label>Current Stock
-              <input id="stock" type="number" min="0" step="1" placeholder="0" />
-            </label>
-            <label>Consignment Min Level
-              <input id="minLevel" type="number" min="0" step="1" placeholder="Minimum on hand" />
-            </label>
-            <label>Consignment Max Level
-              <input id="maxLevel" type="number" min="0" step="1" placeholder="Maximum on hand" />
-            </label>
-          </div>
-          <div class="grid3">
-            <label>Reorder Point (ROP)
-              <input id="reorderPoint" type="number" min="0" step="1" placeholder="Alert at or below this" />
-            </label>
-            <label>Usage Level (for ordering)
+<aside class="side">
+<button class="tab active" data-tab="registerTab">Register</button>
+<button class="tab" data-tab="inventoryTab">Inventory</button>
+<button class="tab" data-tab="ordersTab">Orders</button>
+<button class="tab" data-tab="receivedTab">Received</button>
+<button class="tab" data-tab="qrTab">QR &amp; Labels</button>
+</aside>
+<main>
+<section class="stack" id="registerTab">
+<div class="split2">
+<div class="card stack">
+<h2>Register Product</h2>
+<div class="grid3">
+<label>Supplier
+              <input id="supplier" list="supplierList" placeholder="Type or pick supplier"/>
+<datalist id="supplierList"></datalist>
+</label>
+<label>Product Name
+              <input id="productName" placeholder="e.g. 3.5mm Cortical Screw" type="text"/>
+</label>
+<label>Product Ref / SKU
+              <input id="sku" placeholder="e.g. 214.832" type="text"/>
+</label>
+</div>
+<div class="grid3">
+<label>System (by supplier)
+              <input id="system" placeholder="e.g. Distal Elbow Set" type="text"/>
+</label>
+<label>Type
+              <input id="type" placeholder="e.g. Implant, Consumable" type="text"/>
+</label>
+<label>Location
+              <input id="location" placeholder="e.g. Cupboard A, Shelf 3" type="text"/>
+</label>
+</div>
+<div class="grid3">
+<label>Current Stock
+              <input id="stock" min="0" placeholder="0" step="1" type="number"/>
+</label>
+<label>Consignment Min Level
+              <input id="minLevel" min="0" placeholder="Minimum on hand" step="1" type="number"/>
+</label>
+<label>Consignment Max Level
+              <input id="maxLevel" min="0" placeholder="Maximum on hand" step="1" type="number"/>
+</label>
+</div>
+<div class="grid3">
+<label>Reorder Point (ROP)
+              <input id="reorderPoint" min="0" placeholder="Alert at or below this" step="1" type="number"/>
+</label>
+<label>Usage Level (for ordering)
               <select id="usageLevel">
-                <option value="">Select usage level</option>
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-              </select>
-            </label>
-            <label>Notes
-              <input id="notes" type="text" placeholder="Optional notes (size, lot, etc.)" />
-            </label>
-          </div>
-          <div class="row">
-            <button class="btn" id="saveProduct">Save product</button>
-            <button class="btn secondary" id="clearForm" type="button">Clear</button>
-            <button class="btn ghost" id="previewQr" type="button">Preview QR</button>
-            <span class="pill" id="editHint"></span>
-          </div>
-          <span class="hint">Usage pill: <span class="usage-pill usage-high">High</span>  <span class="usage-pill usage-medium">Medium</span>  <span class="usage-pill usage-low">Low</span> (affects order allowance). Status reflects stock vs levels.</span>
-        </div>
-
-        
-        <div class="card stack">
-          <h2>Recent Activities</h2>
-          <div class="table-wrap">
-            <table id="activityTable">
-              <thead>
-                <tr>
-                  <th>When</th>
-                  <th>Type</</th>
-                  <th>Details</th>
-                  <th>Reference</th>
-                </tr>
-              </thead>
-              <tbody id="activityTbody"></tbody>
-            </table>
-          </div>
-        </div>
-        
-      </div>
-
-      
-      <div class="card stack">
-        <div class="row" style="justify-content:space-between">
-          <h2>Suppliers</h2>
-          <div class="row">
-            <input type="search" id="supplierFilter" placeholder="Filter suppliers or products" />
-            <span class="pill" id="prodCount">0</span>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table id="invTable">
-            <colgroup>
-              <col style="width:160px"/><col style="width:220px"/><col style="width:130px"/><col style="width:120px"/>
-              <col style="width:160px"/><col style="width:110px"/><col style="width:120px"/><col style="width:140px"/>
-              <col style="width:160px"/><col style="width:220px"/><col style="width:240px"/>
-            </colgroup>
-            <thead>
-              <tr>
-                <th>Supplier</th>
-                <th>Product</th>
-                <th>Reference</th>
-                <th>Type</th>
-                <th>Consignment Level</th>
-                <th>Stock Qty</th>
-                <th>Usage</th>
-                <th>Status</th>
-                <th>Last Checked</th>
-                <th>Notes</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-          </table>
-        </div>
-        <span class="pill">Click a supplier to expand/collapse.</span>
-      </div>
-    </section>
-
-    
-    <section id="inventoryTab" class="stack" style="display:none">
-      <div class="card stack">
-        <div class="row" style="justify-content:space-between">
-          <h2>Inventory</h2>
-          <div class="row">
-            <input type="search" id="invFilter" placeholder="Search by supplier, product, ref, system, type" />
-            <span class="pill" id="invCount">0</span>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table id="invTable2">
-            <colgroup>
-              <col style="width:160px"/><col style="width:220px"/><col style="width:130px"/><col style="width:120px"/>
-              <col style="width:160px"/><col style="width:110px"/><col style="width:120px"/><col style="width:140px"/>
-              <col style="width:160px"/><col style="width:220px"/><col style="width:240px"/>
-            </colgroup>
-            <thead>
-              <tr>
-                <th>Supplier</th>
-                <th>Product</th>
-                <th>Reference</th>
-                <th>Type</th>
-                <th>Consignment Level</th>
-                <th>Stock Qty</th>
-                <th>Usage</th>
-                <th>Status</th>
-                <th>Last Checked</th>
-                <th>Notes</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-          </table>
-        
-          <div id="rowCtxMenu"></div>
-          <div id="cellCtxMenu"></div>
-        </div>
-      </div>
-    </section>
-
-    
-    <section id="ordersTab" class="stack" style="display:none">
-      <div class="card stack">
-        <h2>Place / Log an Order</h2>
-        <label>Scan here (barcode/QR keyboard-wedge) — press Enter
-          <input id="orderScan" placeholder='Scan QR Code…' />
-        </label>
-<div class="row" style="margin-top:8px">
-  <button class="btn ghost" id="ordOpenCam" type="button">Open Camera Scanner</button>
+<option value="">Select usage level</option>
+<option value="High">High</option>
+<option value="Medium">Medium</option>
+<option value="Low">Low</option>
+</select>
+</label>
+<label>Notes
+              <input id="notes" placeholder="Optional notes (size, lot, etc.)" type="text"/>
+</label>
 </div>
-
-        <div class="grid3">
-          <label>Supplier
-            <input list="supplierList" id="ordSupplier" placeholder="Type supplier"/>
-          </label>
-          <label>System
-            <input id="ordSystem" placeholder="Optional system"/>
-          </label>
-          <label>Product (pick from inventory)
-            <select id="ordProduct"></select>
-          </label>
-        </div>
-
-        <div class="grid3">
-          <label>Reference (SKU)
-            <input id="ordSku" placeholder="Auto-fills when product selected"/>
-          </label>
-          <label>Quantity Ordered
-            <input id="ordQty" type="number" min="1" step="1" value="1"/>
-          </label>
-          <label>Ordered By
-            <input id="ordBy" placeholder="Your name"/>
-          </label>
-        </div>
-
-        <div class="grid3">
-          <label>Ordered At
-            <input id="ordAt" type="datetime-local"/>
-          </label>
-          <label>PO Number
-            <input id="ordPO"/>
-          </label>
-          <div style="align-self:end">
-            <button class="btn" id="ordSave" type="button">Save Order</button>
-          </div>
-        </div>
-
-        <label>Notes (internal)
-          <input id="ordNotes" placeholder="Optional notes about this order"/>
-        </label>
-      </div>
-
-      <div class="card">
-        <h2>Recent Orders</h2>
-        <div class="table-wrap">
-          <table id="ordersTable">
-            <thead>
-              <tr>
-                <th>When</th>
-                <th>Supplier</th>
-                <th>Product</th>
-                <th>Reference</th>
-                <th>Qty</th>
-                <th>Ordered By</th>
-                <th>PO</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody id="ordersTbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    
-    <section id="receivedTab" class="stack" style="display:none">
-      <div class="card stack">
-        <h2>Receive (Simple Scan)</h2>
-        <label>Scan here (press Enter)
-          <input id="rxScan" placeholder="Scan QR Code…" />
-        </label>
-<div class="row" style="margin-top:8px">
-  <button class="btn ghost" id="rxOpenCam" type="button">Open Camera Scanner</button>
+<div class="row">
+<button class="btn" id="saveProduct">Save product</button>
+<button class="btn secondary" id="clearForm" type="button">Clear</button>
+<button class="btn ghost" id="previewQr" type="button">Preview QR</button>
+<span class="pill" id="editHint"></span>
 </div>
-        <div class="grid3">
-          <label>Quantity Received
-            <input id="rxQty" type="number" min="1" step="1" value="1" />
-          </label>
-          <label>PO Number (optional)
-            <input id="rxPO" />
-          </label>
-          <label>Received By
-            <input id="rxBy" placeholder="Your name" />
-          </label>
-        </div>
-        <label>Delivery Note / Ref
-          <input id="rxRef" placeholder="Delivery note or reference" />
-        </label>
-        <div class="row">
-          <button class="btn" id="rxApply" type="button">Add to Stock</button>
-          <span class="pill" id="rxStatus">Idle</span>
-        </div>
-        <span class="hint">Tip: The scan box accepts either a QR JSON payload or a plain reference. It will locate the product automatically.</span>
-      </div>
-
-      <div class="card stack">
-        <div class="row" style="justify-content:space-between">
-          <h2>Recent Deliveries</h2>
-          <div class="row">
-            <label style="display:grid">
-              <span class="hint">From</span>
-              <input type="date" id="recFrom">
-            </label>
-            <label style="display:grid">
-              <span class="hint">To</span>
-              <input type="date" id="recTo">
-            </label>
-            <button class="btn ghost" id="recApplyRange" type="button">Apply</button>
-            <button class="btn secondary" id="recClearRange" type="button">Clear</button>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table id="receivedTable">
-            <thead>
-              <tr>
-                <th>When</th>
-                <th>Supplier</th>
-                <th>Product</th>
-                <th>Reference</th>
-                <th>Qty</th>
-                <th>PO</th>
-                <th>Received By</th>
-                <th>Delivery Ref</th>
-              </tr>
-            </thead>
-            <tbody id="receivedTbody"></tbody>
-          </table>
-        </div>
-      </div>
+<span class="hint">Usage pill: <span class="usage-pill usage-high">High</span> <span class="usage-pill usage-medium">Medium</span> <span class="usage-pill usage-low">Low</span> (affects order allowance). Status reflects stock vs levels.</span>
+</div>
+<div class="card stack">
+<h2>Recent Activities</h2>
+<div class="table-wrap">
+<table id="activityTable">
+<thead>
+<tr>
+<th>When</th>
+<th>Type<!--</th-->
+<th>Details</th>
+<th>Reference</th>
+</th></tr>
+</thead>
+<tbody id="activityTbody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="card stack">
+<div class="row" style="justify-content:space-between">
+<h2>Suppliers</h2>
+<div class="row">
+<input id="supplierFilter" placeholder="Filter suppliers or products" type="search"/>
+<span class="pill" id="prodCount">0</span>
+</div>
+</div>
+<div class="table-wrap">
+<table id="invTable">
+<colgroup>
+<col style="width:160px"/><col style="width:220px"/><col style="width:130px"/><col style="width:120px"/>
+<col style="width:160px"/><col style="width:110px"/><col style="width:120px"/><col style="width:140px"/>
+<col style="width:160px"/><col style="width:220px"/><col style="width:240px"/>
+</colgroup>
+<thead>
+<tr>
+<th>Supplier</th>
+<th>Product</th>
+<th>Reference</th>
+<th>Type</th>
+<th>Consignment Level</th>
+<th>Stock Qty</th>
+<th>Usage</th>
+<th>Status</th>
+<th>Last Checked</th>
+<th>Notes</th>
+<th>Actions</th>
+</tr>
+</thead>
+</table>
+</div>
+<span class="pill">Click a supplier to expand/collapse.</span>
+</div>
 </section>
-
-    
-    <section id="qrTab" class="stack" style="display:none">
-      <div class="card stack">
-        <div class="row" style="justify-content:space-between">
-          <h2>QR & Labels</h2>
-          <div class="row">
-            <input type="search" id="qrFilter" placeholder="Search to select items for labels…" />
-            <button class="btn" id="makeBulkQr">Generate QR Labels</button>
-          </div>
-        </div>
-        <div id="qrResults" class="qr-grid"></div>
-      </div>
-    </section>
-
-  </main>
+<section class="stack" id="inventoryTab" style="display:none">
+<div class="card stack">
+<div class="row" style="justify-content:space-between">
+<h2>Inventory</h2>
+<div class="row">
+<input id="invFilter" placeholder="Search by supplier, product, ref, system, type" type="search"/>
+<span class="pill" id="invCount">0</span>
 </div>
-
+</div>
+<div class="table-wrap">
+<table id="invTable2">
+<colgroup>
+<col style="width:160px"/><col style="width:220px"/><col style="width:130px"/><col style="width:120px"/>
+<col style="width:160px"/><col style="width:110px"/><col style="width:120px"/><col style="width:140px"/>
+<col style="width:160px"/><col style="width:220px"/><col style="width:240px"/>
+</colgroup>
+<thead>
+<tr>
+<th>Supplier</th>
+<th>Product</th>
+<th>Reference</th>
+<th>Type</th>
+<th>Consignment Level</th>
+<th>Stock Qty</th>
+<th>Usage</th>
+<th>Status</th>
+<th>Last Checked</th>
+<th>Notes</th>
+<th>Actions</th>
+</tr>
+</thead>
+</table>
+<div id="rowCtxMenu"></div>
+<div id="cellCtxMenu"></div>
+</div>
+</div>
+</section>
+<section class="stack" id="ordersTab" style="display:none">
+<div class="card stack">
+<h2>Place / Log an Order</h2>
+<label>Scan here (barcode/QR keyboard-wedge) — press Enter
+          <input id="orderScan" placeholder="Scan QR Code…"/>
+</label>
+<div class="row" style="margin-top:8px">
+<button class="btn ghost" id="ordOpenCam" type="button">Open Camera Scanner</button>
+</div>
+<div class="grid3">
+<label>Supplier
+            <input id="ordSupplier" list="supplierList" placeholder="Type supplier"/>
+</label>
+<label>System
+            <input id="ordSystem" placeholder="Optional system"/>
+</label>
+<label>Product (pick from inventory)
+            <select id="ordProduct"></select>
+</label>
+</div>
+<div class="grid3">
+<label>Reference (SKU)
+            <input id="ordSku" placeholder="Auto-fills when product selected"/>
+</label>
+<label>Quantity Ordered
+            <input id="ordQty" min="1" step="1" type="number" value="1"/>
+</label>
+<label>Ordered By
+            <input id="ordBy" placeholder="Your name"/>
+</label>
+</div>
+<div class="grid3">
+<label>Ordered At
+            <input id="ordAt" type="datetime-local"/>
+</label>
+<label>PO Number
+            <input id="ordPO"/>
+</label>
+<div style="align-self:end">
+<button class="btn" id="ordSave" type="button">Save Order</button>
+</div>
+</div>
+<label>Notes (internal)
+          <input id="ordNotes" placeholder="Optional notes about this order"/>
+</label>
+</div>
+<div class="card">
+<h2>Recent Orders</h2>
+<div class="table-wrap">
+<table id="ordersTable">
+<thead>
+<tr>
+<th>When</th>
+<th>Supplier</th>
+<th>Product</th>
+<th>Reference</th>
+<th>Qty</th>
+<th>Ordered By</th>
+<th>PO</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody id="ordersTbody"></tbody>
+</table>
+</div>
+</div>
+</section>
+<section class="stack" id="receivedTab" style="display:none">
+<div class="card stack">
+<h2>Receive (Simple Scan)</h2>
+<label>Scan here (press Enter)
+          <input id="rxScan" placeholder="Scan QR Code…"/>
+</label>
+<div class="row" style="margin-top:8px">
+<button class="btn ghost" id="rxOpenCam" type="button">Open Camera Scanner</button>
+</div>
+<div class="grid3">
+<label>Quantity Received
+            <input id="rxQty" min="1" step="1" type="number" value="1"/>
+</label>
+<label>PO Number (optional)
+            <input id="rxPO"/>
+</label>
+<label>Received By
+            <input id="rxBy" placeholder="Your name"/>
+</label>
+</div>
+<label>Delivery Note / Ref
+          <input id="rxRef" placeholder="Delivery note or reference"/>
+</label>
+<div class="row">
+<button class="btn" id="rxApply" type="button">Add to Stock</button>
+<span class="pill" id="rxStatus">Idle</span>
+</div>
+<span class="hint">Tip: The scan box accepts either a QR JSON payload or a plain reference. It will locate the product automatically.</span>
+</div>
+<div class="card stack">
+<div class="row" style="justify-content:space-between">
+<h2>Recent Deliveries</h2>
+<div class="row">
+<label style="display:grid">
+<span class="hint">From</span>
+<input id="recFrom" type="date"/>
+</label>
+<label style="display:grid">
+<span class="hint">To</span>
+<input id="recTo" type="date"/>
+</label>
+<button class="btn ghost" id="recApplyRange" type="button">Apply</button>
+<button class="btn secondary" id="recClearRange" type="button">Clear</button>
+</div>
+</div>
+<div class="table-wrap">
+<table id="receivedTable">
+<thead>
+<tr>
+<th>When</th>
+<th>Supplier</th>
+<th>Product</th>
+<th>Reference</th>
+<th>Qty</th>
+<th>PO</th>
+<th>Received By</th>
+<th>Delivery Ref</th>
+</tr>
+</thead>
+<tbody id="receivedTbody"></tbody>
+</table>
+</div>
+</div>
+</section>
+<section class="stack" id="qrTab" style="display:none">
+<div class="card stack">
+<div class="row" style="justify-content:space-between">
+<h2>QR &amp; Labels</h2>
+<div class="row">
+<input id="qrFilter" placeholder="Search to select items for labels…" type="search">
+<button class="btn" id="makeBulkQr">Generate QR Labels</button>
+</input></div>
+</div>
+<div class="qr-grid" id="qrResults"></div>
+</div>
+</section>
+</main>
+</div>
 <div class="modal" id="dupModal">
-  <div class="panel">
-    <h3>Possible duplicate</h3>
-    <p id="dupText" class="hint"></p>
-    <div class="row" style="justify-content:flex-end;gap:8px">
-      <button class="btn secondary" id="dupCancel" type="button">Cancel</button>
-      <button class="btn ghost" id="dupCreate" type="button" disabled>Create New</button>
-      <button class="btn" id="dupUpdate" type="button">Update Existing</button>
-    </div>
-    <span class="hint" id="dupHelp"></span>
-  </div>
+<div class="panel">
+<h3>Possible duplicate</h3>
+<p class="hint" id="dupText"></p>
+<div class="row" style="justify-content:flex-end;gap:8px">
+<button class="btn secondary" id="dupCancel" type="button">Cancel</button>
+<button class="btn ghost" disabled="" id="dupCreate" type="button">Create New</button>
+<button class="btn" id="dupUpdate" type="button">Update Existing</button>
 </div>
-
+<span class="hint" id="dupHelp"></span>
+</div>
+</div>
 <div class="modal" id="adjustModal">
-  <div class="panel">
-    <h3>Adjust Stock</h3>
-    <p id="adjustWhat" class="hint"></p>
-    <div class="row">
-      <label>Quantity (+ add / − deduct)
-        <input id="adjQty" type="number" step="1" value="1"/>
-      </label>
-      <label>Note (optional)
-        <input id="adjNote" type="text" placeholder="Reason or reference"/>
-      </label>
-    </div>
-    <div class="row" style="justify-content:flex-end">
-      <button class="btn secondary" id="adjCancel">Cancel</button>
-      <button class="btn" id="adjSave">Apply</button>
-    </div>
-  </div>
+<div class="panel">
+<h3>Adjust Stock</h3>
+<p class="hint" id="adjustWhat"></p>
+<div class="row">
+<label>Quantity (+ add / − deduct)
+        <input id="adjQty" step="1" type="number" value="1">
+</input></label>
+<label>Note (optional)
+        <input id="adjNote" placeholder="Reason or reference" type="text"/>
+</label>
 </div>
-
-<div class="modal" id="qrModal" aria-hidden="true">
-  <div class="panel">
-    <div class="row" style="justify-content:space-between;align-items:center">
-      <h2>QR Code</h2>
-      <button class="btn secondary" id="closeQr" type="button">Close</button>
-    </div>
-    <div class="qr-box">
-      <div id="qrHolder"></div>
-      <div class="qr-meta" id="qrMeta"></div>
-      <div class="row">
-        <button class="btn" id="downloadQr" type="button">Download PNG</button>
-        <button class="btn ghost" id="copyPayload" type="button">Copy Payload</button>
-      </div>
-    </div>
-  </div>
+<div class="row" style="justify-content:flex-end">
+<button class="btn secondary" id="adjCancel">Cancel</button>
+<button class="btn" id="adjSave">Apply</button>
 </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
-
+</div>
+</div>
+<div aria-hidden="true" class="modal" id="qrModal">
+<div class="panel">
+<div class="row" style="justify-content:space-between;align-items:center">
+<h2>QR Code</h2>
+<button class="btn secondary" id="closeQr" type="button">Close</button>
+</div>
+<div class="qr-box">
+<div id="qrHolder"></div>
+<div class="qr-meta" id="qrMeta"></div>
+<div class="row">
+<button class="btn" id="downloadQr" type="button">Download PNG</button>
+<button class="btn ghost" id="copyPayload" type="button">Copy Payload</button>
+</div>
+</div>
+</div>
+</div>
+<script defer="" src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
   import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, getDocs, query, orderBy, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
@@ -1255,7 +1235,6 @@ catch { return '—'; }
   });
 
 </script>
-
 <script>
 (function(){
   let selectedRow = null;
@@ -1365,7 +1344,6 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
   });
 })();
 </script>
-
 <script>
 (function(){
   
@@ -1532,7 +1510,6 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
 });
 })();
 </script>
-
 <script>
 (function(){
   
@@ -1598,7 +1575,6 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
   }
 })();
 </script>
-
 <script>
 (function(){
   const table = document.getElementById('invTable');
@@ -1638,7 +1614,6 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
   }
 })();
 </script>
-
 <script id="scanner-hash-listener">
 (function(){
   if (window.__scannerHashListenerInstalled) return;
@@ -1695,26 +1670,24 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
   applyFromHash();
 })();
 </script>
-
-<div class="modal" id="camModal" aria-hidden="true">
-  <div class="panel" style="max-width:720px">
-    <div class="row" style="justify-content:space-between;align-items:center">
-      <h2>Camera Scanner</h2>
-      <div class="row" style="gap:8px">
-        <select id="camDevice" class="form-select" style="min-width:220px"></select>
-        <button class="btn ghost" id="camTorch" type="button" disabled>Toggle Torch</button>
-        <button class="btn secondary" id="camClose" type="button">Close</button>
-      </div>
-    </div>
-    <div style="position:relative; background:#000; border-radius:12px; overflow:hidden">
-      <video id="camVideo" playsinline autoplay muted style="width:100%;height:auto;display:block"></video>
-      <canvas id="camCanvas" style="display:none"></canvas>
-      <div style="position:absolute;inset:0;pointer-events:none;border:2px solid rgba(255,255,255,0.25);margin:10%"></div>
-    </div>
-    <div class="hint" id="camHint">Point at a QR or barcode. It auto-captures.</div>
-  </div>
+<div aria-hidden="true" class="modal" id="camModal">
+<div class="panel" style="max-width:720px">
+<div class="row" style="justify-content:space-between;align-items:center">
+<h2>Camera Scanner</h2>
+<div class="row" style="gap:8px">
+<select class="form-select" id="camDevice" style="min-width:220px"></select>
+<button class="btn ghost" disabled="" id="camTorch" type="button">Toggle Torch</button>
+<button class="btn secondary" id="camClose" type="button">Close</button>
 </div>
-
+</div>
+<div style="position:relative; background:#000; border-radius:12px; overflow:hidden">
+<video autoplay="" id="camVideo" muted="" playsinline="" style="width:100%;height:auto;display:block"></video>
+<canvas id="camCanvas" style="display:none"></canvas>
+<div style="position:absolute;inset:0;pointer-events:none;border:2px solid rgba(255,255,255,0.25);margin:10%"></div>
+</div>
+<div class="hint" id="camHint">Point at a QR or barcode. It auto-captures.</div>
+</div>
+</div>
 <script type="module">
   let camStream=null, scanning=false, useZXing=false, codeReader=null, currentTrack=null, torchOn=false;
   let onScan=(t)=>{};
@@ -1784,8 +1757,6 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
   }
   document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && el('camModal')?.classList.contains('open')) closeCamModal(); });
 </script>
-
-
 <script>
 (function(){
   function bindTabs(){
@@ -1819,5 +1790,102 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
 })();
 </script>
 
-</body>
+<div aria-label="Scan-IT to Office Dock" class="scanit-dock" id="scanitDock" role="region">
+<div class="title">Scan‑IT Stream</div>
+<div class="controls">
+<label style="display:flex;align-items:center;gap:6px"><input checked="" id="scanTargetReceive" name="scanTarget" type="radio" value="receive"/> Receive</label>
+<label style="display:flex;align-items:center;gap:6px"><input id="scanTargetOrders" name="scanTarget" type="radio" value="orders"/> Orders</label>
+<label style="display:flex;align-items:center;gap:6px"><input checked="" id="scanKeepFocus" type="checkbox"/> Keep focus</label>
+</div>
+<input autocomplete="off" id="scanitInput" placeholder="Click here, then scan. Press Enter if your scanner doesn’t send Enter." type="text">
+<div class="hint">Use the Scan‑IT to Office Chrome extension or Keyboard Wedge to send scans into this box. They’ll route to the selected target.</div>
+</input></div>
+<script>
+(function(){
+  var input = document.getElementById('scanitInput');
+  var keep = document.getElementById('scanKeepFocus');
+  var toReceive = document.getElementById('scanTargetReceive');
+  var toOrders = document.getElementById('scanTargetOrders');
+
+  function route(text){
+    if(!text) return;
+    var target = toOrders && toOrders.checked ? 'orders' : 'receive';
+    try{
+      if(target === 'orders'){
+        if(typeof handleOrderScan === 'function'){ handleOrderScan(text); }
+        // Also update visible field for user feedback
+        var os = document.getElementById('orderScan');
+        if(os){ os.value = text; setTimeout(function(){ os.value=''; }, 200); }
+      } else {
+        if(typeof handleReceiveScan === 'function'){ handleReceiveScan(text); }
+        var rs = document.getElementById('rxScan');
+        if(rs){ rs.value = text; setTimeout(function(){ rs.value=''; }, 200); }
+      }
+    }catch(e){ console.error('Routing failed', e); }
+  }
+
+  // Enter submits a scan
+  if(input){
+    input.addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        var text = input.value.trim();
+        input.value = '';
+        route(text);
+      }
+    });
+    // If scanner sends trailing newline, oninput can catch it too
+    input.addEventListener('input', function(e){
+      if(input.value.indexOf('\n') !== -1){
+        var text = input.value.replace(/\r?\n/g,'').trim();
+        input.value = '';
+        route(text);
+      }
+    });
+    // Focus initially
+    setTimeout(function(){ try{ input.focus(); input.select(); }catch(e){} }, 200);
+  }
+
+  // Keep focus on the dock input for uninterrupted scanning
+  var focusTimer = null;
+  function startKeepFocus(){
+    if(focusTimer) return;
+    focusTimer = setInterval(function(){
+      if(!document.hasFocus()) return;
+      if(!keep || !keep.checked) return;
+      if(document.activeElement !== input){
+        try{ input.focus(); input.select(); }catch(e){}
+      }
+    }, 800);
+  }
+  function stopKeepFocus(){
+    if(focusTimer){ clearInterval(focusTimer); focusTimer = null; }
+  }
+  if(keep){
+    keep.addEventListener('change', function(){
+      if(keep.checked) startKeepFocus(); else stopKeepFocus();
+    });
+  }
+  startKeepFocus();
+
+  // Auto-select target based on visible tab
+  function activeTab(){
+    var a = document.querySelector('.side .tab.active');
+    return a ? a.dataset.tab : null;
+  }
+  function syncTargetToTab(){
+    var t = activeTab();
+    if(!t) return;
+    if(t === 'ordersTab'){ if(toOrders) toOrders.checked = true; }
+    if(t === 'receivedTab'){ if(toReceive) toReceive.checked = true; }
+  }
+  document.addEventListener('click', function(e){
+    if(e.target.closest('.side .tab')){
+      setTimeout(syncTargetToTab, 50);
+    }
+  });
+  document.addEventListener('DOMContentLoaded', syncTargetToTab);
+  syncTargetToTab();
+})();
+</script></body>
 </html>

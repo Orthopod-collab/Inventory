@@ -14,46 +14,45 @@
   main{padding:18px;display:grid;gap:16px;max-width:560px;margin:0 auto}
   .stack{display:grid;gap:14px}
   .btn{appearance:none;border:1px solid var(--border);background:#142034;color:var(--text);padding:16px;border-radius:14px;font-weight:900;cursor:pointer;font-size:18px}
-  .btn.primary{background:var(--accent);border-color:transparent;color:#071423}
   .btn.ok{background:#12261c;border-color:#1e3a2f;color:#7ff0bb}
   .btn.warn{background:#2a1520;border-color:#57233a;color:#ff6b8b}
-  .center{display:grid;gap:14px}
   .hidden{display:none !important}
   .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px}
   #view{position:relative;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#000}
   video{display:block;width:100%;max-height:62vh}
   #overlay{position:absolute;inset:0;pointer-events:none}
   #overlay:after{content:'';position:absolute;inset:8% 10%;border:2px solid rgba(255,255,255,0.9);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.35) inset}
-  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
   .pill{font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;color:var(--muted)}
   .toggle{display:flex;align-items:center;gap:8px}
   .switch{position:relative;width:52px;height:30px;border-radius:999px;background:#223042;border:1px solid #2b3d52;cursor:pointer}
   .switch input{opacity:0;width:0;height:0}
   .knob{position:absolute;top:3px;left:3px;width:24px;height:24px;background:#fff;border-radius:50%;transition:transform .2s}
   .switch input:checked + .knob{transform:translateX(22px)}
-  @media (min-width:700px){ .btn{font-size:20px} }
+  #diag{font-size:12px;color:#9fb2c7}
 </style>
 </head>
 <body>
 <header><h1>OrthoPod Scanner</h1></header>
 
 <main>
-  <!-- Home screen -->
+  <!-- Home -->
   <section id="home" class="stack">
     <button class="btn" id="btnOrder">Order</button>
     <button class="btn ok" id="btnReceive">Receive</button>
     <button class="btn warn" id="btnUse">Use</button>
+    <div id="diag"></div>
   </section>
 
-  <!-- Scanner screen -->
+  <!-- Scanner -->
   <section id="scan" class="hidden">
     <div class="card stack">
-      <div class="row" style="justify-content:space-between">
-        <div class="row">
-          <select id="camera" style="background:#0a131f;color:#fff;border:1px solid var(--border);border-radius:10px;padding:8px 10px"></select>
+      <div class="row">
+        <div class="row" style="gap:10px">
           <button id="back" class="btn">Back</button>
+          <select id="camera" style="background:#0a131f;color:#fff;border:1px solid var(--border);border-radius:10px;padding:8px 10px"></select>
         </div>
-        <div class="row">
+        <div class="row" style="gap:10px">
           <div class="toggle">
             <label class="switch">
               <input id="continuous" type="checkbox" checked><span class="knob"></span>
@@ -74,14 +73,10 @@
 </main>
 
 <script>
-  // Config — point this to your hosted app URL when deployed.
-  // The scanner will open your app and switch tabs using hash params:
-  //  - #tab=orders&scan=...   (Order)
-  //  - #tab=received&scan=... (Receive)
-  //  - #tab=inventory&scan=... (Use)
-  const APP_URL = './tester1_supplier_context.html';
+  // Resolve APP_URL relative to this file (works on GitHub Pages regardless of repo path)
+  const APP_URL = new URL('tester1_with_scanner_link.html', location.href).href;
 
-  // Lightweight jsQR fallback
+  // jsQR fallback
   let jsQRReady=false;
   function ensureJsQR(){
     return new Promise((resolve)=>{
@@ -93,8 +88,9 @@
       document.head.appendChild(s);
     });
   }
+</script>
 
-  // UI
+<script>
   const $ = s => document.querySelector(s);
   const home = $('#home');
   const scan = $('#scan');
@@ -109,10 +105,13 @@
   const video = $('#video');
   const canvas = $('#canvas');
   const ctx = canvas.getContext('2d');
+  const diag = document.getElementById('diag');
 
   let mode='order'; // 'order' | 'receive' | 'use'
   let stream=null, track=null, scanning=false, detector=null, useBD=('BarcodeDetector' in window);
   let lastText=null;
+
+  function writeDiag(msg){ diag.textContent = msg; }
 
   function showHome(){ home.classList.remove('hidden'); scan.classList.add('hidden'); }
   function showScan(){ home.classList.add('hidden'); scan.classList.remove('hidden'); }
@@ -124,7 +123,7 @@
       const devs = await navigator.mediaDevices.enumerateDevices();
       const vids = devs.filter(d=>d.kind==='videoinput');
       camSel.innerHTML = vids.map(d=>`<option value="${d.deviceId}">${d.label || 'Camera '+(vids.indexOf(d)+1)}</option>`).join('');
-    }catch{}
+    }catch(e){ /* ignore */ }
   }
 
   async function startCamera(){
@@ -137,6 +136,11 @@
           width: { ideal: 1280 }, height: { ideal: 720 }
         }, audio: false
       };
+      if (!window.isSecureContext){
+        writeDiag('This must be served over HTTPS (or localhost) for camera access.');
+      } else {
+        writeDiag('');
+      }
       stream = await navigator.mediaDevices.getUserMedia(constraints);
       video.srcObject = stream;
       await video.play();
@@ -150,7 +154,8 @@
       await listCameras();
     }catch(err){
       console.error(err);
-      setStatus('Camera blocked — use HTTPS and allow permission.');
+      setStatus('Camera blocked');
+      writeDiag((err && (err.name+': '+err.message)) || 'Camera access failed. Check site permissions.');
       alert('Camera access failed. Use HTTPS (or localhost) and allow camera permission.');
     }
   }
@@ -209,7 +214,7 @@
     openInApp(text);
   }
 
-  // Event wiring
+  // Events
   btnOrder.addEventListener('click', async ()=>{ mode='order'; showScan(); await startCamera(); });
   btnReceive.addEventListener('click', async ()=>{ mode='receive'; showScan(); await startCamera(); });
   btnUse.addEventListener('click', async ()=>{ mode='use'; showScan(); await startCamera(); });
@@ -222,8 +227,6 @@
     const next = !settings.torch;
     try{ await track.applyConstraints({ advanced: [{ torch: next }] }); }catch{}
   });
-
-  // First paint shows home with 3 buttons; nothing else
 </script>
 </body>
 </html>

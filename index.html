@@ -146,7 +146,6 @@ textarea {
 }
 </style>
 
-
 <style>
 /* Hide per-row Actions column; we'll use a bottom toolbar instead */
 #invTable2 th:last-child,
@@ -169,7 +168,6 @@ textarea {
 }
 #rowCtxMenu button:hover { background: rgba(0,0,0,0.06); }
 </style>
-
 
 <style>
 #cellCtxMenu {
@@ -1335,7 +1333,6 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
 })();
 </script>
 
-
 <script>
 (function(){
   // Helpers: map columns to doc fields
@@ -1503,7 +1500,6 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
 })();
 </script>
 
-
 <script>
 (function(){
   // Attach cell-level context menu for #invTable mirroring #invTable2
@@ -1570,7 +1566,6 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
 })();
 </script>
 
-
 <script>
 (function(){
   const table = document.getElementById('invTable');
@@ -1610,7 +1605,6 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
   }
 })();
 </script>
-
 
 <script id="scanner-hash-listener">
 (function(){
@@ -1669,51 +1663,9 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
 })();
 </script>
 
-
-
 <!-- Scan-IT-like Dock (v2: draggable, minimizable, beep, barcode support) -->
 <style>
-#scanDock{
-  position:fixed; right:16px; bottom:16px; z-index:2147483646;
-  background:#ffffff; border:1px solid #e5e7eb; border-radius:14px;
-  box-shadow:0 8px 40px rgba(0,0,0,.12); padding:0; width:320px;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial;
-  user-select:none;
-}
-#scanDock.min { width: 220px; }
-#scanDockHeader{
-  display:flex; align-items:center; justify-content:space-between;
-  padding:8px 10px; border-bottom:1px solid #eef2f7; cursor:move; border-top-left-radius:14px; border-top-right-radius:14px;
-  background:#f9fafb;
-}
-#scanDockHeader h4{margin:0; font-size:13px; font-weight:800}
-#scanDockHeader .controls { display:flex; gap:6px; align-items:center; }
-#scanDockHeader button{
-  padding:6px 10px; border-radius:10px; border:1px solid #e5e7eb; background:#fff; color:#111827; font-weight:700; cursor:pointer;
-}
-#scanDockHeader button:hover{ background:#f3f4f6; }
-#scanDockBody{ padding:10px; display:block; }
-#scanDock.minimized #scanDockBody{ display:none; }
-#scanDock .row{display:flex; gap:8px; align-items:center; margin:6px 0; flex-wrap:wrap}
-#scanDock .row > *{flex:1}
-#scanDock .btn{padding:8px 12px; border-radius:10px; border:0; background:#0d6efd; color:#fff; font-weight:800; cursor:pointer}
-#scanDock .btn.stop{background:#dc3545}
-#scanDock small{color:#6b7280}
-#scanReader{display:none; margin-top:8px}
-#scanLight{ width:10px; height:10px; border-radius:999px; background:#9ca3af; display:inline-block; margin-left:6px; }
-#scanDock.min #scanDockHeader h4{ font-size:12px; }
-#scanDock.min #scanDockHeader .controls button{ padding:4px 8px; font-size:12px; }
-</style>
-
-<div id="scanDock" aria-live="polite">
-  <div id="scanDockHeader">
-    <h4>Mobile Scanner <span id="scanLight" title="Status"></span></h4>
-    <div class="controls">
-      <button id="scanMinBtn" title="Minimize">–</button>
-      <button id="scanShrinkBtn" title="Compact">□</button>
-      <button id="scanCloseBtn" title="Close">×</button>
-    </div>
-  </div>
+</div>
   <div id="scanDockBody">
     <div class="row">
       <button class="btn" id="scanStartBtn" type="button">Start Camera</button>
@@ -1741,7 +1693,7 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
       <label style="flex:1"><input type="checkbox" id="scanBeep" checked> Beep on scan</label>
     </div>
     <small id="scanStatus" style="display:block;margin-bottom:6px">Idle. Tip: Camera access requires HTTPS or localhost.</small>
-    <div id="scanReader" style="width:300px;"></div>
+    <div 
   </div>
 </div>
 
@@ -1750,239 +1702,109 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
   <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQwAAAAA////f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f39/f3///8=" type="audio/wav">
 </audio>
 
-<script src="https://unpkg.com/html5-qrcode"></script>
-<script>
-(function(){
-  let qr = null;
-  let dragging = false, dragOffsetX = 0, dragOffsetY = 0;
-  const el = sel => document.querySelector(sel);
-  const dock = el('#scanDock');
-  const header = el('#scanDockHeader');
-  const light = el('#scanLight');
-  const status = msg => el('#scanStatus').textContent = msg;
-  const setLight = (c)=> light.style.background = c;
 
-  function beep(){
-    if(!el('#scanBeep').checked) return;
-    const a = el('#scanBeepAudio');
-    try{ a.currentTime = 0; a.play(); }catch(e){ /* ignore */ }
-  }
+<script type="module">
+  // --- Scan-IT wedge JSON -> SKU extractor + Firestore auto-fill ---
 
-  // Dragging (header as handle)
-  header.addEventListener('mousedown', (e)=>{
-    dragging = true;
-    const rect = dock.getBoundingClientRect();
-    dragOffsetX = e.clientX - rect.left;
-    dragOffsetY = e.clientY - rect.top;
-    e.preventDefault();
-  });
-  document.addEventListener('mousemove', (e)=>{
-    if(!dragging) return;
-    dock.style.left = (e.clientX - dragOffsetX) + 'px';
-    dock.style.top = (e.clientY - dragOffsetY) + 'px';
-    dock.style.right = 'auto'; dock.style.bottom = 'auto';
-  });
-  document.addEventListener('mouseup', ()=> dragging = false);
+  // Selectors for inputs the wedge types into (adjust if needed)
+  const SCAN_INPUTS = ['#orderScan', '#rxScan', '#sku'];
 
-  // Minimize & compact
-  el('#scanMinBtn').addEventListener('click', ()=> dock.classList.toggle('minimized'));
-  el('#scanShrinkBtn').addEventListener('click', ()=> dock.classList.toggle('min'));
-  el('#scanCloseBtn').addEventListener('click', ()=> { dock.style.display='none'; });
+  // Map Firestore fields -> your form fields (adjust selectors if different)
+  const MAP_FIELDS  = {
+    name: '#productName',
+    sku:  '#sku',
+    sup:  '#supplier',
+    sys:  '#system',
+    typ:  '#type',
+    loc:  '#location'
+  };
 
-  async function startCam(){
-    try{
-      if(!qr){
-        // Support common 1D/2D barcodes like Scan-IT
-        const formatsToSupport = [
-          Html5QrcodeSupportedFormats.QR_CODE,
-          Html5QrcodeSupportedFormats.CODE_128,
-          Html5QrcodeSupportedFormats.CODE_39,
-          Html5QrcodeSupportedFormats.EAN_13,
-          Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.UPC_A,
-          Html5QrcodeSupportedFormats.UPC_E,
-          Html5QrcodeSupportedFormats.ITF,
-          Html5QrcodeSupportedFormats.DATA_MATRIX,
-          Html5QrcodeSupportedFormats.AZTEC,
-          Html5QrcodeSupportedFormats.PDF_417
-        ];
-        qr = new Html5Qrcode('scanReader', { formatsToSupport, verbose: false });
-      }
-      el('#scanReader').style.display = 'block';
-      el('#scanStartBtn').disabled = true;
-      el('#scanStopBtn').disabled = false;
-      status('Opening camera…');
-      setLight('#f59e0b'); // amber
-      await qr.start(
-        { facingMode:'environment' },
-        { fps: 15, qrbox: { width: 280, height: 180 }, aspectRatio: 1.777, rememberLastUsedCamera: true },
-        onScan,
-        onScanFailure
-      );
-      status('Camera active — scan a code');
-      setLight('#10b981'); // green
-    }catch(e){
-      console.error(e);
-      status('Camera error — Note: use HTTPS or localhost for camera access.');
-      setLight('#ef4444'); // red
-      el('#scanStartBtn').disabled = false;
-      el('#scanStopBtn').disabled = true;
-      el('#scanReader').style.display = 'none';
+  const COLLECTION = 'inventoryProducts';
+
+  const $ = (sel) => document.querySelector(sel);
+  const maybe = (sel) => sel ? $(sel) : null;
+  const setVal = (sel, val) => { const el = maybe(sel); if (el) el.value = val ?? ''; };
+
+  function extractSku(text) {
+    if (!text) return null;
+    const t = text.trim();
+    if (t.startsWith('{')) {
+      try {
+        const obj = JSON.parse(t);
+        if (obj && typeof obj === 'object') return obj.sku || obj.SKU || obj.code || obj.Code || null;
+      } catch {}
     }
-  }
-  async function stopCam(){
-    try{
-      if(qr){ await qr.stop(); }
-    }catch{};
-    el('#scanReader').style.display = 'none';
-    el('#scanStartBtn').disabled = false;
-    el('#scanStopBtn').disabled = true;
-    status('Stopped');
-    setLight('#9ca3af'); // grey
+    const m = t.match(/"sku"\s*:\s*"([^"]+)"/i);
+    if (m) return m[1];
+    const m2 = t.match(/[A-Z0-9._\-\/]{3,}/i);
+    return m2 ? m2[0] : null;
   }
 
-  function onScan(decodedText){
-    beep();
-    status('Scanned: ' + decodedText);
-    routeScan(decodedText);
-    // keep scanning; don't stop automatically
+  function replaceWithSku(inputEl, sku) {
+    if (!inputEl) return;
+    inputEl.value = sku || '';
+    inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+    inputEl.dispatchEvent(new Event('change', { bubbles: true }));
+    // simulate pressing Enter after setting the SKU
+    const enterEvent = new KeyboardEvent('keydown', {
+      key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true
+    });
+    inputEl.dispatchEvent(enterEvent);
+}
+
+  import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  const db = getFirestore();
+
+  async function fetchBySku(sku) {
+    // If SKU is your doc ID, prefer this:
+    // const snap = await getDoc(doc(db, COLLECTION, sku));
+    // return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+
+    // Otherwise, query by field 'sku'
+    const q = query(collection(db, COLLECTION), where('sku', '==', sku));
+    const snap = await getDocs(q);
+    let item = null;
+    snap.forEach(d => { if (!item) item = { id: d.id, ...d.data() }; });
+    return item;
   }
-  function onScanFailure(err){
-    // throttle noisy logs
+
+  function fillFields(item) {
+    if (!item) return;
+    setVal(MAP_FIELDS.name, item.name || item.productName || '');
+    setVal(MAP_FIELDS.sku,  item.sku  || '');
+    setVal(MAP_FIELDS.sup,  item.sup  || item.supplier || '');
+    setVal(MAP_FIELDS.sys,  item.sys  || item.system   || '');
+    setVal(MAP_FIELDS.typ,  item.typ  || item.type     || '');
+    setVal(MAP_FIELDS.loc,  item.loc  || item.location || '');
   }
 
-  function routeScan(text){
-    const targetMode = el('#scanTarget').value;
-    const suffix = el('#scanSuffix').value;
-    const keepFocus = el('#scanKeepFocus').checked;
-
-    let input = null;
-    if(targetMode === 'auto'){
-      const ae = document.activeElement;
-      input = (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) ? ae : null;
-    } else {
-      input = el(targetMode);
-    }
-    if(!input){ input = el('#orderScan') || el('#rxScan') || el('#sku'); }
-    if(!input){ alert('No input field available to receive scan.'); return; }
-
-    // Insert like a keyboard wedge
-    input.value = text;
-    input.dispatchEvent(new Event('input', {bubbles:true}));
-    input.dispatchEvent(new Event('change', {bubbles:true}));
-    if(suffix === 'enter'){
-      input.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', bubbles:true}));
-      input.dispatchEvent(new KeyboardEvent('keyup', {key:'Enter', bubbles:true}));
-    } else if(suffix === 'tab'){
-      input.blur();
-    }
-    if(keepFocus){
-      input.focus();
-      const len = input.value.length;
-      input.setSelectionRange && input.setSelectionRange(len, len);
+  async function handleScanTyped(e) {
+    const el = e.currentTarget;
+    const raw = el.value;
+    const sku = extractSku(raw);
+    if (!sku) return;
+    if (raw !== sku) replaceWithSku(el, sku);
+    try {
+      const item = await fetchBySku(sku);
+      if (item) fillFields(item);
+    } catch (err) {
+      console.error('Lookup failed', err);
     }
   }
 
-  // Buttons
-  el('#scanStartBtn')?.addEventListener('click', startCam);
-  el('#scanStopBtn')?.addEventListener('click', stopCam);
-
-  // Expose for debugging
-  window.__scanDock = { startCam, stopCam, routeScan };
-})();
-</script>
-
-<script>
-(function(){
-  let qr = null;
-  const el = sel => document.querySelector(sel);
-  const status = msg => el('#scanStatus').textContent = msg;
-
-  async function startCam(){
-    try{
-      if(!qr){ qr = new Html5Qrcode('scanReader'); }
-      el('#scanReader').style.display = 'block';
-      el('#scanStartBtn').disabled = true;
-      el('#scanStopBtn').disabled = false;
-      status('Opening camera…');
-      await qr.start({ facingMode:'environment' }, { fps:10, qrbox:{width:260, height:160} }, onScan);
-      status('Camera active — scan a code');
-    }catch(e){
-      console.error(e);
-      status('Camera error');
-      el('#scanStartBtn').disabled = false;
-      el('#scanStopBtn').disabled = true;
-      el('#scanReader').style.display = 'none';
-    }
-  }
-  async function stopCam(){
-    try{
-      if(qr){ await qr.stop(); }
-    }catch{};
-    el('#scanReader').style.display = 'none';
-    el('#scanStartBtn').disabled = false;
-    el('#scanStopBtn').disabled = true;
-    status('Stopped');
+  for (const sel of SCAN_INPUTS) {
+    const el = $(sel);
+    if (!el) continue;
+    el.addEventListener('input', handleScanTyped);
+    el.addEventListener('change', handleScanTyped);
   }
 
-  function onScan(text){
-    status('Scanned');
-    routeScan(text);
-    // Optional: brief visual ack
-    setTimeout(()=>status('Camera active — scan a code'), 400);
+  // Keep focus on a primary scan box so wedge keeps typing there
+  function focusPrimary() {
+    const el = $('#orderScan') || $('#rxScan') || $('#sku');
+    if (el) el.focus();
   }
-
-  function routeScan(text){
-    const targetMode = el('#scanTarget').value;
-    const suffix = el('#scanSuffix').value;
-    const keepFocus = el('#scanKeepFocus').checked;
-
-    let input = null;
-    if(targetMode === 'auto'){
-      input = document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')
-        ? document.activeElement : null;
-    } else {
-      input = el(targetMode);
-    }
-
-    if(!input){
-      // Fallback: prefer existing scan inputs
-      input = el('#orderScan') || el('#rxScan') || el('#sku');
-    }
-    if(!input){ alert('No input field available to receive scan.'); return; }
-
-    // Drop the text into the field (like a keyboard wedge)
-    const previous = input.value || '';
-    input.value = text;
-
-    // Fire events so your app reacts
-    input.dispatchEvent(new Event('input', {bubbles:true}));
-    input.dispatchEvent(new Event('change', {bubbles:true}));
-
-    // Emulate suffix behavior
-    if(suffix === 'enter'){
-      input.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', bubbles:true}));
-      input.dispatchEvent(new KeyboardEvent('keyup', {key:'Enter', bubbles:true}));
-    } else if(suffix === 'tab'){
-      // Blur acts like leaving the field
-      input.blur();
-    }
-
-    // Keep focus: move it back so the next scan goes to the same field
-    if(keepFocus){
-      input.focus();
-      // Place caret at end
-      const len = input.value.length;
-      input.setSelectionRange && input.setSelectionRange(len, len);
-    }
-  }
-
-  el('#scanStartBtn')?.addEventListener('click', startCam);
-  el('#scanStopBtn')?.addEventListener('click', stopCam);
-
-  // Expose for debugging if needed
-  window.__scanDock = { startCam, stopCam, routeScan };
-})();
+  window.addEventListener('load', focusPrimary);
 </script>
 
 </body>

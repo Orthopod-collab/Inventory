@@ -375,7 +375,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     <section id="ordersTab" class="stack" style="display:none">
       <div class="card stack">
         <h2>Place / Log an Order</h2>
-        <label>Scan here (barcode/QR keyboard-wedge) — press Enter
+        <label>Scan here (barcode/QR keyboard-wedge)
           <input id="orderScan" placeholder='Scan QR Code…' />
         </label>
 
@@ -1705,6 +1705,27 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
 
 <script type="module">
   // --- Scan-IT wedge JSON -> SKU extractor + Firestore auto-fill ---
+  // --- Auto-save helpers ---
+  function clickSaveIfPresent(fromEl){
+    // Prefer the Orders save button
+    const ordBtn = document.querySelector('#ordSave');
+    if (ordBtn && ordBtn.offsetParent !== null) { ordBtn.click(); return true; }
+    // Generic fallbacks
+    const candidates = [
+      '#saveOrder', '#ordersSaveBtn', 'button[type="submit"].save-order', 'button.save-order',
+      'button#save', 'button[type="submit"]'
+    ];
+    for (const sel of candidates){
+      const btn = document.querySelector(sel);
+      if (btn && btn.offsetParent !== null) { btn.click(); return true; }
+    }
+    // Fallback: submit the nearest form
+    let form = fromEl && fromEl.closest ? fromEl.closest('form') : null;
+    if (!form) form = document.querySelector('form');
+    if (form) { form.requestSubmit ? form.requestSubmit() : form.submit(); return true; }
+    return false;
+  }
+
 
   // Selectors for inputs the wedge types into (adjust if needed)
   const SCAN_INPUTS = ['#orderScan', '#rxScan', '#sku'];
@@ -1746,9 +1767,11 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     inputEl.dispatchEvent(new Event('input', { bubbles: true }));
     inputEl.dispatchEvent(new Event('change', { bubbles: true }));
     // simulate pressing Enter after setting the SKU
-    const enterEvent = new KeyboardEvent('keydown', {
-      key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true
-    });
+    const enterEvent = new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true });
+    inputEl.dispatchEvent(enterEvent);
+    // Auto-click Save
+    try { clickSaveIfPresent(inputEl); } catch(e) { console.warn('Auto-save not found', e); }
+  });
     inputEl.dispatchEvent(enterEvent);
 }
 
@@ -1786,8 +1809,8 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     if (raw !== sku) replaceWithSku(el, sku);
     try {
       const item = await fetchBySku(sku);
-      if (item) fillFields(item);
-    } catch (err) {
+      if (item) { fillFields(item); try { clickSaveIfPresent(el); } catch(e){} }
+} catch (err) {
       console.error('Lookup failed', err);
     }
   }

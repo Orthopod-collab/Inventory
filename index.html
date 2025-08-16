@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-
+<!DOCTYPE html> 
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Inventory Manager </title>
 <style>
   :root{
@@ -50,33 +49,35 @@
   .hint{color:var(--muted)}
   .actions{display:flex;gap:8px;flex-wrap:wrap}
 
-  
+  /* Status chips (inventory health) */
   .status-chip{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:900;border:1px solid var(--border);background:#eef2f7}
-  .status-ok{background:#e8f7ef;border-color:#caeede;color:#0f7a43}          
-  .status-over{background:#e7f1ff;border-color:#cfe3ff;color:#0b5ed7}       
-  .status-under{background:#fff3cd;border-color:#ffe8a1;color:#8a6d3b}      
-  .status-reorder{background:#fde2e3;border-color:#f8c7ca;color:#b02a37}    
+  .status-ok{background:#e8f7ef;border-color:#caeede;color:#0f7a43}          /* Stock ok */
+  .status-over{background:#e7f1ff;border-color:#cfe3ff;color:#0b5ed7}       /* Overstocked */
+  .status-under{background:#fff3cd;border-color:#ffe8a1;color:#8a6d3b}      /* Understocked */
+  .status-reorder{background:#fde2e3;border-color:#f8c7ca;color:#b02a37}    /* Reorder Now */
 
-  
+  /* Usage pills (ordering strategy) */
   .usage-pill{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:900;color:#fff}
   .usage-high{background:#198754}
   .usage-medium{background:#ffc107;color:#000}
   .usage-low{background:#dc3545}
 
-  
+  /* Modals */
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:20px}
   .modal.open{display:flex}
   .modal .panel{background:#fff;border-radius:14px;border:1px solid var(--border);max-width:620px;width:100%;padding:18px;display:grid;gap:14px}
 
-  
+  /* QR cards */
   .qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
   .qr-card{border:1px solid var(--border);border-radius:10px;padding:8px;display:grid;gap:6px;justify-items:center}
   .qr-small{width:128px;height:128px}
   .qr-title{font-size:.82rem;text-align:center}
 
+/* Hide per-row Actions column in Supplier table */
 #invTable th:last-child,
 #invTable td.actions { display: none !important; }
 </style>
+
 <style>
 :root {
   --field-border: #ccc;
@@ -144,16 +145,20 @@ textarea {
   resize: vertical !important;
 }
 </style>
-<style>
 
+
+<style>
+/* Hide per-row Actions column; we'll use a bottom toolbar instead */
 #invTable2 th:last-child,
 #invTable2 td.actions { display: none !important; }
 
+/* Clickable rows + selection highlight */
 #invTable2 tbody.subrows tr { cursor: pointer; }
 #invTable2 tbody.subrows tr.selected { background: rgba(0,0,0,0.04); }
 #invToolbar { display:flex; gap:8px; align-items:center; padding:8px 0; }
 #invToolbar .btn[disabled] { opacity:0.5; cursor:not-allowed; }
 
+/* Right-click context menu */
 #rowCtxMenu {
   position: fixed; z-index: 10000; display:none; min-width: 180px;
   background:#fff; border:1px solid #ddd; border-radius:12px; box-shadow:0 6px 24px rgba(0,0,0,0.12);
@@ -164,6 +169,8 @@ textarea {
 }
 #rowCtxMenu button:hover { background: rgba(0,0,0,0.06); }
 </style>
+
+
 <style>
 #cellCtxMenu {
   position: fixed; z-index: 10001; display:none; min-width: 220px;
@@ -177,6 +184,7 @@ textarea {
 }
 #cellCtxMenu button:hover { background: rgba(0,0,0,0.06); }
 
+/* Force QR modal above all sticky headers and UI elements */
 #qrModal{
   position: fixed !important;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -188,416 +196,433 @@ textarea {
 }
 body.modal-open{ overflow:hidden; touch-action:none; }
 </style>
-<style>
-.scanit-dock{
-  position: fixed; right: 16px; bottom: 16px; z-index: 2147483600;
-  background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:12px; width: min(420px, 96vw);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-}
-.scanit-dock .title{ font-weight:800; margin-bottom:8px; }
-.scanit-dock .controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
-.scanit-dock input[type="text"]{ width:100%; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; }
-.scanit-dock .hint{ font-size:12px; color:#6b7280; margin-top:6px; }
-@media (max-width: 640px){
-  .scanit-dock{ left: 16px; right: 16px; bottom: 12px; }
-}
-</style></head>
+
+</head>
 <body>
 <header>RLH Trauma and Orthopaedic Theatres Inventory Manager</header>
 <div class="layout">
-<aside class="side">
-<button class="tab active" data-tab="registerTab">Register</button>
-<button class="tab" data-tab="inventoryTab">Inventory</button>
-<button class="tab" data-tab="ordersTab">Orders</button>
-<button class="tab" data-tab="receivedTab">Received</button>
-<button class="tab" data-tab="qrTab">QR &amp; Labels</button>
-</aside>
-<main>
-<section class="stack" id="registerTab">
-<div class="split2">
-<div class="card stack">
-<h2>Register Product</h2>
-<div class="grid3">
-<label>Supplier
-              <input id="supplier" list="supplierList" placeholder="Type or pick supplier"/>
-<datalist id="supplierList"></datalist>
-</label>
-<label>Product Name
-              <input id="productName" placeholder="e.g. 3.5mm Cortical Screw" type="text"/>
-</label>
-<label>Product Ref / SKU
-              <input id="sku" placeholder="e.g. 214.832" type="text"/>
-</label>
-</div>
-<div class="grid3">
-<label>System (by supplier)
-              <input id="system" placeholder="e.g. Distal Elbow Set" type="text"/>
-</label>
-<label>Type
-              <input id="type" placeholder="e.g. Implant, Consumable" type="text"/>
-</label>
-<label>Location
-              <input id="location" placeholder="e.g. Cupboard A, Shelf 3" type="text"/>
-</label>
-</div>
-<div class="grid3">
-<label>Current Stock
-              <input id="stock" min="0" placeholder="0" step="1" type="number"/>
-</label>
-<label>Consignment Min Level
-              <input id="minLevel" min="0" placeholder="Minimum on hand" step="1" type="number"/>
-</label>
-<label>Consignment Max Level
-              <input id="maxLevel" min="0" placeholder="Maximum on hand" step="1" type="number"/>
-</label>
-</div>
-<div class="grid3">
-<label>Reorder Point (ROP)
-              <input id="reorderPoint" min="0" placeholder="Alert at or below this" step="1" type="number"/>
-</label>
-<label>Usage Level (for ordering)
+  <aside class="side">
+    <button class="tab active" data-tab="registerTab">Register</button>
+    <button class="tab" data-tab="inventoryTab">Inventory</button>
+    <button class="tab" data-tab="ordersTab">Orders</button>
+    <button class="tab" data-tab="receivedTab">Received</button>
+    <button class="tab" data-tab="qrTab">QR & Labels</button>
+  </aside>
+
+  <main>
+
+    <!-- Register + Receive (split) -->
+    <section id="registerTab" class="stack">
+      <div class="split2">
+        <!-- Left: Register -->
+        <div class="card stack">
+          <h2>Register Product</h2>
+          <div class="grid3">
+            <label>Supplier
+              <input list="supplierList" id="supplier" placeholder="Type or pick supplier" />
+              <datalist id="supplierList"></datalist>
+            </label>
+            <label>Product Name
+              <input id="productName" type="text" placeholder="e.g. 3.5mm Cortical Screw" />
+            </label>
+            <label>Product Ref / SKU
+              <input id="sku" type="text" placeholder="e.g. 214.832" />
+            </label>
+          </div>
+          <div class="grid3">
+            <label>System (by supplier)
+              <input id="system" type="text" placeholder="e.g. Distal Elbow Set" />
+            </label>
+            <label>Type
+              <input id="type" type="text" placeholder="e.g. Implant, Consumable" />
+            </label>
+            <label>Location
+              <input id="location" type="text" placeholder="e.g. Cupboard A, Shelf 3" />
+            </label>
+          </div>
+          <div class="grid3">
+            <label>Current Stock
+              <input id="stock" type="number" min="0" step="1" placeholder="0" />
+            </label>
+            <label>Consignment Min Level
+              <input id="minLevel" type="number" min="0" step="1" placeholder="Minimum on hand" />
+            </label>
+            <label>Consignment Max Level
+              <input id="maxLevel" type="number" min="0" step="1" placeholder="Maximum on hand" />
+            </label>
+          </div>
+          <div class="grid3">
+            <label>Reorder Point (ROP)
+              <input id="reorderPoint" type="number" min="0" step="1" placeholder="Alert at or below this" />
+            </label>
+            <label>Usage Level (for ordering)
               <select id="usageLevel">
-<option value="">Select usage level</option>
-<option value="High">High</option>
-<option value="Medium">Medium</option>
-<option value="Low">Low</option>
-</select>
-</label>
-<label>Notes
-              <input id="notes" placeholder="Optional notes (size, lot, etc.)" type="text"/>
-</label>
-</div>
-<div class="row">
-<button class="btn" id="saveProduct">Save product</button>
-<button class="btn secondary" id="clearForm" type="button">Clear</button>
-<button class="btn ghost" id="previewQr" type="button">Preview QR</button>
-<span class="pill" id="editHint"></span>
-</div>
-<span class="hint">Usage pill: <span class="usage-pill usage-high">High</span> <span class="usage-pill usage-medium">Medium</span> <span class="usage-pill usage-low">Low</span> (affects order allowance). Status reflects stock vs levels.</span>
-</div>
-<div class="card stack">
-<h2>Recent Activities</h2>
-<div class="table-wrap">
-<table id="activityTable">
-<thead>
-<tr>
-<th>When</th>
-<th>Type<!--</th-->
-<th>Details</th>
-<th>Reference</th>
-</th></tr>
-</thead>
-<tbody id="activityTbody"></tbody>
-</table>
-</div>
-</div>
-</div>
-<div class="card stack">
-<div class="row" style="justify-content:space-between">
-<h2>Suppliers</h2>
-<div class="row">
-<input id="supplierFilter" placeholder="Filter suppliers or products" type="search"/>
-<span class="pill" id="prodCount">0</span>
-</div>
-</div>
-<div class="table-wrap">
-<table id="invTable">
-<colgroup>
-<col style="width:160px"/><col style="width:220px"/><col style="width:130px"/><col style="width:120px"/>
-<col style="width:160px"/><col style="width:110px"/><col style="width:120px"/><col style="width:140px"/>
-<col style="width:160px"/><col style="width:220px"/><col style="width:240px"/>
-</colgroup>
-<thead>
-<tr>
-<th>Supplier</th>
-<th>Product</th>
-<th>Reference</th>
-<th>Type</th>
-<th>Consignment Level</th>
-<th>Stock Qty</th>
-<th>Usage</th>
-<th>Status</th>
-<th>Last Checked</th>
-<th>Notes</th>
-<th>Actions</th>
-</tr>
-</thead>
-</table>
-</div>
-<span class="pill">Click a supplier to expand/collapse.</span>
-</div>
-</section>
-<section class="stack" id="inventoryTab" style="display:none">
-<div class="card stack">
-<div class="row" style="justify-content:space-between">
-<h2>Inventory</h2>
-<div class="row">
-<input id="invFilter" placeholder="Search by supplier, product, ref, system, type" type="search"/>
-<span class="pill" id="invCount">0</span>
-</div>
-</div>
-<div class="table-wrap">
-<table id="invTable2">
-<colgroup>
-<col style="width:160px"/><col style="width:220px"/><col style="width:130px"/><col style="width:120px"/>
-<col style="width:160px"/><col style="width:110px"/><col style="width:120px"/><col style="width:140px"/>
-<col style="width:160px"/><col style="width:220px"/><col style="width:240px"/>
-</colgroup>
-<thead>
-<tr>
-<th>Supplier</th>
-<th>Product</th>
-<th>Reference</th>
-<th>Type</th>
-<th>Consignment Level</th>
-<th>Stock Qty</th>
-<th>Usage</th>
-<th>Status</th>
-<th>Last Checked</th>
-<th>Notes</th>
-<th>Actions</th>
-</tr>
-</thead>
-</table>
-<div id="rowCtxMenu"></div>
-<div id="cellCtxMenu"></div>
-</div>
-</div>
-</section>
-<section class="stack" id="ordersTab" style="display:none">
-<div class="card stack">
-<h2>Place / Log an Order</h2>
-<label>Scan here (barcode/QR keyboard-wedge) — press Enter
-          <input id="orderScan" placeholder="Scan QR Code…"/>
-</label>
-<div class="row" style="margin-top:8px">
-<button class="btn ghost" id="ordOpenCam" type="button">Open Camera Scanner</button>
-</div>
-<div class="grid3">
-<label>Supplier
-            <input id="ordSupplier" list="supplierList" placeholder="Type supplier"/>
-</label>
-<label>System
+                <option value="">Select usage level</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </label>
+            <label>Notes
+              <input id="notes" type="text" placeholder="Optional notes (size, lot, etc.)" />
+            </label>
+          </div>
+          <div class="row">
+            <button class="btn" id="saveProduct">Save product</button>
+            <button class="btn secondary" id="clearForm" type="button">Clear</button>
+            <button class="btn ghost" id="previewQr" type="button">Preview QR</button>
+            <span class="pill" id="editHint"></span>
+          </div>
+          <span class="hint">Usage pill: <span class="usage-pill usage-high">High</span>  <span class="usage-pill usage-medium">Medium</span>  <span class="usage-pill usage-low">Low</span> (affects order allowance). Status reflects stock vs levels.</span>
+        </div>
+
+        <!-- Right: Recent Activities -->
+        <div class="card stack">
+          <h2>Recent Activities</h2>
+          <div class="table-wrap">
+            <table id="activityTable">
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Type</</th>
+                  <th>Details</th>
+                  <th>Reference</th>
+                </tr>
+              </thead>
+              <tbody id="activityTbody"></tbody>
+            </table>
+          </div>
+        </div>
+        
+      </div>
+
+      <!-- Supplier table -->
+      <div class="card stack">
+        <div class="row" style="justify-content:space-between">
+          <h2>Suppliers</h2>
+          <div class="row">
+            <input type="search" id="supplierFilter" placeholder="Filter suppliers or products" />
+            <span class="pill" id="prodCount">0</span>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="invTable">
+            <colgroup>
+              <col style="width:160px"/><col style="width:220px"/><col style="width:130px"/><col style="width:120px"/>
+              <col style="width:160px"/><col style="width:110px"/><col style="width:120px"/><col style="width:140px"/>
+              <col style="width:160px"/><col style="width:220px"/><col style="width:240px"/>
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Supplier</th>
+                <th>Product</th>
+                <th>Reference</th>
+                <th>Type</th>
+                <th>Consignment Level</th>
+                <th>Stock Qty</th>
+                <th>Usage</th>
+                <th>Status</th>
+                <th>Last Checked</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <span class="pill">Click a supplier to expand/collapse.</span>
+      </div>
+    </section>
+
+    <!-- Inventory -->
+    <section id="inventoryTab" class="stack" style="display:none">
+      <div class="card stack">
+        <div class="row" style="justify-content:space-between">
+          <h2>Inventory</h2>
+          <div class="row">
+            <input type="search" id="invFilter" placeholder="Search by supplier, product, ref, system, type" />
+            <span class="pill" id="invCount">0</span>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="invTable2">
+            <colgroup>
+              <col style="width:160px"/><col style="width:220px"/><col style="width:130px"/><col style="width:120px"/>
+              <col style="width:160px"/><col style="width:110px"/><col style="width:120px"/><col style="width:140px"/>
+              <col style="width:160px"/><col style="width:220px"/><col style="width:240px"/>
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Supplier</th>
+                <th>Product</th>
+                <th>Reference</th>
+                <th>Type</th>
+                <th>Consignment Level</th>
+                <th>Stock Qty</th>
+                <th>Usage</th>
+                <th>Status</th>
+                <th>Last Checked</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+          </table>
+        
+          <div id="rowCtxMenu"></div>
+          <div id="cellCtxMenu"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Orders -->
+    <section id="ordersTab" class="stack" style="display:none">
+      <div class="card stack">
+        <h2>Place / Log an Order</h2>
+        <label>Scan here (barcode/QR keyboard-wedge) — press Enter
+          <input id="orderScan" placeholder='Scan QR Code…' />
+        </label>
+
+        <div class="grid3">
+          <label>Supplier
+            <input list="supplierList" id="ordSupplier" placeholder="Type supplier"/>
+          </label>
+          <label>System
             <input id="ordSystem" placeholder="Optional system"/>
-</label>
-<label>Product (pick from inventory)
+          </label>
+          <label>Product (pick from inventory)
             <select id="ordProduct"></select>
-</label>
-</div>
-<div class="grid3">
-<label>Reference (SKU)
+          </label>
+        </div>
+
+        <div class="grid3">
+          <label>Reference (SKU)
             <input id="ordSku" placeholder="Auto-fills when product selected"/>
-</label>
-<label>Quantity Ordered
-            <input id="ordQty" min="1" step="1" type="number" value="1"/>
-</label>
-<label>Ordered By
+          </label>
+          <label>Quantity Ordered
+            <input id="ordQty" type="number" min="1" step="1" value="1"/>
+          </label>
+          <label>Ordered By
             <input id="ordBy" placeholder="Your name"/>
-</label>
-</div>
-<div class="grid3">
-<label>Ordered At
+          </label>
+        </div>
+
+        <div class="grid3">
+          <label>Ordered At
             <input id="ordAt" type="datetime-local"/>
-</label>
-<label>PO Number
+          </label>
+          <label>PO Number
             <input id="ordPO"/>
-</label>
-<div style="align-self:end">
-<button class="btn" id="ordSave" type="button">Save Order</button>
-</div>
-</div>
-<label>Notes (internal)
+          </label>
+          <div style="align-self:end">
+            <button class="btn" id="ordSave" type="button">Save Order</button>
+          </div>
+        </div>
+
+        <label>Notes (internal)
           <input id="ordNotes" placeholder="Optional notes about this order"/>
-</label>
-</div>
-<div class="card">
-<h2>Recent Orders</h2>
-<div class="table-wrap">
-<table id="ordersTable">
-<thead>
-<tr>
-<th>When</th>
-<th>Supplier</th>
-<th>Product</th>
-<th>Reference</th>
-<th>Qty</th>
-<th>Ordered By</th>
-<th>PO</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody id="ordersTbody"></tbody>
-</table>
-</div>
-</div>
+        </label>
+      </div>
+
+      <div class="card">
+        <h2>Recent Orders</h2>
+        <div class="table-wrap">
+          <table id="ordersTable">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Supplier</th>
+                <th>Product</th>
+                <th>Reference</th>
+                <th>Qty</th>
+                <th>Ordered By</th>
+                <th>PO</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Received -->
+    <section id="receivedTab" class="stack" style="display:none">
+      <div class="card stack">
+        <h2>Receive (Simple Scan)</h2>
+        <label>Scan here (press Enter)
+          <input id="rxScan" placeholder="Scan QR Code…" />
+        </label>
+        <div class="grid3">
+          <label>Quantity Received
+            <input id="rxQty" type="number" min="1" step="1" value="1" />
+          </label>
+          <label>PO Number (optional)
+            <input id="rxPO" />
+          </label>
+          <label>Received By
+            <input id="rxBy" placeholder="Your name" />
+          </label>
+        </div>
+        <label>Delivery Note / Ref
+          <input id="rxRef" placeholder="Delivery note or reference" />
+        </label>
+        <div class="row">
+          <button class="btn" id="rxApply" type="button">Add to Stock</button>
+          <span class="pill" id="rxStatus">Idle</span>
+        </div>
+        <span class="hint">Tip: The scan box accepts either a QR JSON payload or a plain reference. It will locate the product automatically.</span>
+      </div>
+
+      <div class="card stack">
+        <div class="row" style="justify-content:space-between">
+          <h2>Recent Deliveries</h2>
+          <div class="row">
+            <label style="display:grid">
+              <span class="hint">From</span>
+              <input type="date" id="recFrom">
+            </label>
+            <label style="display:grid">
+              <span class="hint">To</span>
+              <input type="date" id="recTo">
+            </label>
+            <button class="btn ghost" id="recApplyRange" type="button">Apply</button>
+            <button class="btn secondary" id="recClearRange" type="button">Clear</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="receivedTable">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Supplier</th>
+                <th>Product</th>
+                <th>Reference</th>
+                <th>Qty</th>
+                <th>PO</th>
+                <th>Received By</th>
+                <th>Delivery Ref</th>
+              </tr>
+            </thead>
+            <tbody id="receivedTbody"></tbody>
+          </table>
+        </div>
+      </div>
 </section>
-<section class="stack" id="receivedTab" style="display:none">
-<div class="card stack">
-<h2>Receive (Simple Scan)</h2>
-<label>Scan here (press Enter)
-          <input id="rxScan" placeholder="Scan QR Code…"/>
-</label>
-<div class="row" style="margin-top:8px">
-<button class="btn ghost" id="rxOpenCam" type="button">Open Camera Scanner</button>
+
+    <!-- QR & Labels -->
+    <section id="qrTab" class="stack" style="display:none">
+      <div class="card stack">
+        <div class="row" style="justify-content:space-between">
+          <h2>QR & Labels</h2>
+          <div class="row">
+            <input type="search" id="qrFilter" placeholder="Search to select items for labels…" />
+            <button class="btn" id="makeBulkQr">Generate QR Labels</button>
+          </div>
+        </div>
+        <div id="qrResults" class="qr-grid"></div>
+      </div>
+    </section>
+
+  </main>
 </div>
-<div class="grid3">
-<label>Quantity Received
-            <input id="rxQty" min="1" step="1" type="number" value="1"/>
-</label>
-<label>PO Number (optional)
-            <input id="rxPO"/>
-</label>
-<label>Received By
-            <input id="rxBy" placeholder="Your name"/>
-</label>
-</div>
-<label>Delivery Note / Ref
-          <input id="rxRef" placeholder="Delivery note or reference"/>
-</label>
-<div class="row">
-<button class="btn" id="rxApply" type="button">Add to Stock</button>
-<span class="pill" id="rxStatus">Idle</span>
-</div>
-<span class="hint">Tip: The scan box accepts either a QR JSON payload or a plain reference. It will locate the product automatically.</span>
-</div>
-<div class="card stack">
-<div class="row" style="justify-content:space-between">
-<h2>Recent Deliveries</h2>
-<div class="row">
-<label style="display:grid">
-<span class="hint">From</span>
-<input id="recFrom" type="date"/>
-</label>
-<label style="display:grid">
-<span class="hint">To</span>
-<input id="recTo" type="date"/>
-</label>
-<button class="btn ghost" id="recApplyRange" type="button">Apply</button>
-<button class="btn secondary" id="recClearRange" type="button">Clear</button>
-</div>
-</div>
-<div class="table-wrap">
-<table id="receivedTable">
-<thead>
-<tr>
-<th>When</th>
-<th>Supplier</th>
-<th>Product</th>
-<th>Reference</th>
-<th>Qty</th>
-<th>PO</th>
-<th>Received By</th>
-<th>Delivery Ref</th>
-</tr>
-</thead>
-<tbody id="receivedTbody"></tbody>
-</table>
-</div>
-</div>
-</section>
-<section class="stack" id="qrTab" style="display:none">
-<div class="card stack">
-<div class="row" style="justify-content:space-between">
-<h2>QR &amp; Labels</h2>
-<div class="row">
-<input id="qrFilter" placeholder="Search to select items for labels…" type="search">
-<button class="btn" id="makeBulkQr">Generate QR Labels</button>
-</input></div>
-</div>
-<div class="qr-grid" id="qrResults"></div>
-</div>
-</section>
-</main>
-</div>
+
+<!-- Modals: duplicate, adjust, QR -->
 <div class="modal" id="dupModal">
-<div class="panel">
-<h3>Possible duplicate</h3>
-<p class="hint" id="dupText"></p>
-<div class="row" style="justify-content:flex-end;gap:8px">
-<button class="btn secondary" id="dupCancel" type="button">Cancel</button>
-<button class="btn ghost" disabled="" id="dupCreate" type="button">Create New</button>
-<button class="btn" id="dupUpdate" type="button">Update Existing</button>
+  <div class="panel">
+    <h3>Possible duplicate</h3>
+    <p id="dupText" class="hint"></p>
+    <div class="row" style="justify-content:flex-end;gap:8px">
+      <button class="btn secondary" id="dupCancel" type="button">Cancel</button>
+      <button class="btn ghost" id="dupCreate" type="button" disabled>Create New</button>
+      <button class="btn" id="dupUpdate" type="button">Update Existing</button>
+    </div>
+    <span class="hint" id="dupHelp"></span>
+  </div>
 </div>
-<span class="hint" id="dupHelp"></span>
-</div>
-</div>
+
 <div class="modal" id="adjustModal">
-<div class="panel">
-<h3>Adjust Stock</h3>
-<p class="hint" id="adjustWhat"></p>
-<div class="row">
-<label>Quantity (+ add / − deduct)
-        <input id="adjQty" step="1" type="number" value="1">
-</input></label>
-<label>Note (optional)
-        <input id="adjNote" placeholder="Reason or reference" type="text"/>
-</label>
+  <div class="panel">
+    <h3>Adjust Stock</h3>
+    <p id="adjustWhat" class="hint"></p>
+    <div class="row">
+      <label>Quantity (+ add / − deduct)
+        <input id="adjQty" type="number" step="1" value="1"/>
+      </label>
+      <label>Note (optional)
+        <input id="adjNote" type="text" placeholder="Reason or reference"/>
+      </label>
+    </div>
+    <div class="row" style="justify-content:flex-end">
+      <button class="btn secondary" id="adjCancel">Cancel</button>
+      <button class="btn" id="adjSave">Apply</button>
+    </div>
+  </div>
 </div>
-<div class="row" style="justify-content:flex-end">
-<button class="btn secondary" id="adjCancel">Cancel</button>
-<button class="btn" id="adjSave">Apply</button>
+
+<div class="modal" id="qrModal" aria-hidden="true">
+  <div class="panel">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <h2>QR Code</h2>
+      <button class="btn secondary" id="closeQr" type="button">Close</button>
+    </div>
+    <div class="qr-box">
+      <div id="qrHolder"></div>
+      <div class="qr-meta" id="qrMeta"></div>
+      <div class="row">
+        <button class="btn" id="downloadQr" type="button">Download PNG</button>
+        <button class="btn ghost" id="copyPayload" type="button">Copy Payload</button>
+      </div>
+    </div>
+  </div>
 </div>
-</div>
-</div>
-<div aria-hidden="true" class="modal" id="qrModal">
-<div class="panel">
-<div class="row" style="justify-content:space-between;align-items:center">
-<h2>QR Code</h2>
-<button class="btn secondary" id="closeQr" type="button">Close</button>
-</div>
-<div class="qr-box">
-<div id="qrHolder"></div>
-<div class="qr-meta" id="qrMeta"></div>
-<div class="row">
-<button class="btn" id="downloadQr" type="button">Download PNG</button>
-<button class="btn ghost" id="copyPayload" type="button">Copy Payload</button>
-</div>
-</div>
-</div>
-</div>
-<script defer="" src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<!-- QR generator -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth, setPersistence, browserLocalPersistence, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
   import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, getDocs, query, orderBy, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyCOwLEv21k5i63laJF86qGOBMoucJMp4Gw",
-    authDomain: "skills-vault.firebaseapp.com",
-    databaseURL: "https://skills-vault-default-rtdb.firebaseio.com",
-    projectId: "skills-vault",
-    storageBucket: "skills-vault.firebasestorage.app",
-    messagingSenderId: "16675638838",
-    appId: "1:16675638838:web:960abec1b6c526c7581297",
-    measurementId: "G-BHRBKRLZ1C"
-  };
+apiKey: "AIzaSyB0w25u3Ys1SyE2Xm0waLHNlUcqOKbQdIw",
+authDomain: "inventory-67ceb.firebaseapp.com",
+projectId: "inventory-67ceb",
+storageBucket: "inventory-67ceb.firebasestorage.app",
+messagingSenderId: "1031351285804",
+appId: "1:1031351285804:web:cee68e7047fc8ef76c7989",
+measurementId: "G-C5G29GW4PZ"
+};
 
   const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  await setPersistence(auth, browserLocalPersistence);
+  try { await signInAnonymously(auth); } catch(e) { console.error('Anon sign-in failed', e); }
   const db = getFirestore(app);
 
   const $ = (q, r=document) => r.querySelector(q);
   const $$ = (q, r=document) => Array.from(r.querySelectorAll(q));
 
-  
+  // Collections
   const productsRef   = collection(db, 'inventoryProducts');
   const suppliersRef  = collection(db, 'suppliers');
   const deliveriesRef = collection(db, 'deliveries');
   const adjustmentsRef= collection(db, 'stockAdjustments');
   const ordersRef     = collection(db, 'orders');
 
-  
+  // State
   let products = [];
   let suppliers = [];
   let editId = null;
   let pendingDup = null;
   let adjustTarget = null;
-  let qr; 
-  let rxSelectedProduct = null; 
+  let qr; // qrcode instance (modal)
+  let rxSelectedProduct = null; // product set by simple scan
 
-  
-  let lastOrderByProductId = new Map();     
-  let lastDeliveryByProductId = new Map();  
+  // Caches for Notes column
+  let lastOrderByProductId = new Map();     // productId -> order
+  let lastDeliveryByProductId = new Map();  // productId -> delivery
 
-  
+  // Tabs
   $$('.side .tab').forEach(btn=>btn.onclick=()=>{
     $$('.side .tab').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
@@ -611,7 +636,7 @@ body.modal-open{ overflow:hidden; touch-action:none; }
     renderTables();
   });
 
-  
+  // Load suppliers list
   async function loadSuppliers(){
     const snap = await getDocs(query(suppliersRef, orderBy('name')));
     suppliers = snap.docs.map(d=>({id:d.id, ...d.data()}));
@@ -619,22 +644,15 @@ body.modal-open{ overflow:hidden; touch-action:none; }
   }
   loadSuppliers();
 
-  
-  
-let skuIndex = new Map();
-onSnapshot(productsRef, snap => {
-  products = snap.docs.map(d=>({id:d.id, ...d.data()}));
-  skuIndex.clear();
-  for (const p of products) {
-    const key = String(p.sku || '').trim().toLowerCase();
-    if (key) skuIndex.set(key, p);
-  }
-  renderTables();
-  if($('.side .tab.active')?.dataset.tab==='qrTab') renderQrSearch();
-  if($('.side .tab.active')?.dataset.tab==='ordersTab') rebuildOrderProductList();
-});
+  // Real-time products
+  onSnapshot(productsRef, snap => {
+    products = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    renderTables();
+    if($('.side .tab.active')?.dataset.tab==='qrTab') renderQrSearch();
+    if($('.side .tab.active')?.dataset.tab==='ordersTab') rebuildOrderProductList();
+  });
 
-  
+  // Recent orders map + Orders table
   onSnapshot(query(ordersRef, orderBy('orderedAt','desc')), snap=>{
     lastOrderByProductId.clear();
     snap.docs.forEach(d=>{
@@ -661,7 +679,7 @@ onSnapshot(productsRef, snap => {
     $('#ordersTbody').innerHTML = rows;
   });
 
-  
+  // Recent deliveries map + Received table (full list, date-filtered)
   let deliveriesCache = [];
   onSnapshot(query(deliveriesRef, orderBy('createdAt','desc')), snap=>{
     deliveriesCache = snap.docs.map(d=>({id:d.id, ...d.data()}));
@@ -674,36 +692,15 @@ onSnapshot(productsRef, snap => {
     renderTables();
   });
 
-  
+  // Helpers
   const n = v => Number(v||0);
   function escapeHtml(str=''){return String(str).replace(/[&<>"']/g, s=>({"&":"&amp;","<":"&lt;","|": "&#124;","—":"—",">":"&gt;","\"":"&quot;","'":"&#39;"}[s]||s))}
   function fmtTS(v){
     try { return v?.toDate ? v.toDate().toLocaleString() : (v ? new Date(v).toLocaleString() : '—'); }
-    
-function findProductByScanText(text){
-  let j=null;
-  try { j = JSON.parse(text); } catch {}
-  let pid = j?.id || null;
-  let sku = (j?.sku || '').trim().toLowerCase();
-  if (pid) {
-    const byId = products.find(p => p.id === pid);
-    if (byId) return byId;
-  }
-  if (sku) {
-    const bySku = skuIndex.get(sku);
-    if (bySku) return bySku;
-  }
-  const t = String(text || '').trim();
-  const byId2 = products.find(p => p.id === t);
-  if (byId2) return byId2;
-  const bySku2 = skuIndex.get(t.toLowerCase());
-  if (bySku2) return bySku2;
-  return null;
-}
-catch { return '—'; }
+    catch { return '—'; }
   }
 
-  
+  // Status rules -> labels
   function statusBadge(p){
     const max = n(p.maxLevel), min = n(p.minLevel), stock = n(p.stock), rop = n(p.reorderPoint);
     if (!max && !min) return `<span class="status-chip">—</span>`;
@@ -740,7 +737,7 @@ catch { return '—'; }
     return Object.keys(g).sort((a,b)=>a.localeCompare(b)).map(s=>({supplier:s,items:g[s].sort((a,b)=>a.productName.localeCompare(b.productName))}));
   }
 
-  
+  // Render tables
   function renderTables(){
     const q1 = $('#supplierFilter')?.value?.toLowerCase()?.trim()||'';
     const q2 = $('#invFilter')?.value?.toLowerCase()?.trim()||'';
@@ -794,7 +791,7 @@ catch { return '—'; }
       table.appendChild(sub);
     });
 
-    
+    // Expand/collapse
     $$(tableSel+' .grp').forEach(r=>{
       r.onclick=()=>{
         r.classList.toggle('open');
@@ -804,14 +801,14 @@ catch { return '—'; }
       };
     });
 
-    
+    // Product name link -> QR modal
     $$(tableSel+' a[data-qr]').forEach(a=>a.onclick=(e)=>{
       e.preventDefault();
       const p = products.find(x=>x.id===a.dataset.qr);
       if(p) openQrModal(p);
     });
 
-    
+    // Actions
     $$(tableSel+' button[data-del]').forEach(b=>b.onclick=async e=>{
       e.stopPropagation();
       if(!confirm('Delete this product?')) return;
@@ -849,11 +846,11 @@ catch { return '—'; }
     });
   }
 
-  
+  // Filters
   $('#supplierFilter')?.addEventListener('input', renderTables);
   $('#invFilter')?.addEventListener('input', renderTables);
 
-  
+  // Duplicate check + Save
   $('#saveProduct').onclick = async ()=>{
     const payload = collectForm();
     if(!payload) return;
@@ -876,6 +873,8 @@ catch { return '—'; }
   };
 
   async function persistProduct(payload){
+    // Warn if rules forbid create
+    if(!editId){ console.log('Attempting to CREATE inventoryProducts item… (rules may block this)'); }
     const now = Date.now();
     if(editId){
       await updateDoc(doc(db,'inventoryProducts',editId), {...payload, updatedAt: now, lastChecked: now});
@@ -889,23 +888,23 @@ catch { return '—'; }
     clearForm();
   }
 
-  
+  // Return rich duplicate info
   async function findPotentialDuplicate({supplier, sku, system, productName}){
-    
+    // 1) Exact SKU duplicate? (same supplier + same sku)
     let r1 = await getDocs(query(productsRef, where('supplier','==',supplier), where('sku','==',sku)));
     if(!r1.empty){
       return { type:'sku_match', doc:r1.docs[0], canCreateNew:false };
     }
-    
+    // 2) Same supplier + same name/system (but different ref) => can create new
     let r2 = await getDocs(query(productsRef, where('supplier','==',supplier), where('system','==',system), where('productName','==',productName)));
     if(!r2.empty){
       return { type:'name_match', doc:r2.docs[0], canCreateNew:true };
     }
-    
+    // None
     return { type:'none', doc:null, canCreateNew:true };
   }
 
-  
+  // Duplicate modal buttons
   $('#dupCreate').onclick = async ()=>{
     if(!pendingDup) return;
     if(!pendingDup.canCreateNew){
@@ -926,7 +925,7 @@ catch { return '—'; }
     $('#dupModal').classList.remove('open');
   };
 
-  
+  // Collect form
   function collectForm(){
     const supplier = $('#supplier').value.trim();
     const productName = $('#productName').value.trim();
@@ -952,7 +951,7 @@ catch { return '—'; }
     $('#usageLevel').value='';
   };
 
-  
+  // Adjust modal
   $('#adjCancel').onclick = ()=> $('#adjustModal').classList.remove('open');
   $('#adjSave').onclick = async ()=>{
     const q = Math.round(n($('#adjQty').value));
@@ -965,7 +964,7 @@ catch { return '—'; }
     $('#adjustModal').classList.remove('open');
   };
 
-  
+  // ----- QR GENERATION (modal) -----
   $('#closeQr').onclick = ()=> $('#qrModal').classList.remove('open');
   $('#previewQr').onclick = ()=>{
     const tmp = collectForm(); if(!tmp) return;
@@ -978,7 +977,7 @@ catch { return '—'; }
     document.body.classList.add('modal-open');
     const holder = $('#qrHolder'); holder.innerHTML='';
     if(!window.QRCode){ alert('QR lib not loaded yet.'); return; }
-    
+    // eslint-disable-next-line no-undef
     qr = new QRCode(holder, { text: makeQrPayload(p), width:256, height:256, correctLevel: QRCode.CorrectLevel.M });
     $('#qrMeta').textContent = `${p.productName} — ${p.supplier} (${p.sku})`;
     $('#qrModal').classList.add('open');
@@ -997,7 +996,7 @@ catch { return '—'; }
     const a=document.createElement('a'); a.href=dataUrl; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
   }
 
-  
+  // ----- QR & Labels tab (mini) -----
   function renderQrSearch(){
     const q = $('#qrFilter').value?.toLowerCase()?.trim()||'';
     const list = !q ? [] :
@@ -1012,10 +1011,10 @@ catch { return '—'; }
       </div>
     `).join('');
 
-    
+    // render minis
     list.forEach(p=>{
       const el = document.querySelector(`.qr-small[data-mini="${CSS.escape(p.id)}"]`);
-      
+      // eslint-disable-next-line no-undef
       const mini = new QRCode(el, {text: makeQrPayload(p), width:128, height:128, correctLevel: QRCode.CorrectLevel.M});
       const btn = document.querySelector(`[data-mini-dl="${CSS.escape(p.id)}"]`);
       btn.onclick = ()=>{
@@ -1039,10 +1038,10 @@ catch { return '—'; }
     }
   });
 
-  
+  // ===== Receive (Simple Scan) logic =====
   function setRxStatus(msg){ $('#rxStatus').textContent = msg; }
 
-  
+  // Single scan input: Enter to decode & match product
   $('#rxScan').addEventListener('keydown', (e)=>{
     if(e.key === 'Enter'){
       e.preventDefault();
@@ -1053,22 +1052,14 @@ catch { return '—'; }
   });
 
   function handleReceiveScan(text){
-  const p = findProductByScanText(text);
-  if (p){
-    rxSelectedProduct = p;
-    setRxStatus(`Linked: ${p.productName} — ${p.supplier} (${p.sku})`);
-  } else {
-    rxSelectedProduct = null;
-    setRxStatus('No matching product');
-  }
-} or plain text (id or sku)
+    // Accept JSON {id, sku, ...} or plain text (id or sku)
     let j=null;
     try{ j = JSON.parse(text); }catch{}
     let pid = j?.id || null;
     let sku = j?.sku || null;
 
     if(!pid && !sku){
-      
+      // treat as plain token; try id first, then sku
       const byId = products.find(p=>p.id===text);
       if(byId){ pid = byId.id; sku = byId.sku; }
       else {
@@ -1089,7 +1080,7 @@ catch { return '—'; }
     }
   }
 
-  
+  // Apply receipt to stock + log delivery
   $('#rxApply').addEventListener('click', async ()=>{
     try{
       const qty = Math.max(1, n($('#rxQty').value));
@@ -1114,7 +1105,7 @@ catch { return '—'; }
     }
   });
 
-  
+  // ===== Orders logic =====
   function rebuildOrderProductList(){
     const sup = $('#ordSupplier').value?.toLowerCase()?.trim()||'';
     const sys = $('#ordSystem').value?.toLowerCase()?.trim()||'';
@@ -1139,7 +1130,7 @@ catch { return '—'; }
     $('#ordSku').value = p.sku||'';
   });
 
-  
+  // Save Order
   $('#ordSave')?.addEventListener('click', async ()=>{
     const id = $('#ordProduct').value;
     const p = products.find(x=>x.id===id);
@@ -1148,7 +1139,7 @@ catch { return '—'; }
     const ordBy = $('#ordBy').value.trim();
     const po = $('#ordPO').value.trim();
     const notes = $('#ordNotes').value.trim();
-    const atRaw = $('#ordAt').value; 
+    const atRaw = $('#ordAt').value; // yyyy-mm-ddThh:mm
     const orderedAt = atRaw ? new Date(atRaw).getTime() : Date.now();
 
     await addDoc(ordersRef, {
@@ -1164,7 +1155,7 @@ catch { return '—'; }
     $('#ordQty').value = 1; $('#ordPO').value=''; $('#ordNotes').value=''; $('#ordBy').value='';
   });
 
-  
+  // Orders keyboard-wedge scan (simple)
   const scanBox = $('#orderScan');
   if (scanBox) {
     scanBox.addEventListener('keydown', (e)=>{
@@ -1176,10 +1167,8 @@ catch { return '—'; }
     });
   }
   function handleOrderScan(text){
-  const p = findProductByScanText(text);
-  if (p) return fillOrderFromProduct(p);
-  alert('No matching product for this scan.');
-}catch{}
+    let j=null;
+    try{ j = JSON.parse(text); }catch{}
     let id = j?.id || null;
     let sku = j?.sku || null;
 
@@ -1198,7 +1187,7 @@ catch { return '—'; }
     $('#ordQty').focus();
   }
 
-  
+  // ===== Received table render with date filters =====
   function paintReceivedTable(){
     const fromRaw = $('#recFrom').value;
     const toRaw = $('#recTo').value;
@@ -1235,6 +1224,7 @@ catch { return '—'; }
   });
 
 </script>
+
 <script>
 (function(){
   let selectedRow = null;
@@ -1277,16 +1267,16 @@ catch { return '—'; }
     }
   }
 
-  
+  // Toolbar buttons
   document.getElementById('actEdit')?.addEventListener('click', ()=>triggerAction('edit'));
   document.getElementById('actAdjust')?.addEventListener('click', ()=>triggerAction('adjust'));
   document.getElementById('actQr')?.addEventListener('click', ()=>triggerAction('qr'));
   document.getElementById('actDelete')?.addEventListener('click', ()=>triggerAction('delete'));
 
-  
+  // Click selection (event delegation)
   document.getElementById('invTable2')?.addEventListener('click', handleRowClick);
 
-  
+  // Context menu
   const menu = document.getElementById('rowCtxMenu');
   document.getElementById('invTable2')?.addEventListener('contextmenu', function(e){
     const row = e.target.closest('tbody.subrows tr');
@@ -1326,15 +1316,15 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     menu.style.display='none';
   });
 
-  
+  // After initial render, selection is off
   setToolbarEnabled(false);
 
-  
+  // Optional: if tables re-render, keep delegation; selection will clear on filter
   document.getElementById('invFilter')?.addEventListener('input', ()=>{
     if(selectedRow){ selectedRow.classList.remove('selected'); selectedRow=null; setToolbarEnabled(false); }
   });
 
-  
+  // Keyboard shortcut: Ctrl + Delete to delete selected row and Firebase doc
   document.addEventListener('keydown', function(e){
     if(e.ctrlKey && (e.key === 'Delete')){
       if(selectedRow){
@@ -1344,9 +1334,11 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
   });
 })();
 </script>
+
+
 <script>
 (function(){
-  
+  // Helpers: map columns to doc fields
   const EDIT_MAP = {
     'Supplier': {key:'supplier', type:'text'},
     'Product': {key:'productName', type:'text'},
@@ -1354,14 +1346,14 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     'Type': {key:'type', type:'text'},
     'Usage': {key:'usageLevel', type:'select', options:['High','Medium','Low','']},
     'Notes': {key:'notes', type:'text'},
-    
+    // Special compound field for Consignment Level (min/max)
     'Consignment Level': {type:'consignment'},
-    
+    // Stock handled by Stock Adjust modal you already have
     'Stock Qty': {type:'stockAdjust'}
-    
+    // 'Status' and 'Last Checked' are derived; not editable
   };
 
-  
+  // Build a quick header index for #invTable2
   function headerIndex(){
     const ths = Array.from(document.querySelectorAll('#invTable2 thead th'));
     return ths.map(th => th.textContent.trim());
@@ -1370,20 +1362,20 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
   let cellMenu = document.getElementById('cellCtxMenu');
   let rowMenu = document.getElementById('rowCtxMenu');
 
-  
+  // Return the product id from a row by peeking at the hidden actions cell buttons
   function getRowProductId(row){
     const b = row.querySelector('button[data-edit]');
     return b ? b.dataset.edit : null;
   }
 
-  
+  // Mount listeners: right click on any cell (but ignore header/group rows)
   const table = document.getElementById('invTable2');
   if(!table) return;
 
   function openCellMenu(e, row, colName, cell){
     const conf = EDIT_MAP[colName];
-    if(!conf) return; 
-    
+    if(!conf) return; // non-editable column
+    // Build menu html
     let title = `<div class="ctx-title">Edit <em>${colName}</em></div><hr/>`;
     let btns = '';
     if(conf.type === 'stockAdjust'){
@@ -1399,17 +1391,17 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     cellMenu.style.display = 'block';
     cellMenu.style.left = e.pageX + 'px';
     cellMenu.style.top = e.pageY + 'px';
-    
+    // Save context
     cellMenu.dataset.rowId = getRowProductId(row) || '';
     cellMenu.dataset.col = colName;
     cellMenu.dataset.cellIndex = [...cell.parentNode.children].indexOf(cell);
   }
 
-  
+  // Delegate right-click on cells
   table.addEventListener('contextmenu', function(e){
     const cell = e.target.closest('td');
     const row = e.target.closest('tbody.subrows tr');
-    if(!cell || !row) return; 
+    if(!cell || !row) return; // ignore headers or group rows
     e.preventDefault();
     const colIdx = [...cell.parentNode.children].indexOf(cell);
     const headers = headerIndex();
@@ -1417,7 +1409,7 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     openCellMenu(e, row, colName, cell);
   });
 
-  
+  // Dismiss menus
   document.addEventListener('click', function(e){
     if(rowMenu) rowMenu.style.display = 'none';
     if(cellMenu && !cellMenu.contains(e.target)) cellMenu.style.display = 'none';
@@ -1429,24 +1421,24 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     }
   });
 
-  
+  // Core edit action
   async function performCellEdit(rowId, colName){
     const conf = EDIT_MAP[colName];
     if(!conf) return;
 
-    
+    // Use hidden action buttons where appropriate
     const row = [...document.querySelectorAll('#invTable2 tbody.subrows tr, #invTable tbody.subrows tr')]
       .find(tr => (tr.querySelector('button[data-edit]')||{}).dataset?.edit === rowId);
     if(!row) return;
 
     if(conf.type === 'stockAdjust'){
-      
+      // Trigger the existing modal via its button
       row.querySelector('button[data-adjust]')?.click();
       return;
     }
 
     if(conf.type === 'consignment'){
-      
+      // Prompt two values
       const min = prompt('Set MIN level (integer):');
       if(min===null) return;
       const max = prompt('Set MAX level (integer):');
@@ -1481,7 +1473,7 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
       return;
     }
 
-    
+    // default text edit
     const curr = row.querySelector('td:nth-child(' + (headerIndex().indexOf(colName)+1) + ')')?.textContent?.trim() || '';
     const next = prompt('Edit ' + colName + ':', curr);
     if(next===null) return;
@@ -1492,7 +1484,7 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     }
   }
 
-  
+  // Cell menu click handler
   cellMenu?.addEventListener('click', function(e){
   const btn = e.target.closest('button[data-cact]');
   if(!btn) return;
@@ -1500,7 +1492,7 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
   const colName = cellMenu.dataset.col;
   cellMenu.style.display = 'none';
   if (btn.dataset.cact === 'delete') {
-    
+    // Find the row and click its existing Delete button (which already has confirmation + Firestore logic)
     const row = [...document.querySelectorAll('#invTable2 tbody.subrows tr, #invTable tbody.subrows tr')]
       .find(tr => (tr.querySelector('button[data-edit]')||{}).dataset?.edit === rowId);
     row?.querySelector('button[data-del]')?.click();
@@ -1510,9 +1502,11 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
 });
 })();
 </script>
+
+
 <script>
 (function(){
-  
+  // Attach cell-level context menu for #invTable mirroring #invTable2
   const table = document.getElementById('invTable');
   const cellMenu = document.getElementById('cellCtxMenu');
   const EDIT_MAP = window.EDIT_MAP || {
@@ -1546,7 +1540,7 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
       const colName = headers[colIdx];
       const conf = EDIT_MAP[colName];
       if(!conf) return;
-      
+      // Build and show menu
       let title = `<div class="ctx-title">Edit <em>${colName}</em></div><hr/>`;
       let btns = '';
       if(conf.type === 'stockAdjust') btns += `<button data-cact="stockAdjust">Adjust Stock…</button>`;
@@ -1563,18 +1557,20 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     }, {passive:false});
   }
 
-  
-  
+  // Reuse existing click handler on #cellCtxMenu which calls performCellEdit and triggers row delete button
+  // Also ensure performCellEdit can find rows in both tables
   if (!window.__multiTablePatched) {
     window.__multiTablePatched = true;
     const oldPerform = window.performCellEdit;
-    
+    // If performCellEdit is scoped, we cannot override; instead append a helper.
     try{
-      
+      // no-op, rely on existing handler that queries '#invTable2 tbody...' only; we will add a broader query below by injecting helper
     }catch(e){}
   }
 })();
 </script>
+
+
 <script>
 (function(){
   const table = document.getElementById('invTable');
@@ -1614,6 +1610,8 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
   }
 })();
 </script>
+
+
 <script id="scanner-hash-listener">
 (function(){
   if (window.__scannerHashListenerInstalled) return;
@@ -1647,7 +1645,7 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
       window.handleOrderScan(scan);
       return;
     }
-    
+    // Fallback: open QR modal if it's a product payload
     try{
       const j = JSON.parse(scan);
       const id = j.id || null, sku = j.sku || null;
@@ -1662,230 +1660,154 @@ document.getElementById('invTable')?.addEventListener('contextmenu', function(e)
     const m = parseHash();
     if(!m.tab && !m.scan) return;
     const ok = selectTab(m.tab);
-    
+    // If tab selection rerenders async, delay scan handling slightly
     setTimeout(()=>handleScan(m.tab, m.scan), ok ? 60 : 0);
   }
   window.addEventListener('hashchange', applyFromHash);
-  
+  // Run once on load
   applyFromHash();
 })();
 </script>
-<div aria-hidden="true" class="modal" id="camModal">
-<div class="panel" style="max-width:720px">
-<div class="row" style="justify-content:space-between;align-items:center">
-<h2>Camera Scanner</h2>
-<div class="row" style="gap:8px">
-<select class="form-select" id="camDevice" style="min-width:220px"></select>
-<button class="btn ghost" disabled="" id="camTorch" type="button">Toggle Torch</button>
-<button class="btn secondary" id="camClose" type="button">Close</button>
+
+
+<!-- Scan-IT-like Dock -->
+<style>
+#scanDock{
+  position:fixed; right:16px; bottom:16px; z-index:99999;
+  background:#ffffff; border:1px solid #e5e7eb; border-radius:14px;
+  box-shadow:0 8px 40px rgba(0,0,0,.12); padding:12px; width:320px;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial;
+}
+#scanDock h4{margin:0 0 8px; font-size:14px; font-weight:800}
+#scanDock .row{display:flex; gap:8px; align-items:center; margin:6px 0; flex-wrap:wrap}
+#scanDock .row > *{flex:1}
+#scanDock button{padding:8px 12px; border-radius:10px; border:0; background:#0d6efd; color:#fff; font-weight:800; cursor:pointer}
+#scanDock button.stop{background:#dc3545}
+#scanDock small{color:#6b7280}
+#scanReader{display:none; margin-top:8px}
+</style>
+<div id="scanDock" aria-live="polite">
+  <h4>Mobile Scanner</h4>
+  <div class="row">
+    <button id="scanStartBtn" type="button">Start Camera</button>
+    <button id="scanStopBtn" type="button" class="stop" disabled>Stop</button>
+  </div>
+  <div class="row">
+    <label style="flex:1.2">Target
+      <select id="scanTarget">
+        <option value="auto">Auto (focused field)</option>
+        <option value="#orderScan">Orders → Scan box</option>
+        <option value="#rxScan">Receive → Scan box</option>
+        <option value="#sku">Register → SKU field</option>
+      </select>
+    </label>
+    <label style="flex:.8">Suffix
+      <select id="scanSuffix">
+        <option value="none">None</option>
+        <option value="tab">TAB</option>
+        <option value="enter">ENTER</option>
+      </select>
+    </label>
+  </div>
+  <div class="row">
+    <label><input type="checkbox" id="scanKeepFocus" checked> Keep focus</label>
+    <small id="scanStatus">Idle</small>
+  </div>
+  <div id="scanReader" style="width:300px;"></div>
 </div>
-</div>
-<div style="position:relative; background:#000; border-radius:12px; overflow:hidden">
-<video autoplay="" id="camVideo" muted="" playsinline="" style="width:100%;height:auto;display:block"></video>
-<canvas id="camCanvas" style="display:none"></canvas>
-<div style="position:absolute;inset:0;pointer-events:none;border:2px solid rgba(255,255,255,0.25);margin:10%"></div>
-</div>
-<div class="hint" id="camHint">Point at a QR or barcode. It auto-captures.</div>
-</div>
-</div>
-<script type="module">
-  let camStream=null, scanning=false, useZXing=false, codeReader=null, currentTrack=null, torchOn=false;
-  let onScan=(t)=>{};
-  const el = (id)=>document.getElementById(id);
-  const has = (id)=>document.getElementById(id) != null;
-
-  if (has('rxOpenCam')) el('rxOpenCam').addEventListener('click', ()=>{ onScan=(t)=>{ try{handleReceiveScan(t)}catch(e){console.error(e)} }; openCamModal(); });
-  if (has('ordOpenCam')) el('ordOpenCam').addEventListener('click', ()=>{ onScan=(t)=>{ try{handleOrderScan(t)}catch(e){console.error(e)} }; openCamModal(); });
-  if (has('camClose')) el('camClose').addEventListener('click', closeCamModal);
-  if (has('camTorch')) el('camTorch').addEventListener('click', toggleTorch);
-
-  async function openCamModal(){ document.body.classList.add('modal-open'); el('camModal').classList.add('open'); await startCamera(); }
-  function closeCamModal(){ stopCamera(); el('camModal').classList.remove('open'); document.body.classList.remove('modal-open'); }
-
-  async function listVideoDevices(){ const ds=await navigator.mediaDevices.enumerateDevices(); return ds.filter(d=>d.kind==='videoinput'); }
-  async function startCamera(deviceId){
-    try{
-      const constraints = deviceId ? { video:{deviceId:{exact:deviceId}} } : { video:{ facingMode:{ideal:'environment'} } };
-      camStream = await navigator.mediaDevices.getUserMedia(constraints);
-      const v = el('camVideo'); v.srcObject = camStream; await v.play();
-      currentTrack = camStream.getVideoTracks()[0];
-      const caps = currentTrack.getCapabilities?.() || {}; el('camTorch').disabled = !caps.torch;
-
-      const select = el('camDevice');
-      if(select && !select.dataset.loaded){
-        const inputs = await listVideoDevices();
-        select.innerHTML = inputs.map(d=>`<option value="${d.deviceId}">${d.label||'Camera'}</option>`).join('');
-        select.dataset.loaded='1';
-        select.onchange = async ()=>{ stopCamera(); await startCamera(select.value); };
-      }
-
-      useZXing = !(window.BarcodeDetector && await isDetectorSupported());
-      if(useZXing){ await loadZXing(); startZXingLoop(); } else { startNativeLoop(); }
-    }catch(err){ console.error(err); if (el('camHint')) el('camHint').textContent='Camera unavailable. Use HTTPS or grant permission.'; }
-  }
-  function stopCamera(){ scanning=false; if(codeReader){ try{codeReader.reset()}catch{} codeReader=null; } if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; } currentTrack=null; torchOn=false; if (el('camTorch')) el('camTorch').disabled=true; }
-  async function toggleTorch(){ if(!currentTrack) return; try{ torchOn=!torchOn; await currentTrack.applyConstraints({advanced:[{torch:torchOn}]}); }catch{} }
-  async function isDetectorSupported(){ try{ const f=await BarcodeDetector.getSupportedFormats(); return f.length>0; }catch{ return false; } }
-
-  function startNativeLoop(){
-    const v=el('camVideo'), c=el('camCanvas'), ctx=c.getContext('2d');
-    const det = new BarcodeDetector({ formats:['qr_code','ean_13','code_128','code_39','upc_a','upc_e','ean_8'] });
-    scanning=true;
-    const tick = async ()=>{
-      if(!scanning) return;
-      if(v && v.readyState===4){
-        c.width=v.videoWidth; c.height=v.videoHeight; ctx.drawImage(v,0,0,c.width,c.height);
-        try{
-          const hits = await det.detect(c);
-          if(hits?.length){
-            const text = (hits[0].rawValue||'').trim();
-            if(text){ scanning=false; onScan(text); closeCamModal(); return; }
-          }
-        }catch{}
-      }
-      requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }
-  async function loadZXing(){ if(window.ZXing) return; await import('https://unpkg.com/@zxing/library@0.20.2/esm/index.min.js'); }
-  function startZXingLoop(){
-    const v=el('camVideo'); codeReader = new ZXing.BrowserMultiFormatReader(); scanning=true;
-    codeReader.decodeFromVideoDevice(null, v, (result, err)=>{
-      if(!scanning) return;
-      if(result?.getText){ scanning=false; onScan(result.getText().trim()); closeCamModal(); }
-    });
-  }
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && el('camModal')?.classList.contains('open')) closeCamModal(); });
-</script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 <script>
 (function(){
-  function bindTabs(){
-    var tabs = document.querySelectorAll('.side .tab');
-    if(!tabs || !tabs.length) return;
-    tabs.forEach(function(btn){
-      btn.onclick = function(){
-        document.querySelectorAll('.side .tab').forEach(function(b){ b.classList.remove('active'); });
-        btn.classList.add('active');
-        document.getElementById('registerTab').style.display = (btn.dataset.tab==='registerTab') ? 'grid' : 'none';
-        document.getElementById('inventoryTab').style.display = (btn.dataset.tab==='inventoryTab') ? 'grid' : 'none';
-        document.getElementById('ordersTab').style.display = (btn.dataset.tab==='ordersTab') ? 'grid' : 'none';
-        document.getElementById('receivedTab').style.display = (btn.dataset.tab==='receivedTab') ? 'grid' : 'none';
-        document.getElementById('qrTab').style.display = (btn.dataset.tab==='qrTab') ? 'grid' : 'none';
-      };
-    });
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bindTabs);
-  } else {
-    bindTabs();
-  }
-  var rx = document.getElementById('rxOpenCam');
-  var ord = document.getElementById('ordOpenCam');
-  [rx, ord].forEach(function(b){
-    if(!b) return;
-    b.addEventListener('click', function(){
-      try { window.scrollTo({top:0, behavior:'smooth'}); } catch(e){}
-    });
-  });
-})();
-</script>
+  let qr = null;
+  const el = sel => document.querySelector(sel);
+  const status = msg => el('#scanStatus').textContent = msg;
 
-<div aria-label="Scan-IT to Office Dock" class="scanit-dock" id="scanitDock" role="region">
-<div class="title">Scan‑IT Stream</div>
-<div class="controls">
-<label style="display:flex;align-items:center;gap:6px"><input checked="" id="scanTargetReceive" name="scanTarget" type="radio" value="receive"/> Receive</label>
-<label style="display:flex;align-items:center;gap:6px"><input id="scanTargetOrders" name="scanTarget" type="radio" value="orders"/> Orders</label>
-<label style="display:flex;align-items:center;gap:6px"><input checked="" id="scanKeepFocus" type="checkbox"/> Keep focus</label>
-</div>
-<input autocomplete="off" id="scanitInput" placeholder="Click here, then scan. Press Enter if your scanner doesn’t send Enter." type="text">
-<div class="hint">Use the Scan‑IT to Office Chrome extension or Keyboard Wedge to send scans into this box. They’ll route to the selected target.</div>
-</input></div>
-<script>
-(function(){
-  var input = document.getElementById('scanitInput');
-  var keep = document.getElementById('scanKeepFocus');
-  var toReceive = document.getElementById('scanTargetReceive');
-  var toOrders = document.getElementById('scanTargetOrders');
-
-  function route(text){
-    if(!text) return;
-    var target = toOrders && toOrders.checked ? 'orders' : 'receive';
+  async function startCam(){
     try{
-      if(target === 'orders'){
-        if(typeof handleOrderScan === 'function'){ handleOrderScan(text); }
-        // Also update visible field for user feedback
-        var os = document.getElementById('orderScan');
-        if(os){ os.value = text; setTimeout(function(){ os.value=''; }, 200); }
-      } else {
-        if(typeof handleReceiveScan === 'function'){ handleReceiveScan(text); }
-        var rs = document.getElementById('rxScan');
-        if(rs){ rs.value = text; setTimeout(function(){ rs.value=''; }, 200); }
-      }
-    }catch(e){ console.error('Routing failed', e); }
-  }
-
-  // Enter submits a scan
-  if(input){
-    input.addEventListener('keydown', function(e){
-      if(e.key === 'Enter'){
-        e.preventDefault();
-        var text = input.value.trim();
-        input.value = '';
-        route(text);
-      }
-    });
-    // If scanner sends trailing newline, oninput can catch it too
-    input.addEventListener('input', function(e){
-      if(input.value.indexOf('\n') !== -1){
-        var text = input.value.replace(/\r?\n/g,'').trim();
-        input.value = '';
-        route(text);
-      }
-    });
-    // Focus initially
-    setTimeout(function(){ try{ input.focus(); input.select(); }catch(e){} }, 200);
-  }
-
-  // Keep focus on the dock input for uninterrupted scanning
-  var focusTimer = null;
-  function startKeepFocus(){
-    if(focusTimer) return;
-    focusTimer = setInterval(function(){
-      if(!document.hasFocus()) return;
-      if(!keep || !keep.checked) return;
-      if(document.activeElement !== input){
-        try{ input.focus(); input.select(); }catch(e){}
-      }
-    }, 800);
-  }
-  function stopKeepFocus(){
-    if(focusTimer){ clearInterval(focusTimer); focusTimer = null; }
-  }
-  if(keep){
-    keep.addEventListener('change', function(){
-      if(keep.checked) startKeepFocus(); else stopKeepFocus();
-    });
-  }
-  startKeepFocus();
-
-  // Auto-select target based on visible tab
-  function activeTab(){
-    var a = document.querySelector('.side .tab.active');
-    return a ? a.dataset.tab : null;
-  }
-  function syncTargetToTab(){
-    var t = activeTab();
-    if(!t) return;
-    if(t === 'ordersTab'){ if(toOrders) toOrders.checked = true; }
-    if(t === 'receivedTab'){ if(toReceive) toReceive.checked = true; }
-  }
-  document.addEventListener('click', function(e){
-    if(e.target.closest('.side .tab')){
-      setTimeout(syncTargetToTab, 50);
+      if(!qr){ qr = new Html5Qrcode('scanReader'); }
+      el('#scanReader').style.display = 'block';
+      el('#scanStartBtn').disabled = true;
+      el('#scanStopBtn').disabled = false;
+      status('Opening camera…');
+      await qr.start({ facingMode:'environment' }, { fps:10, qrbox:{width:260, height:160} }, onScan);
+      status('Camera active — scan a code');
+    }catch(e){
+      console.error(e);
+      status('Camera error');
+      el('#scanStartBtn').disabled = false;
+      el('#scanStopBtn').disabled = true;
+      el('#scanReader').style.display = 'none';
     }
-  });
-  document.addEventListener('DOMContentLoaded', syncTargetToTab);
-  syncTargetToTab();
+  }
+  async function stopCam(){
+    try{
+      if(qr){ await qr.stop(); }
+    }catch{};
+    el('#scanReader').style.display = 'none';
+    el('#scanStartBtn').disabled = false;
+    el('#scanStopBtn').disabled = true;
+    status('Stopped');
+  }
+
+  function onScan(text){
+    status('Scanned');
+    routeScan(text);
+    // Optional: brief visual ack
+    setTimeout(()=>status('Camera active — scan a code'), 400);
+  }
+
+  function routeScan(text){
+    const targetMode = el('#scanTarget').value;
+    const suffix = el('#scanSuffix').value;
+    const keepFocus = el('#scanKeepFocus').checked;
+
+    let input = null;
+    if(targetMode === 'auto'){
+      input = document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')
+        ? document.activeElement : null;
+    } else {
+      input = el(targetMode);
+    }
+
+    if(!input){
+      // Fallback: prefer existing scan inputs
+      input = el('#orderScan') || el('#rxScan') || el('#sku');
+    }
+    if(!input){ alert('No input field available to receive scan.'); return; }
+
+    // Drop the text into the field (like a keyboard wedge)
+    const previous = input.value || '';
+    input.value = text;
+
+    // Fire events so your app reacts
+    input.dispatchEvent(new Event('input', {bubbles:true}));
+    input.dispatchEvent(new Event('change', {bubbles:true}));
+
+    // Emulate suffix behavior
+    if(suffix === 'enter'){
+      input.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', bubbles:true}));
+      input.dispatchEvent(new KeyboardEvent('keyup', {key:'Enter', bubbles:true}));
+    } else if(suffix === 'tab'){
+      // Blur acts like leaving the field
+      input.blur();
+    }
+
+    // Keep focus: move it back so the next scan goes to the same field
+    if(keepFocus){
+      input.focus();
+      // Place caret at end
+      const len = input.value.length;
+      input.setSelectionRange && input.setSelectionRange(len, len);
+    }
+  }
+
+  el('#scanStartBtn')?.addEventListener('click', startCam);
+  el('#scanStopBtn')?.addEventListener('click', stopCam);
+
+  // Expose for debugging if needed
+  window.__scanDock = { startCam, stopCam, routeScan };
 })();
-</script></body>
+</script>
+
+</body>
 </html>

@@ -1,962 +1,137 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>RLH Trauma & Orthopaedic Theatres Inventory Manager</title>
-<style>
-  :root{
-    --bg:#f6f8fc; --panel:#fff; --text:#0f172a; --muted:#52607a; --border:#e6e9f2;
-    --accent:#2563eb; --accent-200:#cfe0ff; --shadow:0 4px 10px rgba(10,16,28,.06);
-    --ok:#10b981; --below:#f59e0b; --over:#ef4444;
-    --chip:#eef3ff;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial}
-
-  .app{display:grid;grid-template-columns:72px 1fr;min-height:100vh}
-  /* Sidebar */
-  .side{position:sticky;top:0;height:100vh;background:linear-gradient(180deg,#0b1224,#0f1933);display:flex;flex-direction:column;align-items:center;padding:14px 10px;gap:12px}
-  .logo{width:42px;height:42px;border-radius:12px;background:#1b2a55;display:grid;place-items:center;color:#cfe0ff;font-weight:800;margin:2px 0 10px;border:1px solid rgba(255,255,255,.08);letter-spacing:.5px}
-  .icon-btn{position:relative;width:52px;height:52px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);display:grid;place-items:center;color:#e3ecff;cursor:pointer;transition:.18s transform,.18s background,.18s box-shadow}
-  .icon-btn:hover{transform:translateX(5px);background:rgba(255,255,255,.1)}
-  .icon-btn.active{background:#1f2d59;border-color:#3a55a4;box-shadow:0 0 0 2px rgba(37,99,235,.25) inset}
-  .icon-btn svg{opacity:.95}
-  .icon-btn .label{position:absolute;left:60px;top:50%;transform:translate(0,-50%) translateX(-8px);opacity:0;pointer-events:none;white-space:nowrap;background:#0f172a;color:#e6f0ff;border:1px solid #29407d;padding:7px 12px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.3);transition:.18s; font-size:13px}
-  .icon-btn:hover .label{opacity:1;transform:translate(0,-50%) translateX(0)}
-  .side .spacer{flex:1}
-
-  /* Topbar */
-  header.top{position:sticky;top:0;background:linear-gradient(#fff,#f7f9ff);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:14px;z-index:2}
-  .top-title{font-weight:900;font-size:18px}
-  .badge{font-size:13px;border:1px solid var(--border);padding:6px 10px;border-radius:999px;background:#fff;color:var(--muted)}
-
-  main{padding:18px;display:flex;flex-direction:column;gap:18px;width:100%;max-width:none}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
-  .card header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .card .body{padding:16px}
-
-  .field{display:flex;flex-direction:column;gap:6px}
-  .field label{font-size:12px;color:var(--muted);font-weight:600}
-  .field input,.field select, .field textarea{padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font:inherit;background:#fff;box-shadow:inset 0 1px 0 rgba(16,24,40,.02)}
-  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#c7d6ff;box-shadow:0 0 0 4px rgba(37,99,235,.08)}
-  .field input::placeholder,.field textarea::placeholder{color:#94a3b8}
-  .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-  .row-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-  .row-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-  .row-5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
-  .narrow{max-width:none;width:100%}
-  @media (max-width:1200px){.app{grid-template-columns:64px 1fr} .row,.row-3,.row-4,.row-5{grid-template-columns:1fr} .narrow{max-width:none}}
-
-  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .search{flex:1;display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--border);padding:10px 12px;border-radius:12px;min-width:260px}
-  .search input{border:0;outline:0;flex:1;background:transparent;font:inherit}
-  .chips{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{padding:7px 12px;border:1px solid var(--border);background:#fff;border-radius:999px;font-size:13px}
-  .chip.stat{background:var(--chip)}
-  .btn{padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font:inherit;display:inline-flex;align-items:center;gap:8px}
-  .btn.primary{border-color:var(--accent-200);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
-
-  /* Segmented */
-  .seg{display:inline-flex;border:1.5px solid var(--border);border-radius:999px;overflow:hidden}
-  .seg button{padding:8px 12px;border:0;background:transparent;cursor:pointer;font:inherit}
-  .seg button.active{background:#0f172a;color:#fff}
-
-  /* Table */
-  table{width:100%;border-collapse:separate;border-spacing:0}
-  th,td{padding:12px 10px;border-bottom:1px solid var(--border);text-align:left}
-  th{font-size:12px;color:var(--muted);font-weight:800;letter-spacing:.2px}
-  tr:hover td{background:#fbfdff}
-  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
-  .level-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
-  .level-dot.ok{background:var(--ok)} .level-dot.below{background:var(--below)} .level-dot.over{background:var(--over)}
-
-  /* Storage Map */
-  .app-storage{display:grid;grid-template-columns:420px 1fr;gap:16px}
-  .room-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;align-content:start}
-  .room[data-room='__Unplaced__']{display:none;}
-  .room{background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
-  .room header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(#fff,#f7f9ff);border-bottom:1px solid var(--border)}
-  .room.collapsed header{background:#fff;border-bottom:0}
-  .room .bar{display:flex;align-items:center;gap:10px;cursor:pointer;flex:1;min-width:0}
-  .room .title{font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .room .kind{font-size:12px;color:var(--muted);margin-left:8px}
-  .room .count{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid var(--accent-200)}
-  .room .list{padding:10px;display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));align-content:start;max-height:56vh;overflow:auto}
-  .room.collapsed .list{display:none}
-  .storage-tile{position:relative;display:flex;flex-direction:column;gap:2px;align-items:flex-start;padding:10px 12px;background:#fff;border:1px solid #ecf0f8;border-radius:12px;min-height:56px;cursor:pointer;text-align:left}
-  .storage-tile .name{font-weight:800}.storage-tile .type{font-size:11px;color:var(--muted)}
-  .storage-tile .count{position:absolute;right:8px;top:6px;font-size:11px;padding:2px 6px;border:1px solid var(--accent-200);border-radius:999px}
-  .add-storage{border:1px dashed var(--accent-200);background:#f7fbff;padding:10px;border-radius:12px;display:flex;align-items:center;justify-content:center}
-  .actions{display:flex;gap:8px;align-items:center}
-  .mini{padding:6px 8px;font-size:12px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer}
-  .danger{border-color:#fecaca;background:#fff1f2}
-  .detail{position:sticky;top:0;height:100%;border:1px solid var(--border);background:linear-gradient(180deg,#fcfdff,#f6f8ff);display:flex;flex-direction:column;border-radius:14px;overflow:hidden}
-  .detail header{padding:12px 16px;border-bottom:1px solid var(--border);background:var(--panel);display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .detail .title{font-weight:900;font-size:18px}.detail .subtitle{color:#64748b;font-size:12px}
-  .detail .body{padding:14px 16px;overflow:auto;display:flex;flex-direction:column;gap:12px}
-  .unplaced{margin-top:auto}
-  .legend{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-  .legend .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:#fff;font-size:12px}
-  .legend .swatch{width:14px;height:14px;border-radius:50%;border:1px solid var(--border)}
-  .drawer-table{display:flex;flex-direction:column;gap:10px}
-  .drawer-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
-  .drawer-label{background:#fff;border:1px solid var(--border);border-radius:999px;padding:8px 12px;font-weight:800;text-align:center;width:fit-content}
-  .drawer-label.circle{display:grid;place-items:center;padding:0;border-radius:50%;width:34px;height:34px}
-  .slots{display:grid;grid-template-columns:repeat(10,minmax(70px,1fr));gap:10px}
-  .slot{border:1px dashed #d8e1f2;border-radius:12px;min-height:60px;background:#fff;display:flex;align-items:center;justify-content:center;padding:8px;position:relative}
-  .slot.drop-over{background:#eef6ff;border-style:solid;border-color:#cfe0ff}
-  .item{width:100%;height:100%;border:1px solid var(--border);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px;background:#fff;cursor:grab;position:relative}
-  .item .name{font-weight:800;line-height:1.15}
-  .item .meta{font-size:12px;color:var(--muted)}
-
-  /* Panels */
-  section.panel{display:none}
-  section.panel.active{display:block}
-
-  /* Right panel (Recent Activities) */
-  .two-col{display:grid;grid-template-columns:1fr 500px;gap:16px}
-  @media (max-width:1200px){.two-col{grid-template-columns:1fr}}
-  .activity-list{display:flex;flex-direction:column;gap:10px}
-  .activity{display:grid;grid-template-columns:120px 1fr;gap:10px;border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff}
-  .activity .when{font-size:12px;color:var(--muted)}
-  .activity .type{font-weight:800}
-  .activity .details{color:#475569}
-</style>
+  <meta charset="utf-8" />
+  <title>Drive Upload · Minimal Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 16px; }
+    .row { margin: 12px 0; }
+    input[type=file]{ max-width:100%;}
+    button { padding: 8px 14px; }
+    #out div { margin: 6px 0; }
+  </style>
+  <!-- Google Identity Services (OAuth token flow) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Google API client -->
+  <script src="https://apis.google.com/js/api.js" async defer></script>
 </head>
 <body>
-<div class="app">
-  <aside class="side">
-    <div class="logo">RLH</div>
-    <button class="icon-btn active" data-target="registerPanel" title="Register">
-      <!-- Pen icon -->
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M3 17.25V21h3.75L18.81 8.94l-3.75-3.75L3 17.25Z" stroke="currentColor" stroke-width="1.6"/><path d="M20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.59 1.59 3.75 3.75 1.59-1.59Z" fill="currentColor"/></svg>
-      <span class="label">Register</span>
-    </button>
-    <button class="icon-btn" data-target="inventoryPanel" title="Inventory">
-      <!-- Graph icon -->
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 19V5" stroke="currentColor" stroke-width="1.6"/><path d="M8 19v-7" stroke="currentColor" stroke-width="1.6"/><path d="M12 19V8" stroke="currentColor" stroke-width="1.6"/><path d="M16 19V4" stroke="currentColor" stroke-width="1.6"/><path d="M20 19V11" stroke="currentColor" stroke-width="1.6"/></svg>
-      <span class="label">Inventory</span>
-    </button>
-    <button class="icon-btn" data-target="storagePanel" title="Storage Map">
-      <!-- Grid icon -->
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg>
-      <span class="label">Storage Map</span>
-    </button>
-    <div class="spacer"></div>
-    <button class="icon-btn" data-target="ordersPanel" title="Orders">
-      <!-- Cart -->
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M3 4h2l2.5 12h10.5l2-8H7" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="20" r="1.5" fill="currentColor"/><circle cx="18" cy="20" r="1.5" fill="currentColor"/></svg>
-      <span class="label">Orders</span>
-    </button>
-    <button class="icon-btn" data-target="receivedPanel" title="Received">
-      <!-- Inbox -->
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 14h5l2 3h4l2-3h5" stroke="currentColor" stroke-width="1.6"/></svg>
-      <span class="label">Received</span>
-    </button>
-    <button class="icon-btn" data-target="labelsPanel" title="QR & Labels">
-      <!-- QR -->
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.6"/><path d="M14 14h7v7h-7v-3h3v-2h-3v-2Z" stroke="currentColor" stroke-width="1.6"/></svg>
-      <span class="label">QR & Labels</span>
-    </button>
-  </aside>
+  <h2>Upload to Google Drive (camera or file)</h2>
 
-  <div>
-    <header class="top">
-      <div class="top-title" id="topTitle">Register</div>
-      <div id="topInfo" class="badge">RLH Trauma and Orthopaedic Theatres Inventory Manager</div>
-    </header>
-    <main>
-      <!-- Register -->
-      <section id="registerPanel" class="panel active card">
-        <header><div>Register Product</div><div><a class="btn" id="jumpInventory">Inventory</a></div></header>
-        <div class="body two-col">
-          <div class="narrow">
-            <div class="row">
-              <div class="field"><label>Supplier</label><input id="r_supplier" list="dlSuppliers" placeholder="Type or pick supplier"></div>
-              <div class="field"><label>Product Name</label><input id="r_name" placeholder="e.g. 3.5mm Cortical Screw"></div>
-            </div>
-            <div class="row-3">
-              <div class="field"><label>System (by supplier)</label><input id="r_system" list="dlSystems" placeholder="e.g. Distal Elbow Set"></div>
-              <div class="field"><label>Type</label>
-                <select id="r_type">
-                  <option value="consumable">Consumable</option>
-                  <option value="implant">Implant</option>
-                  <option value="table_attach">Table & Attachments</option>
-                  <option value="medical_device">Medical Device</option>
-                  <option value="instrument_tray">Instrument Tray</option>
-                  <option value="single_pack">Single Pack</option>
-                </select>
-              </div>
-              <div class="field"><label>Size</label><input id="r_size" placeholder="e.g. 120mm / 12-hole"></div>
-            </div>
-            <div class="row-3">
-              <div class="field"><label>Current Stock</label><input id="r_qty" type="number" min="0" value="0"></div>
-              <div class="field"><label>Reorder Point (ROP)</label><input id="r_rop" type="number" min="0" value="0"></div>
-              <div class="field"><label>Product Ref / SKU</label><input id="r_sku" placeholder="e.g. 214.832"></div>
-            </div>
-            <div class="row-3">
-              <div class="field"><label>Consignment Min Level</label><input id="r_min" type="number" min="0" value="0"></div>
-              <div class="field"><label>Consignment Max Level</label><input id="r_max" type="number" min="0" value="0"></div>
-              <div class="field"><label>Usage Level</label>
-                <div class="seg" id="r_usage_seg">
-                  <button data-v="high">🟢 High</button>
-                  <button class="active" data-v="medium">⚫ Medium</button>
-                  <button data-v="low">🔴 Low</button>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row">
-              <div class="field" style="grid-column:1/-1">
-                <label>Product Image (Google Drive link)</label>
-                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                  <input id="r_image" type="url" placeholder="Paste Google Drive share link (or any image URL)" style="flex:1">
-                  <button id="r_image_preview_btn" class="btn" type="button">Preview</button>
-                </div>
-                <div style="font-size:12px; color: var(--muted); margin-top:6px;">
-                  Tip: Open the image in Google Drive &raquo; Share &raquo; "Anyone with the link" (Viewer), then paste the link here.
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="field" style="grid-column:1/-1">
-                <label>Or take a photo</label>
-                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                  <input id="r_image_file" type="file" accept="image/*" capture="environment">
-                  <button id="r_image_upload_btn" class="btn" type="button">Upload to Storage</button>
-                  <span id="r_image_status" style="font-size:12px; color:var(--muted)"></span>
-                </div>
-                <div style="font-size:12px; color: var(--muted); margin-top:6px;">
-                  On phones/tablets this opens the camera. We’ll upload to Firebase Storage and auto-fill the link above.
-                </div>
-              </div>
-            </div>
-
-<div class="row">
-              <div class="field" style="grid-column:1/-1"><label>Notes</label><textarea id="r_notes" rows="4" placeholder="Optional notes (size, lot, expiry, packaging, pairing, etc.)"></textarea></div>
-            </div>
-            <hr style="border:0;border-top:1px solid var(--border);margin:12px 0">
-            <div class="row-4">
-              <div class="field">
-                <label>Room</label>
-                <select id="r_room"></select>
-              </div>
-              <div class="field">
-                <label>Storage</label>
-                <select id="r_storage"></select>
-              </div>
-              <div class="field">
-                <label>Drawer</label>
-                <select id="r_drawer"></select>
-              </div>
-              <div class="field">
-                <label>Slot</label>
-                <select id="r_slot"></select>
-              </div>
-            </div>
-            <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
-              <button id="r_save" class="btn primary">Save product</button>
-              <button id="r_clear" class="btn">Clear</button>
-              <label style="display:flex;align-items:center;gap:8px;margin-left:auto">
-                <input id="r_preview_qr" type="checkbox"> Preview QR
-              </label>
-            </div>
-          </div>
-          <aside class="card" style="border:none">
-            <header><div>Recent Activities</div></header>
-            <div class="body">
-              <div id="activityList" class="activity-list"></div>
-            </div>
-          </aside>
-        </div>
-        <datalist id="dlSuppliers"></datalist>
-        <datalist id="dlSystems"></datalist>
-      </section>
-
-      <!-- Inventory -->
-      <section id="inventoryPanel" class="panel card">
-        <header>
-          <div>Inventory</div>
-          <div><button id="invExport" class="btn">Export CSV</button></div>
-        </header>
-        <div class="body">
-          <div class="toolbar">
-            <div class="search" style="flex:1">
-              <svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5z"/></svg>
-              <input id="invSearch" placeholder="Search name, SKU, supplier, system...">
-            </div>
-            <select id="filSupplier" class="btn"><option value="">All suppliers</option></select>
-            <select id="filSystem" class="btn" disabled><option value="">All systems</option></select>
-            <select id="filType" class="btn">
-              <option value="">All types</option>
-              <option value="consumable">Consumable</option>
-              <option value="implant">Implant</option>
-              <option value="table_attach">Table & Attachments</option>
-              <option value="medical_device">Medical Device</option>
-              <option value="instrument_tray">Instrument Tray</option>
-              <option value="single_pack">Single Pack</option>
-            </select>
-            <div class="seg" id="filUsage">
-              <button class="active" data-v="">All</button>
-              <button data-v="high">High</button>
-              <button data-v="medium">Medium</button>
-              <button data-v="low">Low</button>
-            </div>
-          </div>
-          <div class="chips" style="margin:10px 0">
-            <span class="chip stat" id="statTotal">Total items: 0</span>
-            <span class="chip stat" id="statStock">Total stock: 0</span>
-            <span class="chip" id="statROP">Reorder due: 0</span>
-            <span class="chip" id="statBelow">Below min: 0</span>
-            <span class="chip" id="statOver">Over max: 0</span>
-            <span class="chip" id="statUsage">Usage (H/M/L): 0/0/0</span>
-          </div>
-          <div style="overflow:auto">
-            <table id="invTable">
-              <thead>
-                <tr>
-                  <th>SKU</th>
-                  <th>Product</th>
-                  <th>Supplier / System</th>
-                  <th>Type / Size</th>
-                  <th>Stock</th>
-                  <th>Min / Max / ROP</th>
-                  <th>Usage</th>
-                  <th>Location</th>
-                  <th>Status</th>
-                  <th>Updated</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- Storage Map -->
-      <section id="storagePanel" class="panel card">
-        <header>
-          <div class="toolbar" style="flex:1">
-            <div class="search">
-              <svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5z"/></svg>
-              <input id="searchBox" placeholder="Search rooms or storages…">
-            </div>
-            <button id="addRoomBtn" class="btn primary">+ Add location</button>
-          </div>
-          <div class="row-actions">
-            <button class="btn" id="addDrawerBtn">+ Add drawer/layer</button>
-            <button class="btn" id="removeDrawerBtn">Remove</button>
-          </div>
-        </header>
-        <div class="body">
-          <div class="app-storage">
-            <div><div id="roomGrid" class="room-grid"></div></div>
-            <div class="detail">
-              <header>
-                <div>
-                  <div class="title" id="detailTitle">Select a storage</div>
-                  <div class="subtitle" id="detailSubtitle"></div>
-                </div>
-              </header>
-              <div class="body">
-                <div class="legend" id="legend"></div>
-                <div id="drawers" class="drawer-table"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Placeholders -->
-      <section id="ordersPanel" class="panel card">
-        <header><div>Orders</div></header>
-        <div class="body"><em>Wire to Firestore later.</em></div>
-      </section>
-      <section id="receivedPanel" class="panel card">
-        <header><div>Received</div></header>
-        <div class="body"><em>Wire to Firestore later.</em></div>
-      </section>
-      <section id="labelsPanel" class="panel card">
-        <header><div>QR & Labels</div></header>
-        <div class="body"><em>Wire to Firestore later.</em></div>
-      </section>
-    </main>
+  <div class="row">
+    <label>Pick or take a photo:</label><br>
+    <input id="file" type="file" accept="image/*" capture="environment">
   </div>
-</div>
 
-<!-- Firebase config for inventory-67ceb -->
-<script>
-  window.firebaseConfig = {
-    apiKey: "AIzaSyB0w25u3Ys1SyE2Xm0waLHNlUcqOKbQdIw",
-    authDomain: "inventory-67ceb.firebaseapp.com",
-    projectId: "inventory-67ceb",
-    storageBucket: "inventory-67ceb.firebasestorage.app",
-    messagingSenderId: "1031351285804",
-    appId: "1:1031351285804:web:cee68e7047fc8ef76c7989",
-    measurementId: "G-C5G29GW4PZ"
-  };
-</script>
+  <div class="row">
+    <button id="auth" disabled>Authorize</button>
+    <button id="upload" disabled>Upload to Drive</button>
+  </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
-  import {
-    getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs,
-    updateDoc, deleteDoc, onSnapshot, query, where, writeBatch, orderBy, limit, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
+  <div id="out" class="row"></div>
 
-  const app = initializeApp(window.firebaseConfig);
-  try { getAnalytics(app); } catch(_) {}
-  const db = getFirestore(app);
-const storage = getStorage(app);
-  console.info("Connected:", window.firebaseConfig.projectId);
+  <script>
+    // ==== YOUR KEYS (ok to be public in front-end) ====
+    const CLIENT_ID = '498416046472-eolm8kdn1b4m85j7kmore5h81g5p8ul6.apps.googleusercontent.com';
+    const API_KEY   = 'AIzaSyD__pdagN23rYDiaV914fvuUeulNkZUzwc';
 
-  /* ========= Shared state / helpers ========= */
-  const UNPLACED_ROOM='__Unplaced__', UNPLACED_STORAGE_ID='__unplaced__';
-  let rooms=[], storages=[], items=[];
-  const state = { selectedStorageId:null, draggingItemId:null, collapsed:new Set(JSON.parse(localStorage.getItem('collapsedRooms')||'[]')) };
-  const $ = s => document.querySelector(s);
-  const $$ = s => Array.from(document.querySelectorAll(s));
-  const escapeHtml = s => String(s??"").replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    // Scopes: drive.file lets your app create/manage files it made/selected
+    const SCOPES    = 'https://www.googleapis.com/auth/drive.file';
+    const DISCOVERY = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
 
-  function level(it){ if((+it.qty)<(+it.min)) return 'below'; if((+it.qty)>(+it.max) && (+it.max)>0) return 'over'; return 'ok'; }
-  function computeItemCounts(){ const out={}; items.forEach(it=>{ const sid=it?.location?.storage; if(sid) out[sid]=(out[sid]||0)+Number(it.qty||0); }); return out; }
-  function roomOf(storageId){ const s=storages.find(x=>x.id===storageId); return s?.location||''; }
-  function tsToStr(ts){ try{ return ts?.toDate ? ts.toDate().toLocaleString() : ''; }catch{ return ''; } }
+    const $ = s => document.querySelector(s);
+    const out = $('#out');
+    let tokenClient, gapiReady = false, gisReady = false;
 
-  /* ========= Activities ========= */
-  async function logActivity(type, details, ref=null){
-    try{
-      await addDoc(collection(db,"activities"), { type, details, ref, createdAt: serverTimestamp() });
-    }catch(e){ console.warn('Activity log failed', e); }
-  }
-  function renderActivities(){
-    const list = $('#activityList'); if(!list) return;
-    onSnapshot(query(collection(db,"activities"), orderBy("createdAt","desc"), limit(25)), snap=>{
-      const rows = snap.docs.map(d=>({id:d.id, ...d.data()}));
-      if(rows.length===0){ list.innerHTML = '<div class="muted">No recent activity.</div>'; return; }
-      list.innerHTML = rows.map(a=>`<div class="activity">
-        <div class="when">${escapeHtml(tsToStr(a.createdAt))}</div>
-        <div>
-          <div class="type">${escapeHtml(a.type)}</div>
-          <div class="details">${escapeHtml(a.details||'')}</div>
-        </div>
-      </div>`).join('');
-    });
-  }
-
-  /* ========= ensure Unplaced ========= */
-  await (async function ensureUnplaced(){
-    const rref = collection(db,"rooms");
-    const rs = await getDocs(query(rref, where("name","==", UNPLACED_ROOM)));
-    if(rs.empty){ await addDoc(rref,{name:UNPLACED_ROOM,kind:"Unplaced",floor:"—"}); await logActivity('Add Room', 'Auto-created __Unplaced__'); }
-    const sref = collection(db,"storages");
-    const ss = await getDocs(query(sref, where("id","==", UNPLACED_STORAGE_ID)));
-    if(ss.empty){ await addDoc(sref,{id:UNPLACED_STORAGE_ID,name:"Unplaced Bin",type:"System",location:UNPLACED_ROOM,drawers:[]}); await logActivity('Add Storage', 'Auto-created Unplaced Bin'); }
-  })();
-
-  /* ========= live snapshots ========= */
-  onSnapshot(collection(db,"rooms"), snap=>{ rooms = snap.docs.map(d=>({id:d.id,...d.data()})); refreshAll(); });
-  onSnapshot(collection(db,"storages"), snap=>{ storages = snap.docs.map(d=>({docId:d.id, id:d.data().id||d.id, ...d.data()})); refreshAll(); });
-  onSnapshot(collection(db,"items"), snap=>{ items = snap.docs.map(d=>({id:d.id,...d.data()})); refreshAll(); });
-
-  renderActivities();
-
-  function refreshAll(){
-    populateRegisterLocSelectors();
-    renderInventory();
-    renderRoomGrid(); renderDetail();
-    // suggestions
-    const dlS=$('#dlSuppliers'); const dlY=$('#dlSystems');
-    if(dlS) dlS.innerHTML=[...new Set(items.map(i=>i.supplier).filter(Boolean))].sort().map(v=>`<option value="${escapeHtml(v)}">`).join('');
-    if(dlY) dlY.innerHTML=[...new Set(items.map(i=>i.system).filter(Boolean))].sort().map(v=>`<option value="${escapeHtml(v)}">`).join('');
-    // filters
-    const supSel=$('#filSupplier'); const sysSel=$('#filSystem');
-    if(supSel){ const sups=[...new Set(items.map(i=>i.supplier).filter(Boolean))].sort(); supSel.innerHTML = '<option value="">All suppliers</option>' + sups.map(s=>`<option>${escapeHtml(s)}</option>`).join(''); }
-    if(sysSel){ const pick = $('#filSupplier').value; const systems=[...new Set(items.filter(i=>!pick||i.supplier===pick).map(i=>i.system).filter(Boolean))].sort(); sysSel.innerHTML = '<option value="">All systems</option>' + systems.map(s=>`<option>${escapeHtml(s)}</option>`).join(''); sysSel.disabled = systems.length===0; }
-  }
-
-  /* ========= Sidebar nav ========= */
-  $$('.icon-btn').forEach(btn=>btn.addEventListener('click', ()=>{
-    $$('.icon-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
-    const target = btn.dataset.target;
-    $$('section.panel').forEach(p=>p.classList.remove('active'));
-    $('#'+target).classList.add('active');
-    $('#topTitle').textContent = btn.querySelector('.label').textContent;
-  }));
-  $('#jumpInventory').addEventListener('click', ()=>{ document.querySelector('[data-target="inventoryPanel"]').click(); });
-
-  /* ========= Register behaviour ========= */
-  let usage='medium'; $('#r_usage_seg').addEventListener('click',e=>{ if(e.target.tagName!=='BUTTON') return; $$('#r_usage_seg button').forEach(b=>b.classList.remove('active')); e.target.classList.add('active'); usage=e.target.dataset.v; });
-
-  function populateRegisterLocSelectors(){
-    const roomSel = $('#r_room'); if(!roomSel) return;
-    const sorted = [...rooms].sort((a,b)=>a.name.localeCompare(b.name));
-    roomSel.innerHTML = sorted.map(r=>`<option value="${escapeHtml(r.name)}">${escapeHtml(r.name===UNPLACED_ROOM?'Unplaced':r.name)}</option>`).join('');
-    updateRegStorage();
-  }
-  function updateRegStorage(){
-    const rname=$('#r_room').value;
-    const storageSel=$('#r_storage'); const drawerSel=$('#r_drawer'); const slotSel=$('#r_slot');
-    const st = storages.filter(s=>s.location===rname);
-    storageSel.innerHTML = st.map(x=>`<option value="${escapeHtml(x.id)}">${escapeHtml(x.name)}</option>`).join('');
-    updateRegDrawer(); updateRegSlot();
-  }
-  function updateRegDrawer(){
-    const sid=$('#r_storage').value; const drawerSel=$('#r_drawer');
-    const s = storages.find(x=>x.id===sid); const drawers=s?.drawers||[];
-    drawerSel.innerHTML = ['<option value="">Unplaced</option>', ...drawers.map(d=>`<option>${escapeHtml(d)}</option>`)].join('');
-  }
-  function updateRegSlot(){
-    const slotSel=$('#r_slot');
-    slotSel.innerHTML = ['<option value="">Unplaced</option>', ...Array.from({length:10},(_,i)=>i+1).map(n=>`<option>${n}</option>`)].join('');
-  }
-  $('#r_room').addEventListener('change', updateRegStorage);
-  $('#r_storage').addEventListener('change', ()=>{ updateRegDrawer(); updateRegSlot(); });
-
-  // Image preview button
-  (function(){
-    const previewBtn = document.getElementById('r_image_preview_btn');
-    if(previewBtn){
-      previewBtn.addEventListener('click', ()=>{
-        const raw = document.getElementById('r_image').value;
-        const norm = normalizeDriveLink(raw);
-        if(!norm){ alert('Paste a link first.'); return; }
-        window.open(norm, '_blank', 'noopener');
-      });
-  async function uploadItemImageFromInput(file, suggestedName){
-    if(!file) return null;
-    const safe = (suggestedName||'item').toLowerCase().replace(/[^a-z0-9-_]+/g,'_').slice(0,80) || 'item';
-    const ext = (file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
-    const path = `item-images/${Date.now()}_${safe}.${ext||'jpg'}`;
-    const ref = sRef(storage, path);
-    await uploadBytes(ref, file);
-    return await getDownloadURL(ref);
-  }
-  // Wire the "Upload to Storage" button to upload immediately and fill the link.
-  (function(){
-    const btn = document.getElementById('r_image_upload_btn');
-    if(btn){
-      btn.addEventListener('click', async ()=>{
-        try{
-          const status = document.getElementById('r_image_status');
-          const fileInput = document.getElementById('r_image_file');
-          const file = fileInput?.files?.[0];
-          if(!file){ alert('Please take or choose a photo first.'); return; }
-          status.textContent = 'Uploading...';
-          const name = document.getElementById('r_name')?.value || '';
-          const sku  = document.getElementById('r_sku')?.value || '';
-          const link = await uploadItemImageFromInput(file, sku||name);
-          document.getElementById('r_image').value = link;
-          status.textContent = 'Uploaded ✓';
-          setTimeout(()=>status.textContent='', 2000);
-        }catch(e){
-          console.error(e);
-          alert('Upload failed. See console.');
-        }
-      });
-    }
-  })();
-
-    }
-  })();
-
-  $('#r_clear').addEventListener('click', ()=>{
-    $('#r_supplier').value=''; $('#r_name').value=''; $('#r_system').value=''; $('#r_type').value='consumable'; $('#r_image').value=''; const sEl=document.getElementById('r_image_status'); if(sEl) sEl.textContent='';
-    $('#r_size').value=''; $('#r_qty').value=0; $('#r_rop').value=0; $('#r_min').value=0; $('#r_max').value=0; $('#r_sku').value=''; $('#r_notes').value='';
-    usage='medium'; $$('#r_usage_seg button').forEach(b=>b.classList.toggle('active', b.dataset.v==='medium'));
-  });
-
-  $('#r_save').addEventListener('click', async ()=>{
-    const supplier=$('#r_supplier').value.trim();
-    const name=$('#r_name').value.trim();
-    const system=$('#r_system').value.trim();
-    const type=$('#r_type').value;
-    const size=$('#r_size').value.trim();
-    const qty=Number($('#r_qty').value||0);
-    const rop=Number($('#r_rop').value||0);
-    const min=Number($('#r_min').value||0);
-    const max=Number($('#r_max').value||0);
-    const sku=$('#r_sku').value.trim();
-    const notes=$('#r_notes').value.trim();
-    let imageUrl = normalizeDriveLink($('#r_image').value.trim());
-    const fileEl=document.getElementById('r_image_file');
-    const file=fileEl?.files?.[0];
-    if(file){
-      try{
-        const link = await uploadItemImageFromInput(file, sku||name);
-        if(link) imageUrl = link;
-      }catch(e){ console.warn('Image upload skipped:', e); }
-    }
-    const roomName=$('#r_room').value;
-    const storageId=$('#r_storage').value;
-    const drawer=$('#r_drawer').value || null;
-    const slot=$('#r_slot').value ? Number($('#r_slot').value) : null;
-    if(!supplier || !name){ alert('Supplier and Product Name are required.'); return; }
-    if(!storageId){ alert('Please choose a storage.'); return; }
-    const docRef = await addDoc(collection(db,"items"), { supplier, name, system, type, size, qty, rop, min, max, sku, usage, notes, imageUrl, location:{ storage:storageId, drawer, slot }, updatedAt: serverTimestamp() });
-    await logActivity('Register', `${name} (${sku||'no SKU'}) added to ${roomOf(storageId)} / ${storageId}${drawer?(' / '+drawer):''}${slot?(' / '+slot):''}`, {itemId: docRef.id});
-    alert('Saved.');
-    $('#r_clear').click();
-  });
-
-  /* ========= Inventory ========= */
-  $('#filSupplier').addEventListener('change', refreshAll);
-  $('#filSystem').addEventListener('change', renderInventory);
-  $('#filType').addEventListener('change', renderInventory);
-  $('#invSearch').addEventListener('input', renderInventory);
-  $('#filUsage').addEventListener('click', e=>{ if(e.target.tagName!=='BUTTON') return; $$('#filUsage button').forEach(b=>b.classList.remove('active')); e.target.classList.add('active'); renderInventory(); });
-
-  function renderInventory(){
-    const tbody = $('#invTable tbody'); if(!tbody) return;
-    const q = ($('#invSearch').value||'').toLowerCase();
-    const fs = $('#filSupplier').value||'';
-    const fy = $('#filSystem').value||'';
-    const ft = $('#filType').value||'';
-    const fu = $('#filUsage .active')?.dataset.v || '';
-
-    const filtered = items.filter(it=>{
-      if(fs && it.supplier!==fs) return false;
-      if(fy && it.system!==fy) return false;
-      if(ft && it.type!==ft) return false;
-      if(fu && it.usage!==fu) return false;
-      const hay=[it.name,it.sku,it.supplier,it.system,it.size,it.type].join(' ').toLowerCase();
-      return !q || hay.includes(q);
-    });
-
-    const counts = {
-      total: filtered.length,
-      stock: filtered.reduce((n,i)=>n+(+i.qty||0),0),
-      due: filtered.filter(i=>(+i.qty)<= (+i.rop||0)).length,
-      below: filtered.filter(i=>(+i.qty)<(+i.min||0)).length,
-      over: filtered.filter(i=>(+i.qty)>(+i.max||Infinity)).length,
-      usageH: filtered.filter(i=>i.usage==='high').length,
-      usageM: filtered.filter(i=>i.usage==='medium').length,
-      usageL: filtered.filter(i=>i.usage==='low').length,
-    };
-    $('#statTotal').textContent = `Total items: ${counts.total}`;
-    $('#statStock').textContent = `Total stock: ${counts.stock}`;
-    $('#statROP').textContent = `Reorder due: ${counts.due}`;
-    $('#statBelow').textContent = `Below min: ${counts.below}`;
-    $('#statOver').textContent = `Over max: ${counts.over}`;
-    $('#statUsage').textContent = `Usage (H/M/L): ${counts.usageH}/${counts.usageM}/${counts.usageL}`;
-
-    tbody.innerHTML = filtered.map(it=>{
-      const sObj = storages.find(s=>s.id===it?.location?.storage);
-      const storageName = sObj?.name || '';
-      const roomName = sObj?.location || '';
-      const lev = level(it);
-      const updated = tsToStr(it.updatedAt);
-      return `<tr data-id="${it.id}">
-        <td class="mono">${escapeHtml(it.sku||'')}</td>
-        <td>${it.imageUrl?`<a href="${escapeHtml(it.imageUrl)}" target="_blank" rel="noopener"><strong>${escapeHtml(it.name||'')}</strong></a>`:`<strong>${escapeHtml(it.name||'')}</strong>`}</td>
-        <td>${escapeHtml(it.supplier||'')}<div style="color:var(--muted);font-size:12px">${escapeHtml(it.system||'')}</div></td>
-        <td>${escapeHtml(it.type||'')}<div style="color:var(--muted);font-size:12px">${escapeHtml(it.size||'')}</div></td>
-        <td class="mono">${it.qty||0}</td>
-        <td class="mono">${it.min||0} / ${it.max||0} / ${it.rop||0}</td>
-        <td>${(it.usage||'').replace(/^\w/,c=>c.toUpperCase())}</td>
-        <td>${escapeHtml(roomName)}<div style="color:var(--muted);font-size:12px">${escapeHtml(storageName)} ${it?.location?.drawer?('• '+escapeHtml(it.location.drawer)) : ''} ${it?.location?.slot?('• '+escapeHtml(it.location.slot)) : ''}</div></td>
-        <td><span class="level-dot ${lev}"></span>${lev}</td>
-        <td>${escapeHtml(updated)}</td>
-        <td><button class="mini" data-act="move">Move</button> <button class="mini" data-act="inc">+1</button> <button class="mini danger" data-act="del">Delete</button></td>
-      </tr>`;
-    }).join('');
-
-    // Row actions
-    $$('#invTable [data-act="move"]').forEach(btn=>btn.onclick=()=>{
-      const id = btn.closest('tr').getAttribute('data-id');
-      const it = items.find(x=>x.id===id); if(!it) return;
-      document.querySelector('[data-target="storagePanel"]').click();
-      state.selectedStorageId = it?.location?.storage || null;
-      renderDetail();
-    });
-    $$('#invTable [data-act="inc"]').forEach(btn=>btn.onclick=async ()=>{
-      const id = btn.closest('tr').getAttribute('data-id');
-      const it = items.find(x=>x.id===id); if(!it) return;
-      await updateDoc(doc(db,"items", id), { qty: Number(it.qty||0)+1, updatedAt: serverTimestamp() });
-      await logActivity('Update Inventory', `+1 to ${it.name} (${it.sku||'no SKU'})` , {itemId:id});
-    });
-    $$('#invTable [data-act="del"]').forEach(btn=>btn.onclick=async ()=>{
-      const id = btn.closest('tr').getAttribute('data-id');
-      const it = items.find(x=>x.id===id);
-      if(confirm('Delete this item?')){ await deleteDoc(doc(db,"items", id)); await logActivity('Delete Item', `${it?.name||'Item'} removed`, {itemId:id}); }
-    });
-  }
-
-  $('#invExport').addEventListener('click', ()=>{
-    const rows = [['SKU','Product','Supplier','System','Type','Size','Qty','Min','Max','ROP','Usage','Room','Storage','Drawer','Slot','Notes','ImageURL']];
-    items.forEach(it=>{
-      const sObj=storages.find(s=>s.id===it?.location?.storage);
-      rows.push([it.sku||'', it.name||'', it.supplier||'', it.system||'', it.type||'', it.size||'', it.qty||0, it.min||0, it.max||0, it.rop||0, it.usage||'', sObj?.location||'', sObj?.name||'', it?.location?.drawer||'', it?.location?.slot||'', (it.notes||'').replace(/\n/g,' '), it.imageUrl||'' ]);
-    });
-    const csv = rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');
-    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='inventory.csv'; a.click();
-  });
-
-  /* ========= Storage Map ========= */
-  function renderRoomGrid(){
-    const grid=$('#roomGrid'); if(!grid) return; grid.innerHTML='';
-    const q=$('#searchBox').value.trim().toLowerCase();
-    const counts=computeItemCounts();
-    const names=[...rooms.filter(r=>r.name!==UNPLACED_ROOM).map(r=>r.name)];
-    names.forEach(roomName=>{
-      if(q){
-        const inRoom=storages.filter(s=>s.location===roomName);
-        const hit=[roomName,...inRoom.map(s=>s.name),...inRoom.map(s=>s.type)].some(t=>(t||'').toLowerCase().includes(q));
-        if(!hit) return;
+    // Wait for both libraries, then enable the Authorize button
+    const readyTick = setInterval(()=>{
+      if (window.gapi?.load && !gapiReady) {
+        gapi.load('client', async ()=>{
+          await gapi.client.init({ apiKey: API_KEY, discoveryDocs:[DISCOVERY] });
+          gapiReady = true; maybeEnable();
+        });
       }
-      const collapsed=state.collapsed.has(roomName);
-      const panel=document.createElement('section'); panel.className='room'+(collapsed?' collapsed':'');
-      const metaRoom = rooms.find(r=>r.name===roomName);
-      const kind = metaRoom?.kind || (roomName===UNPLACED_ROOM?'':'Room');
-      const floor= metaRoom?.floor || (roomName===UNPLACED_ROOM?'':'');
-      panel.innerHTML=`<header>
-          <div class="bar" data-room="${escapeHtml(roomName)}">
-            <div class="title">${roomName===UNPLACED_ROOM?'Unplaced':escapeHtml(roomName)}${roomName===UNPLACED_ROOM?'':(kind?`<span class="kind">• ${escapeHtml(kind)}</span>`:'')}${roomName===UNPLACED_ROOM?'':(floor?`<span class="kind">• ${escapeHtml(floor)}</span>`:'')}</div>
-          </div>
-          <div class="actions">
-            <span class="count">${(storages.filter(s=>s.location===roomName).length)} storage</span>
-            ${roomName===UNPLACED_ROOM?'':`<button class="mini" data-action="edit">Edit</button><button class="mini danger" data-action="remove">Remove</button>`}
-          </div>
-        </header>
-        <div class="list"></div>`;
-      grid.appendChild(panel);
+      if (window.google?.accounts?.oauth2 && !gisReady) {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID, scope: SCOPES, callback: () => {}
+        });
+        gisReady = true; maybeEnable();
+      }
+      if (gapiReady && gisReady) clearInterval(readyTick);
+    }, 150);
 
-      panel.querySelector('.bar').onclick=()=>{
-        if(state.collapsed.has(roomName)) state.collapsed.delete(roomName); else state.collapsed.add(roomName);
-        localStorage.setItem('collapsedRooms', JSON.stringify(Array.from(state.collapsed)));
-        renderRoomGrid();
+    function maybeEnable(){
+      if (gapiReady && gisReady) $('#auth').disabled = false;
+    }
+
+    $('#auth').addEventListener('click', () => {
+      tokenClient.callback = (resp) => {
+        if (resp.error) { console.error(resp); alert('Auth failed'); return; }
+        log('Authorized ✓');
+        $('#upload').disabled = false;
       };
-      if(roomName!==UNPLACED_ROOM){
-        panel.querySelector('[data-action="edit"]').onclick=()=>openEditRoom(roomName);
-        panel.querySelector('[data-action="remove"]').onclick=()=>removeRoom(roomName);
-      }
+      if (!gapi.client.getToken()) tokenClient.requestAccessToken({ prompt: 'consent' });
+      else tokenClient.requestAccessToken({ prompt: '' });
+    });
 
-      if(collapsed) return;
-      const listEl=panel.querySelector('.list');
-      let inRoom=storages.filter(s=>s.location===roomName).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
-
-      inRoom.forEach(s=>{
-        const tile=document.createElement('button'); tile.type='button'; tile.className='storage-tile'+(s.id===state.selectedStorageId?' active':'');
-        tile.innerHTML=`<div class="name">${escapeHtml(s.name)}</div><div class="type">${escapeHtml(s.type)}</div><span class="count">${counts[s.id]||0}</span>`;
-        tile.onclick=()=>{ state.selectedStorageId=s.id; document.querySelectorAll('.storage-tile.active').forEach(el=>el.classList.remove('active')); tile.classList.add('active'); renderDetail(); };
-        listEl.appendChild(tile);
-      });
-
-      if(roomName!==UNPLACED_ROOM){
-        const controls=document.createElement('div'); controls.style.display='flex'; controls.style.gap='8px';
-        const add=document.createElement('button'); add.className='add-storage'; add.textContent='+ New storage';
-        add.onclick=()=>openCreateStorage(roomName);
-        const rem=document.createElement('button'); rem.className='add-storage'; rem.textContent='− Remove';
-        rem.onclick=()=>removeSelectedStorage(roomName);
-        controls.appendChild(add); controls.appendChild(rem);
-        listEl.appendChild(controls);
+    $('#upload').addEventListener('click', async ()=>{
+      const file = $('#file').files?.[0];
+      if (!file) return alert('Pick or take a photo first.');
+      try {
+        const res = await uploadToDrive(file /*, 'YOUR_FOLDER_ID' */);
+        log(`Uploaded: <a href="${res.viewUrl}" target="_blank" rel="noopener">${res.name}</a>`);
+        log(`<small>Store this in Firestore: <code>${res.viewUrl}</code></small>`);
+      } catch (e) {
+        console.error(e); alert('Upload error (see console).');
       }
     });
-  }
 
-  function renderDetail(){
-    const title=$('#detailTitle'); const sub=$('#detailSubtitle'); const wrap=$('#drawers'); if(!wrap) return; wrap.innerHTML='';
-    const s=storages.find(x=>x.id===state.selectedStorageId);
-    if(!s){ if(title) title.textContent='Select a storage'; if(sub) sub.textContent=''; $('#addDrawerBtn').disabled=true; $('#removeDrawerBtn').disabled=true; return; }
-    $('#addDrawerBtn').disabled=false; $('#removeDrawerBtn').disabled=false;
-    if(title) title.textContent=s.name; if(sub) sub.textContent=`${s.type} • ${s.location}`;
+    // Create file in Drive, set "anyone with link" to reader, return a clean view URL
+    async function uploadToDrive(file, folderId){
+      const token = gapi.client.getToken().access_token;
+      const meta = { name: file.name, mimeType: file.type };
+      if (folderId) meta.parents = [folderId];
 
-    const legend=$('#legend'); if(legend){ legend.innerHTML='';
-      ['Consumable','Instrument Tray','Single Pack','Implant','Medical Device','Table & Attachments'].forEach(label=>{
-        const chip=document.createElement('span'); chip.className='chip'; chip.textContent=label; legend.appendChild(chip);
+      // multipart/related upload with base64 body
+      const boundary = '-------314159265358979323846';
+      const delimiter = `\r\n--${boundary}\r\n`;
+      const closeDelim = `\r\n--${boundary}--`;
+
+      const buf = await file.arrayBuffer();
+      let binary = ''; new Uint8Array(buf).forEach(b=> binary += String.fromCharCode(b));
+      const base64Data = btoa(binary);
+
+      const body = 
+        delimiter + 'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+        JSON.stringify(meta) +
+        delimiter + 'Content-Type: ' + file.type + '\r\n' +
+        'Content-Transfer-Encoding: base64\r\n\r\n' +
+        base64Data + closeDelim;
+
+      const create = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name', {
+        method: 'POST',
+        headers: { 'Authorization':'Bearer ' + token, 'Content-Type':'multipart/related; boundary=' + boundary },
+        body
       });
+      const f = await create.json();
+      if (!f.id) throw new Error('Upload failed: ' + JSON.stringify(f));
+
+      // Make shareable by link
+      await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}/permissions`, {
+        method: 'POST',
+        headers: { 'Authorization':'Bearer ' + token, 'Content-Type':'application/json' },
+        body: JSON.stringify({ role: 'reader', type: 'anyone' })
+      });
+
+      return {
+        id: f.id,
+        name: f.name,
+        viewUrl: `https://drive.google.com/file/d/${f.id}/view?usp=sharing`
+      };
     }
 
-    const drawers = Array.isArray(s.drawers)? s.drawers:[];
-    for(const label of drawers){
-      const row=document.createElement('div'); row.className='drawer-row';
-      const lab=document.createElement('div'); const isNum=/^\d+$/.test(String(label)); lab.className='drawer-label'+(isNum?' circle':''); lab.textContent=label; row.appendChild(lab);
-      const slots=document.createElement('div'); slots.className='slots';
-      for(let i=1;i<=10;i++){
-        const cell=document.createElement('div'); cell.className='slot'; cell.dataset.slot=i; cell.dataset.drawer=label; cell.dataset.storage=s.id;
-        attachCellDrop(cell, s.id, label, i);
-        const it=items.find(x=>x?.location?.storage===s.id && x?.location?.drawer===label && x?.location?.slot===i);
-        if(it){ const box=renderItemBox(it); cell.appendChild(box); } else { cell.addEventListener('dblclick',()=>addItemPrompt(s.id,label,i)); }
-        slots.appendChild(cell);
-      }
-      row.appendChild(slots); wrap.appendChild(row);
-    }
-
-    const unplaced = items.filter(x => x?.location?.storage === UNPLACED_STORAGE_ID);
-const sec=document.createElement('div'); sec.className='unplaced';
-    sec.innerHTML=`<header><strong>Unplaced (Global)</strong><span>${unplaced.length} item(s)</span></header>`;
-    const grid=document.createElement('div'); grid.className='unplaced-grid';
-    const dz=document.createElement('div'); dz.className='dropzone'; dz.textContent='Drop items here to leave unplaced';
-    dz.addEventListener('dragover',(e)=>{ if(!state.draggingItemId) return; e.preventDefault(); dz.classList.add('drop-over'); });
-    dz.addEventListener('dragleave',()=>dz.classList.remove('drop-over'));
-    dz.addEventListener('drop',async (e)=>{ if(!state.draggingItemId) return; e.preventDefault(); dz.classList.remove('drop-over'); await moveItemToUnplaced(state.draggingItemId, UNPLACED_STORAGE_ID); });
-    grid.appendChild(dz);
-    unplaced.forEach(it=>{ const card=renderItemCard(it); grid.appendChild(card); });
-    sec.appendChild(grid); wrap.appendChild(sec);
-  }
-
-  function renderItemBox(it){
-    const box=document.createElement('div'); box.className='item'; box.draggable=true;
-    box.innerHTML=`<div class="name">${it.imageUrl?`<a href="${escapeHtml(it.imageUrl)}" target="_blank" rel="noopener">${escapeHtml(it.name)}</a>`:escapeHtml(it.name)}</div><div class="meta">${escapeHtml(it.sku)} • ${escapeHtml(it.supplier)} • ${escapeHtml(it.type)} • Qty ${it.qty}</div><span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>`;
-    box.addEventListener('dragstart',(e)=>{ state.draggingItemId=it.id; e.dataTransfer.setData('text/plain',it.id); e.dataTransfer.effectAllowed='move'; });
-    box.addEventListener('dragend',()=>{ state.draggingItemId=null; document.querySelectorAll('.drop-over').forEach(el=>el.classList.remove('drop-over')); });
-    box.addEventListener('dblclick',()=>editItemPrompt(it));
-    return box;
-  }
-  function renderItemCard(it){
-    const card=document.createElement('div'); card.className='item'; card.style.minHeight='unset'; card.draggable=true; card.style.position='relative';
-    card.innerHTML=`<button type="button" class="mini remove-item" style="position:absolute; right:6px; top:6px;">Remove</button><div class="name">${it.imageUrl?`<a href="${escapeHtml(it.imageUrl)}" target="_blank" rel="noopener">${escapeHtml(it.name)}</a>`:escapeHtml(it.name)}</div><div class="meta">${escapeHtml(it.sku)} • ${escapeHtml(it.supplier)} • ${escapeHtml(it.type)} • Qty ${it.qty}</div><span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>`;
-    card.addEventListener('dragstart',(e)=>{ state.draggingItemId=it.id; e.dataTransfer.setData('text/plain',it.id); e.dataTransfer.effectAllowed='move'; });
-    card.addEventListener('dragend',()=>{ state.draggingItemId=null; document.querySelectorAll('.drop-over').forEach(el=>el.classList.remove('drop-over')); });
-    card.addEventListener('dblclick',()=>editItemPrompt(it));
-    card.querySelector('.remove-item').onclick=async (e)=>{ e.stopPropagation(); if(confirm('Remove this item?')){ await deleteDoc(doc(db, "items", it.id)); await logActivity('Delete Item', `${it.name} removed`, {itemId: it.id}); } };
-    return card;
-  }
-  function attachCellDrop(cell, storageId, drawer, slot){
-    cell.addEventListener('dragover',(e)=>{ if(!state.draggingItemId) return; e.preventDefault(); cell.classList.add('drop-over'); });
-    cell.addEventListener('dragleave',()=>cell.classList.remove('drop-over'));
-    cell.addEventListener('drop',async (e)=>{ if(!state.draggingItemId) return; e.preventDefault(); cell.classList.remove('drop-over'); await moveItemTo(storageId,drawer,slot); });
-  }
-
-  async function openCreateStorage(roomName){
-    const type = prompt("Storage TYPE (e.g., Gratnell, Shelves, Cupboard):","Gratnell") || "Storage";
-    const name = prompt(`Storage NAME (in ${roomName}):`); if(!name) return;
-    const drawersCount = Math.max(0, Number(prompt("How many drawers/layers?", "5") || 0));
-    const drawers = []; for(let i=1;i<=drawersCount;i++) drawers.push(String(i));
-    const nextId = "s_" + Math.random().toString(36).slice(2,8);
-    await addDoc(collection(db, "storages"), { id: nextId, name, type, location:roomName, drawers });
-    await logActivity('Add Storage', `${name} in ${roomName}`);
-    state.selectedStorageId = nextId;
-  }
-  async function removeSelectedStorage(roomName){
-    const sid=state.selectedStorageId; const st=storages.find(s=>s.id===sid);
-    if(!st || st.location!==roomName){ alert('Select a storage first.'); return; }
-    if(!confirm('Remove this storage? Items will move to Unplaced.')) return;
-    const bin = storages.find(s=>s.id===UNPLACED_STORAGE_ID);
-    const batch = writeBatch(db);
-    items.filter(it=>it?.location?.storage===sid).forEach(it=>{
-      batch.update(doc(db,"items", it.id), { location:{storage:bin.id, drawer:null, slot:null}, updatedAt: serverTimestamp() });
-    });
-    batch.delete(doc(db, "storages", st.docId));
-    await batch.commit();
-    await logActivity('Remove Storage', `${st.name} from ${st.location}`);
-    if(state.selectedStorageId===sid) state.selectedStorageId=null;
-  }
-  function openEditRoom(roomName){
-    const r=rooms.find(x=>x.name===roomName)||{name:roomName,kind:'Room',floor:'Unassigned'};
-    const name = prompt("Rename location:", r.name); if(!name) return;
-    const kind = prompt("Description:", r.kind || "Room") || "Room";
-    const floor = prompt("Floor:", r.floor || "Unassigned") || "Unassigned";
-    (async ()=>{
-      const roomDoc = rooms.find(x=>x.name===roomName);
-      if(roomDoc){
-        const batch = writeBatch(db);
-        batch.update(doc(db, "rooms", roomDoc.id), { name, kind, floor });
-        storages.filter(s=>s.location===roomName).forEach(s=> batch.update(doc(db, "storages", s.docId), { location:name }));
-        await batch.commit();
-        await logActivity('Update Room', `${roomName} → ${name} (${kind}, ${floor})`);
-      }
-    })();
-  }
-  async function removeRoom(roomName){
-    if(roomName===UNPLACED_ROOM){ alert('Cannot remove Unplaced.'); return; }
-    if(!confirm('Remove this location? All items will be moved to Unplaced.')) return;
-    const bin=storages.find(s=>s.id===UNPLACED_STORAGE_ID);
-    const roomDoc = rooms.find(r=>r.name===roomName);
-    const ids = storages.filter(s=>s.location===roomName);
-    const batch = writeBatch(db);
-    items.forEach(it=>{ if(ids.some(s=>s.id===it?.location?.storage)){ batch.update(doc(db,"items", it.id), { location:{storage:bin.id, drawer:null, slot:null}, updatedAt: serverTimestamp() }); } });
-    ids.forEach(s=> batch.delete(doc(db,"storages", s.docId)) );
-    if(roomDoc) batch.delete(doc(db,"rooms", roomDoc.id));
-    await batch.commit();
-    await logActivity('Remove Room', `${roomName}`);
-    if(state.collapsed.has(roomName)){ state.collapsed.delete(roomName); localStorage.setItem('collapsedRooms', JSON.stringify(Array.from(state.collapsed))); }
-    if(ids.some(s=>s.id===state.selectedStorageId)) state.selectedStorageId=null;
-  }
-
-  function addItemPrompt(storageId, drawer, slot){
-    const supplier = prompt("Supplier:","")||"";
-    const name = prompt("Item name:","")||"";
-    if(!name) return;
-    const system = prompt("System:","")||"";
-    const type = prompt("Type (consumable/implant/...):","consumable")||"consumable";
-    const size = prompt("Size:","")||"";
-    const qty = Number(prompt("Qty:","1")||1);
-    const min = Number(prompt("Min:","0")||0);
-    const max = Number(prompt("Max:","0")||0);
-    const rop = Number(prompt("ROP:","0")||0);
-    const sku = prompt("SKU:","")||"";
-    const usage = prompt("Usage (high/medium/low):","medium")||"medium";
-    const imageUrl = normalizeDriveLink(prompt("Image link (optional, Google Drive share URL):","")||"");
-    const notes = prompt("Notes:","")||"";
-    (async ()=>{
-      const ref = await addDoc(collection(db,"items"), { supplier, name, system, type, size, qty, min, max, rop, sku, usage, notes, imageUrl, location:{storage:storageId, drawer, slot}, updatedAt: serverTimestamp() });
-      await logActivity('Register', `${name} placed into ${roomOf(storageId)} / ${storageId}${drawer?(' / '+drawer):''}${slot?(' / '+slot):''}`, {itemId: ref.id});
-    })();
-  }
-  function editItemPrompt(it){
-    const name = prompt("Item name:", it.name) || it.name;
-    const imageUrl = normalizeDriveLink(prompt("Image link (leave blank to keep):", it.imageUrl||"")||it.imageUrl||"");
-    const qty = Number(prompt("Quantity:", String(it.qty))||it.qty);
-    (async ()=>{ await updateDoc(doc(db,"items", it.id), { name, qty, imageUrl, updatedAt: serverTimestamp() }); await logActivity('Update Item', `${it.name} → ${name}; qty ${it.qty} → ${qty}`, {itemId: it.id}); })();
-  }
-
-  async function moveItemTo(storageId,drawer,slot){
-    const it=items.find(x=>x.id===state.draggingItemId); if(!it) return;
-    const occ=items.find(x=>x?.location?.storage===storageId && x?.location?.drawer===drawer && x?.location?.slot===slot);
-    if(occ){
-      const batch = writeBatch(db);
-      batch.update(doc(db,"items", occ.id), { location:{...it.location}, updatedAt: serverTimestamp() });
-      batch.update(doc(db,"items", it.id), { location:{storage:storageId, drawer, slot}, updatedAt: serverTimestamp() });
-      await batch.commit();
-    } else {
-      await updateDoc(doc(db,"items", it.id), { location:{storage:storageId, drawer, slot}, updatedAt: serverTimestamp() });
-    }
-    await logActivity('Move Item', `${it.name} moved to ${roomOf(storageId)} / ${storageId}${drawer?(' / '+drawer):''}${slot?(' / '+slot):''}`, {itemId: it.id});
-  }
-  async function moveItemToUnplaced(itemId, storageId){
-    const it=items.find(x=>x.id===itemId); if(!it) return;
-    await updateDoc(doc(db,"items", it.id), { location:{storage:storageId, drawer:null, slot:null}, updatedAt: serverTimestamp() });
-    await logActivity('Unplace Item', `${it.name} moved to Unplaced in ${roomOf(storageId)}`, {itemId: it.id});
-  }
-
-  document.getElementById('addDrawerBtn').addEventListener('click', async ()=>{
-    const s=storages.find(x=>x.id===state.selectedStorageId); if(!s) return;
-    const next = prompt("New drawer/layer label (e.g., 6 or 'Top'):","");
-    if(!next) return;
-    const updated = [...(s.drawers||[])];
-    if(!updated.includes(next)) updated.push(next);
-    await updateDoc(doc(db,"storages", s.docId), { drawers: updated });
-    await logActivity('Add Drawer', `${next} in ${s.name}`);
-  });
-  document.getElementById('removeDrawerBtn').addEventListener('click', async ()=>{
-    const s=storages.find(x=>x.id===state.selectedStorageId); if(!s) return;
-    const target = prompt("Remove which drawer/layer label?","");
-    if(!target) return;
-    const updated = (s.drawers||[]).filter(d=>String(d)!==String(target));
-    const batch = writeBatch(db);
-    items.filter(it=>it?.location?.storage===s.id && String(it?.location?.drawer)===String(target))
-         .forEach(it=> batch.update(doc(db,"items", it.id), { location:{storage:s.id, drawer:null, slot:null}, updatedAt: serverTimestamp() }));
-    batch.update(doc(db,"storages", s.docId), { drawers: updated });
-    await batch.commit();
-    await logActivity('Remove Drawer', `${target} from ${s.name}`);
-  });
-
-  document.getElementById('addRoomBtn').addEventListener('click', async ()=>{
-    const name = prompt("Location name:"); if(!name) return;
-    const kind = prompt("Description (e.g., Room, Cupboard):","Room") || "Room";
-    const floor = prompt("Floor:","Unassigned") || "Unassigned";
-    await addDoc(collection(db,"rooms"), {name,kind,floor});
-    await logActivity('Add Room', `${name} (${kind}, ${floor})`);
-  });
-
-  document.getElementById('searchBox').addEventListener('input', renderRoomGrid);
-
-  renderInventory(); renderRoomGrid(); renderDetail();
-</script>
+    function log(html){ const d=document.createElement('div'); d.innerHTML=html; out.appendChild(d); }
+  </script>
 </body>
 </html>

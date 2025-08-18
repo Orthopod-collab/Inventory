@@ -219,20 +219,6 @@
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="field" style="grid-column:1/-1">
-                <label>Or take a photo</label>
-                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                  <input id="r_image_file" type="file" accept="image/*" capture="environment">
-                  <button id="r_image_upload_btn" class="btn" type="button">Upload to Cloudinary</button>
-                  <span id="r_image_status" style="font-size:12px; color:var(--muted)"></span>
-                </div>
-                <div style="font-size:12px; color: var(--muted); margin-top:6px;">
-                  On phones/tablets this opens the camera. We’ll upload to Cloudinary and auto-fill the link above.
-                </div>
-              </div>
-            </div>
-
 <div class="row">
               <div class="field" style="grid-column:1/-1"><label>Notes</label><textarea id="r_notes" rows="4" placeholder="Optional notes (size, lot, expiry, packaging, pairing, etc.)"></textarea></div>
             </div>
@@ -406,12 +392,10 @@
     getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs,
     updateDoc, deleteDoc, onSnapshot, query, where, writeBatch, orderBy, limit, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
 
   const app = initializeApp(window.firebaseConfig);
   try { getAnalytics(app); } catch(_) {}
   const db = getFirestore(app);
-const storage = getStorage(app);
   console.info("Connected:", window.firebaseConfig.projectId);
 
   /* ========= Shared state / helpers ========= */
@@ -421,13 +405,6 @@ const storage = getStorage(app);
   const $ = s => document.querySelector(s);
   const $$ = s => Array.from(document.querySelectorAll(s));
   const escapeHtml = s => String(s??"").replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  // Cloudinary (unsigned) config
-  const CLOUDINARY = {
-    cloudName: 'dhnoelj8j',          // <-- set yours
-    uploadPreset: 'inventory_unsigned', // <-- create this in Cloudinary console
-    folder: 'inventory'              // optional: keep uploads organized
-  };
-
 
   function level(it){ if((+it.qty)<(+it.min)) return 'below'; if((+it.qty)>(+it.max) && (+it.max)>0) return 'over'; return 'ok'; }
   function computeItemCounts(){ const out={}; items.forEach(it=>{ const sid=it?.location?.storage; if(sid) out[sid]=(out[sid]||0)+Number(it.qty||0); }); return out; }
@@ -534,57 +511,11 @@ const storage = getStorage(app);
         if(!norm){ alert('Paste a link first.'); return; }
         window.open(norm, '_blank', 'noopener');
       });
-  
-  async function uploadItemImageFromInput(file, suggestedName){
-    if(!file) return null;
-    const nameBase = (suggestedName||'item').toLowerCase().replace(/[^a-z0-9-_]+/g,'_').slice(0,80) || 'item';
-    const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/auto/upload`;
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('upload_preset', CLOUDINARY.uploadPreset);
-    if(CLOUDINARY.folder) fd.append('folder', CLOUDINARY.folder);
-    // Optional custom name:
-    // fd.append('public_id', `${Date.now()}_${nameBase}`);
-    const r = await fetch(url, { method:'POST', body: fd });
-    if(!r.ok){ throw new Error(await r.text()); }
-    const data = await r.json();
-    return data.secure_url; // store this as imageUrl
-  }
-_${safe}.${ext||'jpg'}`;
-    const ref = sRef(storage, path);
-    await uploadBytes(ref, file);
-    return await getDownloadURL(ref);
-  }
-  // Wire the "Upload to Cloudinary" button to upload immediately and fill the link.
-  (function(){
-    const btn = document.getElementById('r_image_upload_btn');
-    if(btn){
-      btn.addEventListener('click', async ()=>{
-        try{
-          const status = document.getElementById('r_image_status');
-          const fileInput = document.getElementById('r_image_file');
-          const file = fileInput?.files?.[0];
-          if(!file){ alert('Please take or choose a photo first.'); return; }
-          status.textContent = 'Uploading...';
-          const name = document.getElementById('r_name')?.value || '';
-          const sku  = document.getElementById('r_sku')?.value || '';
-          const link = await uploadItemImageFromInput(file, sku||name);
-          document.getElementById('r_image').value = link;
-          status.textContent = 'Uploaded ✓';
-          setTimeout(()=>status.textContent='', 2000);
-        }catch(e){
-          console.error(e);
-          alert('Upload failed. See console.');
-        }
-      });
-    }
-  })();
-
     }
   })();
 
   $('#r_clear').addEventListener('click', ()=>{
-    $('#r_supplier').value=''; $('#r_name').value=''; $('#r_system').value=''; $('#r_type').value='consumable'; $('#r_image').value=''; const sEl=document.getElementById('r_image_status'); if(sEl) sEl.textContent='';
+    $('#r_supplier').value=''; $('#r_name').value=''; $('#r_system').value=''; $('#r_type').value='consumable'; $('#r_image').value='';
     $('#r_size').value=''; $('#r_qty').value=0; $('#r_rop').value=0; $('#r_min').value=0; $('#r_max').value=0; $('#r_sku').value=''; $('#r_notes').value='';
     usage='medium'; $$('#r_usage_seg button').forEach(b=>b.classList.toggle('active', b.dataset.v==='medium'));
   });
@@ -601,15 +532,7 @@ _${safe}.${ext||'jpg'}`;
     const max=Number($('#r_max').value||0);
     const sku=$('#r_sku').value.trim();
     const notes=$('#r_notes').value.trim();
-    let imageUrl = normalizeDriveLink($('#r_image').value.trim());
-    const fileEl=document.getElementById('r_image_file');
-    const file=fileEl?.files?.[0];
-    if(file){
-      try{
-        const link = await uploadItemImageFromInput(file, sku||name);
-        if(link) imageUrl = link;
-      }catch(e){ console.warn('Image upload skipped:', e); }
-    }
+    const imageUrl = normalizeDriveLink($('#r_image').value.trim());
     const roomName=$('#r_room').value;
     const storageId=$('#r_storage').value;
     const drawer=$('#r_drawer').value || null;

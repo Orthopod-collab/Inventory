@@ -47,6 +47,7 @@
   .row-5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
   .narrow{max-width:none;width:100%}
   @media (max-width:1200px){.app{grid-template-columns:64px 1fr} .row,.row-3,.row-4,.row-5{grid-template-columns:1fr} .narrow{max-width:none}}
+@media (max-width: 900px){.row,.row-3,.row-4,.row-5{grid-template-columns:1fr}}
 
   .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .search{flex:1;display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--border);padding:10px 12px;border-radius:12px;min-width:260px}
@@ -103,7 +104,9 @@
   .drawer-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
   .drawer-label{background:#fff;border:1px solid var(--border);border-radius:999px;padding:8px 12px;font-weight:800;text-align:center;width:fit-content}
   .drawer-label.circle{display:grid;place-items:center;padding:0;border-radius:50%;width:34px;height:34px}
-  .slots{display:grid;grid-template-columns:repeat(10,minmax(70px,1fr));gap:10px}
+  .slots{display:flex;gap:10px;align-items:stretch;overflow-x:auto;border:1px dashed #d8e1f2;border-radius:12px;padding:8px;min-height:90px}
+.slots.drop-over{background:#eef6ff;border-color:#cfe0ff}
+.slots .item{flex:0 0 180px;width:180px;height:auto}
   .slot{border:1px dashed #d8e1f2;border-radius:12px;min-height:60px;background:#fff;display:flex;align-items:center;justify-content:center;padding:8px;position:relative}
   .slot.drop-over{background:#eef6ff;border-style:solid;border-color:#cfe0ff}
   .item{width:100%;height:100%;border:1px solid var(--border);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px;background:#fff;cursor:grab;position:relative}
@@ -122,6 +125,184 @@
   .activity .when{font-size:12px;color:var(--muted)}
   .activity .type{font-weight:800}
   .activity .details{color:#475569}
+
+  /* ===== Mobile-first refinements ===== */
+  /* Tablets and down */
+  @media (max-width: 768px){
+    body{font-size:14px}
+    .app{grid-template-columns:60px 1fr}
+    header.top{padding:10px 14px}
+    .top-title{font-size:16px}
+    .badge{font-size:11px;padding:5px 8px}
+    main{padding:12px;gap:12px}
+    .card{border-radius:14px}
+    .card header{padding:10px 12px}
+    .card .body{padding:12px}
+    .field label{font-size:11px}
+    .field input,.field select,.field textarea{padding:10px 12px;border-radius:10px}
+    .search{min-width:unset;padding:8px 10px}
+    .btn{padding:8px 10px;border-radius:10px}
+    .chip{padding:6px 10px;font-size:12px}
+    .seg button{padding:6px 10px}
+    th,td{padding:10px 8px}
+    .app-storage{grid-template-columns:1fr}
+    .room-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+    .storage-tile{padding:8px 10px;border-radius:10px;min-height:48px}
+    .storage-tile .type{font-size:10px}
+    .storage-tile .count{font-size:10px;right:6px;top:6px}
+    .detail{position:relative;height:auto}
+    .detail header{padding:10px 12px}
+    .legend .chip{font-size:11px;padding:5px 8px}
+    .drawer-label{padding:6px 10px}
+    .drawer-label.circle{width:28px;height:28px}
+    .slots{gap:8px;padding:6px;min-height:76px}
+    .slots .item{flex:0 0 140px;width:140px}
+    .item{padding:8px;border-radius:10px}
+    .item .meta{font-size:11px}
+    .activity{grid-template-columns:100px 1fr;padding:8px}
+  }
+
+  /* Small phones (e.g., iPhone 12/13/14/15, Galaxy S series in portrait, Pixel) */
+  @media (max-width: 430px){
+    body{font-size:13px}
+    .app{grid-template-columns:54px 1fr}
+    .logo{width:36px;height:36px;border-radius:10px;font-size:12px}
+    .icon-btn{width:44px;height:44px;border-radius:12px}
+    .icon-btn svg{width:22px;height:22px}
+    header.top{padding:8px 10px}
+    .top-title{font-size:15px}
+    .badge{display:none} /* hide long subtitle on small screens */
+    main{padding:10px;gap:10px}
+    .card{border-radius:12px}
+    .card header{padding:8px 10px}
+    .card .body{padding:10px}
+    .toolbar{gap:8px}
+    .search{padding:6px 8px}
+    .search input{font-size:13px}
+    .btn{padding:7px 9px;font-size:13px;border-radius:9px}
+    .chip{padding:5px 8px;font-size:11px}
+    .seg button{padding:5px 8px;font-size:12px}
+
+    /* Inventory table: hide less-critical columns */
+    #invTable th:nth-child(3),  #invTable td:nth-child(3),  /* Supplier / System */
+    #invTable th:nth-child(4),  #invTable td:nth-child(4),  /* Type / Size */
+    #invTable th:nth-child(6),  #invTable td:nth-child(6),  /* Min / Max / ROP */
+    #invTable th:nth-child(8),  #invTable td:nth-child(8),  /* Location */
+    #invTable th:nth-child(9),  #invTable td:nth-child(9),  /* Status */
+    #invTable th:nth-child(10), #invTable td:nth-child(10)  /* Updated */
+    { display:none; }
+
+    th,td{padding:8px 6px}
+    th{font-size:11px}
+    td{font-size:13px}
+    .mono{font-size:12px}
+
+    /* Storage: denser grid & smaller items */
+    .room-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+    .room header{padding:8px 10px}
+    .room .title{font-size:14px}
+    .room .kind,.room .count{font-size:10px}
+    .room .list{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));max-height:52vh;padding:8px}
+    .detail .title{font-size:16px}
+    .detail .subtitle{font-size:11px}
+    .drawer-label{font-size:12px}
+    .slots{gap:6px;padding:6px;min-height:68px}
+    .slots .item{flex:0 0 120px;width:120px}
+    .item .name{font-size:13px}
+    .item .meta{font-size:10.5px}
+    .drawer-label.circle{width:24px;height:24px;font-size:12px}
+
+    /* Forms */
+    .field label{font-size:10.5px}
+    .field input,.field select,.field textarea{padding:9px 10px;border-radius:9px}
+    .seg button.active{border-radius:8px}
+
+    /* Activities panel */
+    .activity{grid-template-columns:90px 1fr;gap:8px}
+    .activity .when{font-size:11px}
+  }
+
+  /* Ultra-small devices (older/mini phones) */
+  @media (max-width: 360px){
+    body{font-size:12px}
+    .slots .item{flex:0 0 100px;width:100px}
+    .room-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  }
+
+
+/* --- Inventory tab: phone-optimized "card view" --- */
+@media (max-width: 430px){
+  #invTable{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0 10px;
+    display:block;
+  }
+  #invTable thead{display:none;}
+  #invTable tbody{display:block;}
+  #invTable tr{
+    display:block;
+    background:#0b1226;
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:12px;
+    padding:10px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.2);
+    overflow:hidden;
+  }
+  #invTable td{
+    display:grid;
+    grid-template-columns:110px 1fr;
+    gap:8px;
+    padding:8px 6px;
+    border:none;
+    font-size:13px;
+  }
+  #invTable td:before{
+    content:"";
+    opacity:0.8;
+    font-size:11px;
+    letter-spacing:0.2px;
+  }
+
+  /* Show labels via nth-child mapping */
+  #invTable td:nth-child(1):before{content:"SKU";}
+  #invTable td:nth-child(2):before{content:"Product";}
+  #invTable td:nth-child(3):before{content:"Supplier/System";}
+  #invTable td:nth-child(4):before{content:"Type/Size";}
+  #invTable td:nth-child(5):before{content:"Stock";}
+  #invTable td:nth-child(6):before{content:"Min/Max/ROP";}
+  #invTable td:nth-child(7):before{content:"Usage";}
+  #invTable td:nth-child(8):before{content:"Location";}
+  #invTable td:nth-child(9):before{content:"Status";}
+  #invTable td:nth-child(10):before{content:"Updated";}
+  #invTable td:nth-child(11):before{content:"Actions";}
+
+  /* Re-show important fields hidden earlier, for card view */
+  #invTable td:nth-child(8),
+  #invTable td:nth-child(9),
+  #invTable td:nth-child(10){
+    display:grid !important;
+  }
+
+  /* Make Actions full-width row buttons */
+  #invTable td:nth-child(11){
+    grid-template-columns:1fr;
+    gap:6px;
+  }
+  #invTable td:nth-child(11) .btn{
+    width:100%;
+    justify-content:center;
+  }
+
+  /* Compact mono fields */
+  #invTable .mono{font-size:12px;}
+
+  /* Subtle emphasis for Product row */
+  #invTable td:nth-child(2){font-weight:600;}
+}
+
+
+.unplaced{display:none!important}
 </style>
 </head>
 <body>
@@ -419,16 +600,6 @@
     });
   }
 
-  /* ========= ensure Unplaced ========= */
-  await (async function ensureUnplaced(){
-    const rref = collection(db,"rooms");
-    const rs = await getDocs(query(rref, where("name","==", UNPLACED_ROOM)));
-    if(rs.empty){ await addDoc(rref,{name:UNPLACED_ROOM,kind:"Unplaced",floor:"—"}); await logActivity('Add Room', 'Auto-created __Unplaced__'); }
-    const sref = collection(db,"storages");
-    const ss = await getDocs(query(sref, where("id","==", UNPLACED_STORAGE_ID)));
-    if(ss.empty){ await addDoc(sref,{id:UNPLACED_STORAGE_ID,name:"Unplaced Bin",type:"System",location:UNPLACED_ROOM,drawers:[]}); await logActivity('Add Storage', 'Auto-created Unplaced Bin'); }
-  })();
-
   /* ========= live snapshots ========= */
   onSnapshot(collection(db,"rooms"), snap=>{ rooms = snap.docs.map(d=>({id:d.id,...d.data()})); refreshAll(); });
   onSnapshot(collection(db,"storages"), snap=>{ storages = snap.docs.map(d=>({docId:d.id, id:d.data().id||d.id, ...d.data()})); refreshAll(); });
@@ -687,32 +858,40 @@
     }
 
     const drawers = Array.isArray(s.drawers)? s.drawers:[];
+    // ===== Shared global "Unplaced" drawer (visible for any selected storage) =====
+    {
+      const row = document.createElement('div'); row.className = 'drawer-row';
+      const lab = document.createElement('div'); lab.className = 'drawer-label'; lab.textContent = 'Unplaced';
+      row.appendChild(lab);
+
+      const slots = document.createElement('div'); slots.className = 'slots';
+      // Accept drops to the shared Unplaced area (no drawer/slot)
+      attachDrawerDrop(slots, UNPLACED_STORAGE_ID, null);
+
+      // Render all items currently in the Unplaced storage
+      const list = items.filter(x => x?.location?.storage === UNPLACED_STORAGE_ID);
+      list.forEach(it => { const card = renderItemCard(it); slots.appendChild(card); });
+
+      // Optional: quick add by double-click
+      slots.addEventListener('dblclick', () => addItemPrompt(UNPLACED_STORAGE_ID, null, null));
+
+      row.appendChild(slots);
+      wrap.appendChild(row);
+    }
+
     for(const label of drawers){
       const row=document.createElement('div'); row.className='drawer-row';
       const lab=document.createElement('div'); const isNum=/^\d+$/.test(String(label)); lab.className='drawer-label'+(isNum?' circle':''); lab.textContent=label; row.appendChild(lab);
       const slots=document.createElement('div'); slots.className='slots';
-      for(let i=1;i<=10;i++){
-        const cell=document.createElement('div'); cell.className='slot'; cell.dataset.slot=i; cell.dataset.drawer=label; cell.dataset.storage=s.id;
-        attachCellDrop(cell, s.id, label, i);
-        const it=items.find(x=>x?.location?.storage===s.id && x?.location?.drawer===label && x?.location?.slot===i);
-        if(it){ const box=renderItemBox(it); cell.appendChild(box); } else { cell.addEventListener('dblclick',()=>addItemPrompt(s.id,label,i)); }
-        slots.appendChild(cell);
-      }
+      // single row dropzone per drawer
+        attachDrawerDrop(slots, s.id, label);
+        slots.addEventListener('dblclick',()=>addItemPrompt(s.id,label,null));
+        const list=items.filter(x=>x?.location?.storage===s.id && x?.location?.drawer===label);
+        list.forEach(it=>{ const box=renderItemBox(it); slots.appendChild(box); });
       row.appendChild(slots); wrap.appendChild(row);
     }
 
-    const unplaced = items.filter(x => x?.location?.storage === UNPLACED_STORAGE_ID);
-const sec=document.createElement('div'); sec.className='unplaced';
-    sec.innerHTML=`<header><strong>Unplaced (Global)</strong><span>${unplaced.length} item(s)</span></header>`;
-    const grid=document.createElement('div'); grid.className='unplaced-grid';
-    const dz=document.createElement('div'); dz.className='dropzone'; dz.textContent='Drop items here to leave unplaced';
-    dz.addEventListener('dragover',(e)=>{ if(!state.draggingItemId) return; e.preventDefault(); dz.classList.add('drop-over'); });
-    dz.addEventListener('dragleave',()=>dz.classList.remove('drop-over'));
-    dz.addEventListener('drop',async (e)=>{ if(!state.draggingItemId) return; e.preventDefault(); dz.classList.remove('drop-over'); await moveItemToUnplaced(state.draggingItemId, UNPLACED_STORAGE_ID); });
-    grid.appendChild(dz);
-    unplaced.forEach(it=>{ const card=renderItemCard(it); grid.appendChild(card); });
-    sec.appendChild(grid); wrap.appendChild(sec);
-  }
+    }
 
   function renderItemBox(it){
     const box=document.createElement('div'); box.className='item'; box.draggable=true;
@@ -736,6 +915,12 @@ const sec=document.createElement('div'); sec.className='unplaced';
     cell.addEventListener('dragleave',()=>cell.classList.remove('drop-over'));
     cell.addEventListener('drop',async (e)=>{ if(!state.draggingItemId) return; e.preventDefault(); cell.classList.remove('drop-over'); await moveItemTo(storageId,drawer,slot); });
   }
+  function attachDrawerDrop(container, storageId, drawer){
+    container.addEventListener('dragover',(e)=>{ if(!state.draggingItemId) return; e.preventDefault(); container.classList.add('drop-over'); });
+    container.addEventListener('dragleave',()=>container.classList.remove('drop-over'));
+    container.addEventListener('drop',async (e)=>{ if(!state.draggingItemId) return; e.preventDefault(); container.classList.remove('drop-over'); await moveItemTo(storageId,drawer,null); });
+  }
+
 
   async function openCreateStorage(roomName){
     const type = prompt("Storage TYPE (e.g., Gratnell, Shelves, Cupboard):","Gratnell") || "Storage";
@@ -819,6 +1004,13 @@ const sec=document.createElement('div'); sec.className='unplaced';
   }
 
   async function moveItemTo(storageId,drawer,slot){
+    if(slot==null || slot===undefined){
+      const it=items.find(x=>x.id===state.draggingItemId); if(!it) return;
+      await updateDoc(doc(db,"items", it.id), { location:{storage:storageId, drawer, slot:null}, updatedAt: serverTimestamp() });
+      await logActivity('Move Item', `${it.name} moved to ${roomOf(storageId)}${drawer?(' / '+drawer):''}`, {itemId: it.id});
+      return;
+    }
+
     const it=items.find(x=>x.id===state.draggingItemId); if(!it) return;
     const occ=items.find(x=>x?.location?.storage===storageId && x?.location?.drawer===drawer && x?.location?.slot===slot);
     if(occ){
@@ -871,5 +1063,112 @@ const sec=document.createElement('div'); sec.className='unplaced';
 
   renderInventory(); renderRoomGrid(); renderDetail();
 </script>
-</body>
-</html>
+
+<script>
+// --- DnD (no Unplaced): move storages between rooms + move items into slots ---
+(function(){
+  const RETRIES = 60; let tries = 0;
+  function wait(){ tries++; if(!(window.$&&window.$$&&window.getFirestore)){ if(tries<RETRIES) return setTimeout(wait,200); else return; }
+    // Patch renderDetail and renderRoomGrid so handlers rebind after each render
+    if(window.renderDetail && !window.renderDetail.__patched){
+      const o = window.renderDetail; window.renderDetail = function(){ const r=o.apply(this,arguments); bind(); return r; }; window.renderDetail.__patched=true;
+    }
+    if(window.renderRoomGrid && !window.renderRoomGrid.__patched){
+      const o = window.renderRoomGrid; window.renderRoomGrid = function(){ const r=o.apply(this,arguments); bind(); return r; }; window.renderRoomGrid.__patched=true;
+    }
+    bind();
+  }
+
+  function bind(){
+    bindStorageDnD();
+    bindSlotDropTargets();
+  }
+
+  function bindStorageDnD(){
+    document.querySelectorAll('.room .list .storage-tile').forEach(tile=>{
+      if(tile.dataset.dndInit) return; tile.dataset.dndInit='1';
+      tile.draggable=true;
+      const sid = tile.getAttribute('data-storage-id') || tile.textContent.trim();
+      tile.addEventListener('dragstart', e=>{
+        e.dataTransfer.setData('text/plain', JSON.stringify({kind:'storage', id:sid}));
+        e.dataTransfer.effectAllowed='move'; tile.classList.add('dragging');
+      });
+      tile.addEventListener('dragend', ()=> tile.classList.remove('dragging'));
+    });
+
+    document.querySelectorAll('.room .list').forEach(list=>{
+      if(list.dataset.dndInit) return; list.dataset.dndInit='1';
+      const panel=list.closest('.room'); const roomName=panel?.querySelector('header .title')?.textContent?.trim();
+      list.addEventListener('dragover', e=>{
+        const d = safeParse(e.dataTransfer.getData('text/plain')); if(d?.kind!=='storage') return;
+        e.preventDefault(); list.classList.add('drop-over');
+      });
+      list.addEventListener('dragleave', ()=> list.classList.remove('drop-over'));
+      list.addEventListener('drop', async e=>{
+        const d = safeParse(e.dataTransfer.getData('text/plain')); list.classList.remove('drop-over');
+        if(d?.kind!=='storage' || !roomName) return;
+        try{
+          if(window.moveStorageToRoom){ await window.moveStorageToRoom(d.id, roomName); }
+          else { await genericMoveStorage(d.id, roomName); }
+        }catch(err){ console.error('Move storage failed', err); }
+      });
+    });
+  }
+
+  function bindSlotDropTargets(){
+    document.querySelectorAll('#drawers .drawer-row .slots').forEach(slots=>{
+      if(slots.dataset.dndInit) return; slots.dataset.dndInit='1';
+      const storageId = (document.querySelector('[data-storage-id]')?.getAttribute('data-storage-id')) || (window.state && window.state.selectedStorageId) || null;
+      const drawer = slots.closest('.drawer-row')?.getAttribute('data-label') || slots.getAttribute('data-drawer') || null;
+      const slotKey = slots.getAttribute('data-slot') || 'A';
+      slots.addEventListener('dragover', e=>{
+        const d = safeParse(e.dataTransfer.getData('text/plain')); if(d?.kind!=='item') return;
+        e.preventDefault(); slots.classList.add('drop-over');
+      });
+      slots.addEventListener('dragleave', ()=> slots.classList.remove('drop-over'));
+      slots.addEventListener('drop', async e=>{
+        const d = safeParse(e.dataTransfer.getData('text/plain')); slots.classList.remove('drop-over');
+        if(d?.kind!=='item') return;
+        try{
+          if(window.moveItemToSlot){ await window.moveItemToSlot(d.id, {storage: storageId, drawer, slot: slotKey}); }
+          else { await genericMoveItem(d.id, {storage: storageId, drawer, slot: slotKey}); }
+        }catch(err){ console.error('Move into slot failed', err); }
+      });
+    });
+  }
+
+  function safeParse(s){ try{ return JSON.parse(s); }catch(_){ return null; } }
+
+  async function genericMoveItem(itemId, location){
+    try{
+      const _db = window.getFirestore(window.app);
+      let docId = null;
+      if(Array.isArray(window.items)){ const found = window.items.find(i=>i.id===itemId || i.docId===itemId); docId = found?.docId || found?.__id || found?.id; }
+      if(!docId){
+        const iref = window.collection(_db, 'items');
+        const qs = await window.getDocs(window.query(iref, window.where('id','==', itemId)));
+        qs.forEach(d=>{ docId = d.id; });
+      }
+      if(docId){ const ref = window.doc(_db, 'items', docId); await window.updateDoc(ref, { location }); }
+    }catch(err){ console.error('genericMoveItem', err); }
+  }
+
+  async function genericMoveStorage(storageId, roomName){
+    try{
+      const _db = window.getFirestore(window.app);
+      let docId = null;
+      if(Array.isArray(window.storages)){ const found = window.storages.find(s=>s.id===storageId || s.docId===storageId); docId = found?.docId || found?.__id || found?.id; }
+      if(!docId){
+        const sref = window.collection(_db, 'storages');
+        const qs = await window.getDocs(window.query(sref, window.where('id','==', storageId)));
+        qs.forEach(d=>{ docId = d.id; });
+      }
+      if(docId){ const ref = window.doc(_db, 'storages', docId); await window.updateDoc(ref, { location: roomName }); }
+    }catch(err){ console.error('genericMoveStorage', err); }
+  }
+
+  wait();
+})();
+</script>
+
+</body></html>

@@ -259,6 +259,46 @@
 /* Inventory Var column */
 #invTable td.var-col{font-weight:600;text-align:center;white-space:nowrap}
 
+
+/* === Mobile inventory card list === */
+.m-list{display:none}
+@media (max-width: 768px){
+  #invTable{display:none !important}
+  .m-list{display:block}
+  .m-group{border:1px solid var(--border);border-radius:12px;background:#fff;margin:8px 0;overflow:hidden}
+  .m-ghead{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;cursor:pointer}
+  .m-ghead .chev{width:18px;height:18px;display:grid;place-items:center;transition:transform .18s ease}
+  .m-group.open .m-ghead .chev{transform:rotate(90deg)}
+  .m-gcount{margin-left:auto;font-size:12px;font-weight:700;color:var(--muted);background:#f6f7fb;border:1px dashed #d8e1f2;padding:3px 8px;border-radius:999px}
+  .m-gbody{padding:6px;display:none;background:#fafafa}
+  .m-group.open .m-gbody{display:block}
+  .m-item{width:100%;position:relative;border:1px dashed #d8e1f2;border-radius:14px;background:#fff;padding:10px 12px;display:grid;grid-template-columns:1fr auto;align-items:center;box-shadow:0 1px 6px rgba(0,0,0,.05);margin:6px 0}
+  .m-name{font-weight:900;font-size:15px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .m-sub{margin-top:1px;font-size:12px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .m-loc{margin-top:1px;font-size:11px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .m-badge{width:38px;height:38px;border-radius:999px;display:grid;place-items:center;font-weight:900;font-size:15px;color:#111827;border:2px solid #dbeafe;background:#f8fbff}
+  .m-dot{position:absolute;right:8px;top:8px;width:8px;height:8px;border-radius:999px}
+  .m-item.ok   .m-dot{background:#10b981}
+  .m-item.over .m-dot{background:#ef4444}
+  .m-item.warn .m-dot{background:#f59e0b}
+  .m-details{grid-column:1 / -1;display:none;border-top:1px dashed #e5e7eb;padding-top:6px;margin-top:6px}
+  .m-item.expanded .m-details{display:block}
+  .m-chips{display:flex;flex-wrap:wrap;gap:4px}
+  .m-chip{font-size:10px;font-weight:700;background:#f3f4f6;border:1px solid #e5e7eb;padding:3px 6px;border-radius:999px}
+}
+
+
+/* Mobile pill: Var badge (top-left) */
+@media (max-width: 768px){
+  .m-item .m-var{
+    position:absolute; top:6px; left:8px;
+    font-size:11px; font-weight:700;
+    color:#92400e; background:#fef3c7;
+    border:1px solid #fcd34d; padding:2px 6px;
+    border-radius:6px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -448,6 +488,7 @@
               </thead>
               <tbody></tbody>
             </table>
+        <div id="invMobile" class="m-list"></div>
           </div>
         </div>
       </section>
@@ -689,6 +730,59 @@ function renderActivities(){
   onSnapshot(collection(db,"items"), snap=>{ items = snap.docs.map(d=>({id:d.id,...d.data()})); refreshAll(); });
 
   renderActivities();
+
+
+
+// === Mobile renderer ===
+function __statusClass(it){
+  const q = Number(it.qty||0), mn = Number(it.min||0), mx = Number(it.max||0), rp = Number(it.rop||0);
+  if(q <= rp) return 'over';
+  if(q < mn) return 'warn';
+  return 'ok';
+}
+function renderInventoryMobile(list){
+  const wrap = document.getElementById('invMobile'); if(!wrap) return;
+  const groups = {};
+  list.forEach(it=>{ const k = it.supplier || 'Unknown'; (groups[k] ||= []).push(it); });
+  const sections = Object.entries(groups).sort((a,b)=>a[0].localeCompare(b[0]));
+  wrap.innerHTML = sections.map(([supplier, items])=>{
+    const body = items.map(it=>{
+      const sObj = storages.find(s=>s.id===it?.location?.storage);
+      const storageName = sObj?.name || ''; const roomName = sObj?.location || '';
+      const loc = roomName ? `${roomName}${storageName?(' • '+storageName):''}${it?.location?.drawer?(' • '+it.location.drawer):''}${it?.location?.slot?(' • '+it.location.slot):''}` : 'Unplaced';
+      const cls = __statusClass(it);
+      return `<button class="m-item ${cls}" type="button" data-id="${it.id}">
+        <span class="m-var">${varianceLabel(it.usage, it.qty, it.max)}</span>
+        <span class="m-dot" aria-hidden="true"></span>
+        <div class="m-txt">
+          <div class="m-name">${escapeHtml(it.name||'')}</div>
+          <div class="m-sub">${escapeHtml(it.system||'')}</div>
+          <div class="m-loc">${(roomName===UNPLACED_ROOM || sObj?.id===UNPLACED_STORAGE_ID) ? '<span class="unplaced-label">Unplaced</span>' : escapeHtml(loc)}</div>
+        </div>
+        <div class="m-badge">${it.qty||0}</div>
+        <div class="m-details">
+          <div class="m-chips">
+            <span class="m-chip">SKU: ${escapeHtml(it.sku||'')}</span>
+            <span class="m-chip">Type: ${escapeHtml(it.type||'')} • Size: ${escapeHtml(it.size||'')}</span>
+            <span class="m-chip">Min/Max/ROP: ${it.min||0}/${it.max||0}/${it.rop||0}</span>
+            <span class="m-chip">Usage: ${(it.usage||'').replace(/^\w/,c=>c.toUpperCase())}</span>
+            <span class="m-chip">Updated: ${escapeHtml(tsToStr(it.updatedAt)||'')}</span>
+          </div>
+        </div>
+      </button>`;
+    }).join('');
+    return `<section class="m-group open">
+      <div class="m-ghead" role="button" tabindex="0"><div class="chev">▶</div><div style="font-weight:800">${escapeHtml(supplier)}</div><div class="m-gcount">${items.length}</div></div>
+      <div class="m-gbody">${body}</div>
+    </section>`;
+  }).join('');
+  wrap.querySelectorAll('.m-item').forEach(btn=>btn.addEventListener('click', ()=>btn.classList.toggle('expanded')));
+  wrap.querySelectorAll('.m-ghead').forEach(h=>{
+    const sec = h.closest('.m-group');
+    h.addEventListener('click', ()=>sec.classList.toggle('open'));
+  });
+}
+
   bindActivityControls();
 
   function refreshAll(){
@@ -868,6 +962,7 @@ function renderInventory(){
     $('#statOver').textContent = `Over max: ${counts.over}`;
     $('#statUsage').textContent = `Usage (H/M/L): ${counts.usageH}/${counts.usageM}/${counts.usageL}`;
 
+    renderInventoryMobile(filtered);
     tbody.innerHTML = filtered.map(it=>{
       const sObj = storages.find(s=>s.id===it?.location?.storage);
       const storageName = sObj?.name || '';
@@ -880,7 +975,7 @@ function renderInventory(){
         <td><strong>${escapeHtml(it.name||'')}</strong></td>
         <td>${escapeHtml(it.supplier||'')}<div style="color:var(--muted);font-size:12px">${escapeHtml(it.system||'')}</div></td>
         <td>${escapeHtml(it.type||'')}<div style="color:var(--muted);font-size:12px">${escapeHtml(it.size||'')}</div></td>
-        <td>${escapeHtml(roomName)}<div style="color:var(--muted);font-size:12px">${escapeHtml(storageName)} ${it?.location?.drawer?('• '+escapeHtml(it.location.drawer)) : ''} ${it?.location?.slot?('• '+escapeHtml(it.location.slot)) : ''}</div></td>
+        <td>${(sObj?.id===UNPLACED_STORAGE_ID || roomName===UNPLACED_ROOM) ? '<span class="unplaced-label">Unplaced</span>' : (escapeHtml(roomName) + '<div style="color:var(--muted);font-size:12px">' + escapeHtml(storageName)   + (it?.location?.drawer?(' • '+escapeHtml(it.location.drawer)) : '')   + (it?.location?.slot?(' • '+escapeHtml(it.location.slot)) : '') + '</div>')}</td>
         <td class="mono" data-field="qty">${it.qty||0}</td>
         <td class="mono" data-field="min">${it.min||0}</td>
         <td class="mono" data-field="max">${it.max||0}</td>

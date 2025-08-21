@@ -444,21 +444,7 @@
           <div style="overflow:auto">
             <table id="invTable">
               <thead>
-                <tr>
-                  <th class="sel-col"><input id="invHeadSel" type="checkbox" /></th>
-                  <th>SKU</th>
-                  <th>Product</th>
-                  <th>Supplier / System</th>
-                  <th>Type / Size</th>
-                  <th>Stock</th>
-                  <th>Min Qty</th><th>Max Qty</th><th>ROP</th>
-                  <th>Usage</th>
-            <th>Var</th>
-                  <th>Location</th>
-                  <th>Status</th>
-                  <th>Updated</th>
-                  <th>Actions</th><th>Flags</th>
-                </tr>
+                <tr><th class="sel-col"><input id="invHeadSel" type="checkbox" /></th><th>SKU</th><th>Product</th><th>Supplier / System</th><th>Type / Size</th><th>Location</th><th>Stock</th><th>Min Qty</th><th>Max Qty</th><th>ROP</th><th>Usage</th><th>Var</th><th>Status</th><th>Updated</th><th>Actions</th><th>Flags</th></tr>
               </thead>
               <tbody></tbody>
             </table>
@@ -894,13 +880,14 @@ function renderInventory(){
         <td><strong>${escapeHtml(it.name||'')}</strong></td>
         <td>${escapeHtml(it.supplier||'')}<div style="color:var(--muted);font-size:12px">${escapeHtml(it.system||'')}</div></td>
         <td>${escapeHtml(it.type||'')}<div style="color:var(--muted);font-size:12px">${escapeHtml(it.size||'')}</div></td>
+        <td>${escapeHtml(roomName)}<div style="color:var(--muted);font-size:12px">${escapeHtml(storageName)} ${it?.location?.drawer?('• '+escapeHtml(it.location.drawer)) : ''} ${it?.location?.slot?('• '+escapeHtml(it.location.slot)) : ''}</div></td>
         <td class="mono" data-field="qty">${it.qty||0}</td>
         <td class="mono" data-field="min">${it.min||0}</td>
         <td class="mono" data-field="max">${it.max||0}</td>
         <td class="mono" data-field="rop">${it.rop||0}</td>
         <td>${(it.usage||'').replace(/^\w/,c=>c.toUpperCase())}</td>
         <td class=\"var-col\">${varianceLabel(it.usage, it.qty, it.max)}</td>
-        <td>${escapeHtml(roomName)}<div style="color:var(--muted);font-size:12px">${escapeHtml(storageName)} ${it?.location?.drawer?('• '+escapeHtml(it.location.drawer)) : ''} ${it?.location?.slot?('• '+escapeHtml(it.location.slot)) : ''}</div></td>
+        
         <td><span class="level-dot ${lev}"></span>${lev}</td>
         <td>${escapeHtml(updated)}</td>
         <td><button class="mini" data-act="move">Move</button> <button class="mini danger" data-act="del">Delete</button> <a href="#" class="note-link" data-id="${it.id}" data-has-note="${(it.notes && it.notes.trim() !== '') ? '1' : '0'}">${(it.notes && it.notes.trim() !== '') ? 'View Note' : 'Add Note'}</a></td><td class="inv-flags"></td></tr>`;

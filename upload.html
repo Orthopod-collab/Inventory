@@ -47,6 +47,7 @@
   .row-5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
   .narrow{max-width:none;width:100%}
   @media (max-width:1200px){.app{grid-template-columns:64px 1fr} .row,.row-3,.row-4,.row-5{grid-template-columns:1fr} .narrow{max-width:none}}
+  @media (max-width: 900px){.row,.row-3,.row-4,.row-5{grid-template-columns:1fr}}
 
   .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .search{flex:1;display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--border);padding:10px 12px;border-radius:12px;min-width:260px}
@@ -56,6 +57,7 @@
   .chip.stat{background:var(--chip)}
   .btn{padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font:inherit;display:inline-flex;align-items:center;gap:8px}
   .btn.primary{border-color:var(--accent-200);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+  .btn.danger{border-color:#fecaca;background:#fff1f2}
 
   /* Segmented */
   .seg{display:inline-flex;border:1.5px solid var(--border);border-radius:999px;overflow:hidden}
@@ -103,7 +105,9 @@
   .drawer-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
   .drawer-label{background:#fff;border:1px solid var(--border);border-radius:999px;padding:8px 12px;font-weight:800;text-align:center;width:fit-content}
   .drawer-label.circle{display:grid;place-items:center;padding:0;border-radius:50%;width:34px;height:34px}
-  .slots{display:grid;grid-template-columns:repeat(10,minmax(70px,1fr));gap:10px}
+  .slots{display:flex;gap:10px;align-items:stretch;overflow-x:auto;border:1px dashed #d8e1f2;border-radius:12px;padding:8px;min-height:90px}
+  .slots.drop-over{background:#eef6ff;border-color:#cfe0ff}
+  .slots .item{flex:0 0 180px;width:180px;height:auto}
   .slot{border:1px dashed #d8e1f2;border-radius:12px;min-height:60px;background:#fff;display:flex;align-items:center;justify-content:center;padding:8px;position:relative}
   .slot.drop-over{background:#eef6ff;border-style:solid;border-color:#cfe0ff}
   .item{width:100%;height:100%;border:1px solid var(--border);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px;background:#fff;cursor:grab;position:relative}
@@ -118,10 +122,520 @@
   .two-col{display:grid;grid-template-columns:1fr 500px;gap:16px}
   @media (max-width:1200px){.two-col{grid-template-columns:1fr}}
   .activity-list{display:flex;flex-direction:column;gap:10px}
-  .activity{display:grid;grid-template-columns:120px 1fr;gap:10px;border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff}
+  .activity{display:grid;grid-template-columns:24px 110px 1fr;gap:10px;border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;align-items:center}
   .activity .when{font-size:12px;color:var(--muted)}
   .activity .type{font-weight:800}
   .activity .details{color:#475569}
+
+  /* Inventory: selection column */
+  .sel-col{width:36px}
+  .sel-cell{width:36px}
+
+  /* ===== Mobile-first refinements ===== */
+  @media (max-width: 768px){
+    body{font-size:14px}
+    .app{grid-template-columns:60px 1fr}
+    header.top{padding:10px 14px}
+    .top-title{font-size:16px}
+    .badge{font-size:11px;padding:5px 8px}
+    main{padding:12px;gap:12px}
+    .card{border-radius:14px}
+    .card header{padding:10px 12px}
+    .card .body{padding:12px}
+    .field label{font-size:11px}
+    .field input,.field select,.field textarea{padding:10px 12px;border-radius:10px}
+    .search{min-width:unset;padding:8px 10px}
+    .btn{padding:8px 10px;border-radius:10px}
+    .chip{padding:6px 10px;font-size:12px}
+    .seg button{padding:6px 10px}
+    th,td{padding:10px 8px}
+    .app-storage{grid-template-columns:1fr}
+    .room-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+    .storage-tile{padding:8px 10px;border-radius:10px;min-height:48px}
+    .storage-tile .type{font-size:10px}
+    .storage-tile .count{font-size:10px;right:6px;top:6px}
+    .detail{position:relative;height:auto}
+    .detail header{padding:10px 12px}
+    .legend .chip{font-size:11px;padding:5px 8px}
+    .drawer-label{padding:6px 10px}
+    .drawer-label.circle{width:28px;height:28px}
+    .slots{gap:8px;padding:6px;min-height:76px}
+    .slots .item{flex:0 0 140px;width:140px}
+    .item{padding:8px;border-radius:10px}
+    .item .meta{font-size:11px}
+    .activity{grid-template-columns:24px 100px 1fr;padding:8px}
+  }
+
+  /* Small phones */
+  @media (max-width: 430px){
+    body{font-size:13px}
+    .app{grid-template-columns:54px 1fr}
+    .logo{width:36px;height:36px;border-radius:10px;font-size:12px}
+    .icon-btn{width:44px;height:44px;border-radius:12px}
+    .icon-btn svg{width:22px;height:22px}
+    header.top{padding:8px 10px}
+    .top-title{font-size:15px}
+    .badge{display:none}
+    main{padding:10px;gap:10px}
+    .card{border-radius:12px}
+    .card header{padding:8px 10px}
+    .card .body{padding:10px}
+    .toolbar{gap:8px}
+    .search{padding:6px 8px}
+    .search input{font-size:13px}
+    .btn{padding:7px 9px;font-size:13px;border-radius:9px}
+    .chip{padding:5px 8px;font-size:11px}
+    .seg button{padding:5px 8px;font-size:12px}
+    th,td{padding:8px 6px}
+    th{font-size:11px}
+    td{font-size:13px}
+    .mono{font-size:12px}
+  }
+
+  .unplaced{display:none!important}
+
+/* === Inventory table: compact + zebra + resizable columns === */
+#invTable{table-layout:auto;border-collapse:separate;border-spacing:0}
+#invTable th,#invTable td{padding:6px 8px;font-size:13px;line-height:1.2;vertical-align:middle}
+#invTable th,#invTable td{white-space:nowrap}
+#invTable td{overflow:hidden;text-overflow:ellipsis}
+#invTable tbody tr:nth-child(odd) td{background:#ffffff}
+#invTable tbody tr:nth-child(even) td{background:#f6f7fb}
+#invTable thead th{position:relative}
+#invTable .col-resizer{position:absolute;right:0;top:0;height:100%;width:6px;cursor:col-resize;user-select:none;-webkit-user-select:none}
+#invTable .col-resizer:hover{background:rgba(37,99,235,.15)}
+
+
+/* === Inventory: context menu + row states === */
+.context-menu{display:none;position:absolute;z-index:10000;background:#fff;border:1px solid #ccc;border-radius:6px;padding:6px 0;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:180px}
+.context-menu li{list-style:none;padding:8px 14px;cursor:pointer;font-size:14px}
+.context-menu li:hover{background:#f5f7fb}
+.inv-pinned{background:#fff7e6 !important}
+#invTable td.editing{padding:0}
+#invTable td.editing input{width:100%;height:100%;box-sizing:border-box;border:0;padding:6px 8px;font-size:13px}
+
+
+/* === Inventory table: spreadsheet look + compact editors === */
+#invTable{border-collapse:collapse}
+#invTable th,#invTable td{border:1px dashed #d0d0d0;padding:4px 6px;vertical-align:middle}
+#invTable thead th{background:#f4f6fa;font-weight:600;text-align:center}
+#invTable tbody td{text-align:center}
+#invTable td:first-child,#invTable th:first-child{text-align:left} /* keep first column (Item) left-aligned */
+#invTable input[type=number].cell-editor{
+  width:5ch;min-width:50px;border:1px solid #aaa;border-radius:3px;
+  padding:2px 3px;font-size:13px;box-sizing:content-box
+}
+
+
+/* Flags cell centering */
+#invTable td.inv-flags{min-width:60px;text-align:center}
+
+
+/* Style for Unplaced location label */
+.unplaced-label {
+  font-weight: bold;
+  color: #d97706; /* amber */
+}
+
+
+/* Recent Activities toolbar layout */
+.activity-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.activity-toolbar .group{display:flex;align-items:center;gap:10px}
+.activity-toolbar .date-chip{display:flex;align-items:center;gap:8px;background:#f6f7fb;border:1px dashed #d8e1f2;padding:6px 10px;border-radius:10px;font-size:14px}
+.activity-toolbar .date-input{border:0;background:transparent;padding:2px 4px;outline:none}
+.activity-toolbar .sel-chip{display:flex;align-items:center;gap:8px;background:#f6f7fb;border:1px dashed #d8e1f2;padding:6px 10px;border-radius:10px;font-size:14px}
+@media (max-width:768px){
+  .activity-toolbar{flex-direction:column;align-items:stretch}
+  .activity-toolbar .group{justify-content:space-between}
+}
+
+
+/* Recent Activities: dropdown filter styling */
+.activity-toolbar .show-label{font-size:13px;color:var(--muted);margin-right:4px}
+.activity-toolbar .select{padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:#fff}
+.activity-toolbar .date-input{padding:8px 10px;border:1px solid var(--border);border-radius:10px}
+
+
+/* Inventory Var column */
+#invTable td.var-col{font-weight:600;text-align:center;white-space:nowrap}
+
+
+/* === Mobile inventory card list === */
+.m-list{display:none}
+@media (max-width: 768px){
+  #invTable{display:none !important}
+  .m-list{display:block}
+  .m-group{border:1px solid var(--border);border-radius:12px;background:#fff;margin:8px 0;overflow:hidden}
+  .m-ghead{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;cursor:pointer}
+  .m-ghead .chev{width:18px;height:18px;display:grid;place-items:center;transition:transform .18s ease}
+  .m-group.open .m-ghead .chev{transform:rotate(90deg)}
+  .m-gcount{margin-left:auto;font-size:12px;font-weight:700;color:var(--muted);background:#f6f7fb;border:1px dashed #d8e1f2;padding:3px 8px;border-radius:999px}
+  .m-gbody{padding:6px;display:none;background:#fafafa}
+  .m-group.open .m-gbody{display:block}
+  .m-item{width:100%;position:relative;border:1px dashed #d8e1f2;border-radius:14px;background:#fff;padding:10px 12px;display:grid;grid-template-columns:1fr auto;align-items:center;box-shadow:0 1px 6px rgba(0,0,0,.05);margin:6px 0}
+  .m-name{font-weight:900;font-size:15px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .m-sub{margin-top:1px;font-size:12px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .m-loc{margin-top:1px;font-size:11px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .m-badge{width:38px;height:38px;border-radius:999px;display:grid;place-items:center;font-weight:900;font-size:15px;color:#111827;border:2px solid #dbeafe;background:#f8fbff}
+  .m-dot{position:absolute;right:8px;top:8px;width:8px;height:8px;border-radius:999px}
+  .m-item.ok   .m-dot{background:#10b981}
+  .m-item.over .m-dot{background:#ef4444}
+  .m-item.warn .m-dot{background:#f59e0b}
+  .m-details{grid-column:1 / -1;display:none;border-top:1px dashed #e5e7eb;padding-top:6px;margin-top:6px}
+  .m-item.expanded .m-details{display:block}
+  .m-chips{display:flex;flex-wrap:wrap;gap:4px}
+  .m-chip{font-size:10px;font-weight:700;background:#f3f4f6;border:1px solid #e5e7eb;padding:3px 6px;border-radius:999px}
+}
+
+
+/* Mobile pill: Var badge (top-left) */
+@media (max-width: 768px){
+  .m-item .m-var{
+    position:absolute; top:6px; left:8px;
+    font-size:11px; font-weight:700;
+    color:#92400e; background:#fef3c7;
+    border:1px solid #fcd34d; padding:2px 6px;
+    border-radius:6px;
+  }
+}
+
+
+  /* === Type color mapping (both desktop & mobile) === */
+  :root{
+    --type-consumable:#2563eb;
+    --type-implant:#7c3aed;
+    --type-table_attach:#d97706;
+    --type-medical_device:#0f766e;
+    --type-instrument_tray:#4338ca;
+    --type-single_pack:#db2777;
+  }
+  /* Desktop: color stripe on left of each inventory row by type */
+  #invTable tr[data-type] td:first-child{ position: relative; }
+  #invTable tr[data-type]::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:4px 0 0 4px;
+  }
+  #invTable tr[data-type="consumable"]::before{ background:var(--type-consumable); }
+  #invTable tr[data-type="implant"]::before{ background:var(--type-implant); }
+  #invTable tr[data-type="table_attach"]::before{ background:var(--type-table_attach); }
+  #invTable tr[data-type="medical_device"]::before{ background:var(--type-medical_device); }
+  #invTable tr[data-type="instrument_tray"]::before{ background:var(--type-instrument_tray); }
+  #invTable tr[data-type="single_pack"]::before{ background:var(--type-single_pack); }
+
+  /* Mobile: subtle border + badge background per type */
+  @media (max-width:768px){
+    .m-item[data-type="consumable"]{ border-color: rgba(37,99,235,.35); box-shadow:0 1px 6px rgba(37,99,235,.15); }
+    .m-item[data-type="implant"]{ border-color: rgba(124,58,237,.35); box-shadow:0 1px 6px rgba(124,58,237,.15); }
+    .m-item[data-type="table_attach"]{ border-color: rgba(217,119,6,.35); box-shadow:0 1px 6px rgba(217,119,6,.15); }
+    .m-item[data-type="medical_device"]{ border-color: rgba(15,118,110,.35); box-shadow:0 1px 6px rgba(15,118,110,.15); }
+    .m-item[data-type="instrument_tray"]{ border-color: rgba(67,56,202,.35); box-shadow:0 1px 6px rgba(67,56,202,.15); }
+    .m-item[data-type="single_pack"]{ border-color: rgba(219,39,119,.35); box-shadow:0 1px 6px rgba(219,39,119,.15); }
+
+    /* Lower-left type label on mobile tile */
+    .m-item .m-type{
+      position:absolute; left:8px; bottom:6px;
+      font-size:10px; font-weight:800; letter-spacing:.2px;
+      padding:3px 6px; border-radius:6px; border:1px solid rgba(0,0,0,.08);
+      background:#f8fafc; color:#111827;
+    }
+    .m-item[data-type="consumable"] .m-type{ background:rgba(37,99,235,.12); border-color:rgba(37,99,235,.25); }
+    .m-item[data-type="implant"] .m-type{ background:rgba(124,58,237,.12); border-color:rgba(124,58,237,.25); }
+    .m-item[data-type="table_attach"] .m-type{ background:rgba(217,119,6,.12); border-color:rgba(217,119,6,.25); }
+    .m-item[data-type="medical_device"] .m-type{ background:rgba(15,118,110,.12); border-color:rgba(15,118,110,.25); }
+    .m-item[data-type="instrument_tray"] .m-type{ background:rgba(67,56,202,.12); border-color:rgba(67,56,202,.25); }
+    .m-item[data-type="single_pack"] .m-type{ background:rgba(219,39,119,.12); border-color:rgba(219,39,119,.25); }
+  }
+
+
+  /* --- Mobile tile layout safety + stronger color coding --- */
+  .m-item{ position:relative; padding-bottom:34px; } /* room for bottom-left type badge */
+  .m-item::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:6px; border-radius:12px 0 0 12px;
+  }
+  .m-item[data-type="consumable"]::before{ background:var(--type-consumable); }
+  .m-item[data-type="implant"]::before{ background:var(--type-implant); }
+  .m-item[data-type="table_attach"]::before{ background:var(--type-table_attach); }
+  .m-item[data-type="medical_device"]::before{ background:var(--type-medical_device); }
+  .m-item[data-type="instrument_tray"]::before{ background:var(--type-instrument_tray); }
+  .m-item[data-type="single_pack"]::before{ background:var(--type-single_pack); }
+
+  .m-item .m-type{ z-index:2; }
+  .m-item .m-title,
+  .m-item .m-subtitle,
+  .m-item .m-location{
+    text-align:center;
+    white-space:normal;
+    word-break:break-word;
+    overflow-wrap:anywhere;
+  }
+  .m-item .m-title{ line-height:1.15; }
+  .m-item .m-subtitle{ line-height:1.2; }
+  .m-item .m-details{ padding-bottom:4px; } /* breathing space above badge */
+
+
+  /* === Light background tint for entire tile === */
+  .m-item[data-type="consumable"]{ background-color:rgba(37,99,235,0.08); }
+  .m-item[data-type="implant"]{ background-color:rgba(124,58,237,0.08); }
+  .m-item[data-type="table_attach"]{ background-color:rgba(217,119,6,0.08); }
+  .m-item[data-type="medical_device"]{ background-color:rgba(15,118,110,0.08); }
+  .m-item[data-type="instrument_tray"]{ background-color:rgba(67,56,202,0.08); }
+  .m-item[data-type="single_pack"]{ background-color:rgba(219,39,119,0.08); }
+
+  #invTable tr[data-type="consumable"] td{ background-color:rgba(37,99,235,0.06); }
+  #invTable tr[data-type="implant"] td{ background-color:rgba(124,58,237,0.06); }
+  #invTable tr[data-type="table_attach"] td{ background-color:rgba(217,119,6,0.06); }
+  #invTable tr[data-type="medical_device"] td{ background-color:rgba(15,118,110,0.06); }
+  #invTable tr[data-type="instrument_tray"] td{ background-color:rgba(67,56,202,0.06); }
+  #invTable tr[data-type="single_pack"] td{ background-color:rgba(219,39,119,0.06); }
+
+
+  /* === Desktop Type/Size pill badges === */
+  .type-pill{
+    display:inline-block; padding:2px 8px; border-radius:9999px;
+    font-size:12px; font-weight:600; color:#111827;
+  }
+  .type-pill.consumable{ background-color:rgba(37,99,235,0.18); color:#1e3a8a; }
+  .type-pill.implant{ background-color:rgba(124,58,237,0.18); color:#4c1d95; }
+  .type-pill.table_attach{ background-color:rgba(217,119,6,0.18); color:#78350f; }
+  .type-pill.medical_device{ background-color:rgba(15,118,110,0.18); color:#064e3b; }
+  .type-pill.instrument_tray{ background-color:rgba(67,56,202,0.18); color:#1e1b4b; }
+  .type-pill.single_pack{ background-color:rgba(219,39,119,0.18); color:#831843; }
+
+
+  /* === Storage tab tile color coding === */
+  .s-item[data-type="consumable"]{ background-color:rgba(37,99,235,0.08); }
+  .s-item[data-type="implant"]{ background-color:rgba(124,58,237,0.08); }
+  .s-item[data-type="table_attach"]{ background-color:rgba(217,119,6,0.08); }
+  .s-item[data-type="medical_device"]{ background-color:rgba(15,118,110,0.08); }
+  .s-item[data-type="instrument_tray"]{ background-color:rgba(67,56,202,0.08); }
+  .s-item[data-type="single_pack"]{ background-color:rgba(219,39,119,0.08); }
+
+  .s-item{ position:relative; padding-bottom:34px; }
+  .s-item .s-type{
+    position:absolute; left:8px; bottom:6px;
+    font-size:10px; font-weight:800; letter-spacing:.2px;
+    padding:3px 6px; border-radius:6px; border:1px solid rgba(0,0,0,.08);
+    background:#f8fafc; color:#111827;
+  }
+  .s-item[data-type="consumable"] .s-type{ background:rgba(37,99,235,.12); border-color:rgba(37,99,235,.25); }
+  .s-item[data-type="implant"] .s-type{ background:rgba(124,58,237,.12); border-color:rgba(124,58,237,.25); }
+  .s-item[data-type="table_attach"] .s-type{ background:rgba(217,119,6,.12); border-color:rgba(217,119,6,.25); }
+  .s-item[data-type="medical_device"] .s-type{ background:rgba(15,118,110,.12); border-color:rgba(15,118,110,.25); }
+  .s-item[data-type="instrument_tray"] .s-type{ background:rgba(67,56,202,.12); border-color:rgba(67,56,202,.25); }
+  .s-item[data-type="single_pack"] .s-type{ background:rgba(219,39,119,.12); border-color:rgba(219,39,119,.25); }
+
+
+  /* === Storage tab tile color coding === */
+  .s-item[data-type="consumable"]{ background-color:rgba(37,99,235,0.08); }
+  .s-item[data-type="implant"]{ background-color:rgba(124,58,237,0.08); }
+  .s-item[data-type="table_attach"]{ background-color:rgba(217,119,6,0.08); }
+  .s-item[data-type="medical_device"]{ background-color:rgba(15,118,110,0.08); }
+  .s-item[data-type="instrument_tray"]{ background-color:rgba(67,56,202,0.08); }
+  .s-item[data-type="single_pack"]{ background-color:rgba(219,39,119,0.08); }
+
+  .s-item{ position:relative; padding-bottom:34px; }
+  .s-item .s-type{
+    position:absolute; left:8px; bottom:6px;
+    font-size:10px; font-weight:800; letter-spacing:.2px;
+    padding:3px 6px; border-radius:6px; border:1px solid rgba(0,0,0,.08);
+    background:#f8fafc; color:#111827;
+  }
+  .s-item[data-type="consumable"] .s-type{ background:rgba(37,99,235,.12); border-color:rgba(37,99,235,.25); }
+  .s-item[data-type="implant"] .s-type{ background:rgba(124,58,237,.12); border-color:rgba(124,58,237,.25); }
+  .s-item[data-type="table_attach"] .s-type{ background:rgba(217,119,6,.12); border-color:rgba(217,119,6,.25); }
+  .s-item[data-type="medical_device"] .s-type{ background:rgba(15,118,110,.12); border-color:rgba(15,118,110,.25); }
+  .s-item[data-type="instrument_tray"] .s-type{ background:rgba(67,56,202,.12); border-color:rgba(67,56,202,.25); }
+  .s-item[data-type="single_pack"] .s-type{ background:rgba(219,39,119,.12); border-color:rgba(219,39,119,.25); }
+
+
+  /* === Storage tiles color coding via data-type === */
+  .item{ position:relative; padding-bottom:34px; }
+  .item::after{
+    content: attr(data-type);
+    position:absolute; left:8px; bottom:6px;
+    font-size:10px; font-weight:800; letter-spacing:.2px;
+    padding:3px 6px; border-radius:6px; border:1px solid rgba(0,0,0,.08);
+    background:#f8fafc; color:#111827;
+    text-transform:none;
+  }
+  .item[data-type="Consumable"]{ background-color:rgba(37,99,235,0.08); }
+  .item[data-type="Implant"]{ background-color:rgba(124,58,237,0.08); }
+  .item[data-type="Table & Attachments"]{ background-color:rgba(217,119,6,0.08); }
+  .item[data-type="Medical Device"]{ background-color:rgba(15,118,110,0.08); }
+  .item[data-type="Instrument Tray"]{ background-color:rgba(67,56,202,0.08); }
+  .item[data-type="Single Pack"]{ background-color:rgba(219,39,119,0.08); }
+
+
+/* === Storage tiles: color tint + bottom-left badge via ::after === */
+.item{ position:relative; padding-bottom:34px; }
+.item::after{
+  content: attr(data-type);
+  position:absolute; left:8px; bottom:6px;
+  font-size:10px; font-weight:800; letter-spacing:.2px;
+  padding:3px 6px; border-radius:6px; border:1px solid rgba(0,0,0,.08);
+  background:#f8fafc; color:#111827;
+}
+.item[data-type="Consumable"], .item[data-type="consumable"], .item[data-type="consumable" i]{ background-color:rgba(37,99,235,0.08); }
+.item[data-type="Implant"], .item[data-type="implant"], .item[data-type="implant" i]{ background-color:rgba(124,58,237,0.08); }
+.item[data-type="Table & Attachments"], .item[data-type="table_attach"], .item[data-type="table attachments" i]{ background-color:rgba(217,119,6,0.08); }
+.item[data-type="Medical Device"], .item[data-type="medical_device"], .item[data-type="medical device" i]{ background-color:rgba(15,118,110,0.08); }
+.item[data-type="Instrument Tray"], .item[data-type="instrument_tray"], .item[data-type="instrument tray" i]{ background-color:rgba(67,56,202,0.08); }
+.item[data-type="Single Pack"], .item[data-type="single_pack"], .item[data-type="single pack" i]{ background-color:rgba(219,39,119,0.08); }
+
+.item[data-type="Consumable"]::after, .item[data-type="consumable"]::after{ background:rgba(37,99,235,.12); border-color:rgba(37,99,235,.25); }
+.item[data-type="Implant"]::after, .item[data-type="implant"]::after{ background:rgba(124,58,237,.12); border-color:rgba(124,58,237,.25); }
+.item[data-type="Table & Attachments"]::after, .item[data-type="table_attach"]::after{ background:rgba(217,119,6,.12); border-color:rgba(217,119,6,.25); }
+.item[data-type="Medical Device"]::after, .item[data-type="medical_device"]::after{ background:rgba(15,118,110,.12); border-color:rgba(15,118,110,.25); }
+.item[data-type="Instrument Tray"]::after, .item[data-type="instrument_tray"]::after{ background:rgba(67,56,202,.12); border-color:rgba(67,56,202,.25); }
+.item[data-type="Single Pack"]::after, .item[data-type="single_pack"]::after{ background:rgba(219,39,119,.12); border-color:rgba(219,39,119,.25); }
+
+
+  /* === Storage tiles: full tint + auto badge === */
+  .item{ position:relative; padding-bottom:34px; }
+  .item::after{
+    content: attr(data-type);
+    position:absolute; left:8px; bottom:6px;
+    font-size:10px; font-weight:800; letter-spacing:.2px;
+    padding:3px 6px; border-radius:6px; border:1px solid rgba(0,0,0,.08);
+    background:#f8fafc; color:#111827; text-transform:capitalize;
+  }
+  .item[data-type="consumable"], .item[data-type="Consumable"]{ background-color:rgba(37,99,235,0.08); }
+  .item[data-type="implant"], .item[data-type="Implant"]{ background-color:rgba(124,58,237,0.08); }
+  .item[data-type="table_attach"], .item[data-type="Table & Attachments"], .item[data-type="Table Attachments"]{ background-color:rgba(217,119,6,0.08); }
+  .item[data-type="medical_device"], .item[data-type="Medical Device"]{ background-color:rgba(15,118,110,0.08); }
+  .item[data-type="instrument_tray"], .item[data-type="Instrument Tray"]{ background-color:rgba(67,56,202,0.08); }
+  .item[data-type="single_pack"], .item[data-type="Single Pack"]{ background-color:rgba(219,39,119,0.08); }
+
+
+  /* Size line under main label */
+  .m-size, .item .size{
+    text-align:center;
+    font-weight:700;
+    font-size:0.9em;
+    margin-top:2px;
+  }
+
+  /* Color hints for type filter pills at the top (drawers) */
+  .chip.type-consumable{ background:rgba(37,99,235,.18); color:#1e3a8a; }
+  .chip.type-implant{ background:rgba(124,58,237,.18); color:#4c1d95; }
+  .chip.type-table_attach{ background:rgba(217,119,6,.18); color:#78350f; }
+  .chip.type-medical_device{ background:rgba(15,118,110,.18); color:#064e3b; }
+  .chip.type-instrument_tray{ background:rgba(67,56,202,.18); color:#1e1b4b; }
+  .chip.type-single_pack{ background:rgba(219,39,119,.18); color:#831843; }
+
+
+  /* Storage item: prevent overlap with top-right controls */
+  .item{ position:relative; padding-top:10px; }
+  .item .name{ text-align:center; margin:0 60px 2px 8px; }
+  .item .size{ text-align:center; font-weight:700; font-size:0.9em; margin:0 60px 6px 8px; }
+
+  /* Turn "Remove" mini button into a minus icon and avoid text overflow */
+  .mini.danger[data-action="remove"]{ font-size:0; padding:6px 10px; }
+  .mini.danger[data-action="remove"]::before{ content:"\2212"; font-size:16px; font-weight:900; line-height:1; }
+
+  /* Extra: ensure level-dot doesn't sit over text */
+  .item .level-dot{ z-index:2; }
+
+
+  /* --- Storage Map: location row improvements --- */
+  .room header{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    justify-content:flex-start;
+  }
+  .room .bar{ align-items:flex-start; }
+  .room .title{
+    white-space:normal;
+    overflow:visible;
+    overflow-wrap:anywhere;
+    text-overflow:initial;
+    background:#00e5ff; /* neon blue */
+    color:#000;
+    font-weight:800;
+    padding:8px 10px;
+    border-radius:10px;
+    display:inline-block;
+    max-width:100%;
+  }
+  .room .kind{ margin-left:8px; }
+  .room header .actions{
+    margin-top:10px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+
+  /* --- Light grey action pills/buttons --- */
+  .room header .actions{ display:flex; flex-direction:column; align-items:flex-start; gap:8px; }
+  .room header .actions .count,
+  .room header .actions .mini{
+    background:#f3f4f6;
+    border:1px solid #e5e7eb;
+    color:#111827;
+  }
+  .room header .actions .mini.danger{ background:#f3f4f6; border-color:#e5e7eb; color:#111827; }
+
+  /* Spinner-style control for + / - storage */
+  .storage-controls{ display:flex; justify-content:flex-start; }
+  .storage-spinner{
+    display:inline-flex; align-items:center; gap:10px;
+    background:#f3f4f6; border:1px dashed #d1d5db; padding:10px 14px; border-radius:12px;
+  }
+  .storage-spinner .spin-btn{
+    width:28px; height:28px; border-radius:9999px; border:1px solid #d1d5db; background:#fff;
+    font-weight:900; line-height:1; font-size:18px; cursor:pointer;
+  }
+  .storage-spinner .spin-label{ font-weight:700; }
+
+
+  /* Horizontal action row + button styling */
+  .room header .actions{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .room header .actions .mini{appearance:none; border:0; background:#e5e7eb; color:#111827; padding:6px 10px; border-radius:10px; font-weight:600; cursor:pointer}
+  .room header .actions .mini.edit{background:#3b82f6; color:#fff}
+  .room header .actions .mini.danger{background:transparent; color:#ef4444; border:1.5px solid #ef4444}
+
+</style>
+  <link rel="manifest" href="manifest.webmanifest">
+<style>
+/* === Light Yellow Storage Tile === */
+.storage-tile{
+  background: #FFF9DB;          /* light yellow */
+  border: 1px solid #FFE8A3;    /* yellow border */
+  border-radius: 20px;
+  padding: 16px 18px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  transition: box-shadow .2s ease, transform .06s ease;
+}
+.storage-tile:hover{
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  transform: translateY(-1px);
+}
+.storage-tile h3{
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.15;
+  font-weight: 800;
+}
+.storage-tile small{
+  display: block;
+  color: #6b7280;
+  margin-top: 2px;
+  font-weight: 600;
+}
+.tile-dot{
+  width: 36px; height: 36px;
+  border-radius: 999px;
+  background: white;
+  border: 2px solid #FFE8A3;
+  display: grid; place-items: center;
+  font-weight: 800;
+}
+/* === End storage tile === */
 </style>
 </head>
 <body>
@@ -129,33 +643,27 @@
   <aside class="side">
     <div class="logo">RLH</div>
     <button class="icon-btn active" data-target="registerPanel" title="Register">
-      <!-- Pen icon -->
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M3 17.25V21h3.75L18.81 8.94l-3.75-3.75L3 17.25Z" stroke="currentColor" stroke-width="1.6"/><path d="M20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.59 1.59 3.75 3.75 1.59-1.59Z" fill="currentColor"/></svg>
       <span class="label">Register</span>
     </button>
     <button class="icon-btn" data-target="inventoryPanel" title="Inventory">
-      <!-- Graph icon -->
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 19V5" stroke="currentColor" stroke-width="1.6"/><path d="M8 19v-7" stroke="currentColor" stroke-width="1.6"/><path d="M12 19V8" stroke="currentColor" stroke-width="1.6"/><path d="M16 19V4" stroke="currentColor" stroke-width="1.6"/><path d="M20 19V11" stroke="currentColor" stroke-width="1.6"/></svg>
       <span class="label">Inventory</span>
     </button>
     <button class="icon-btn" data-target="storagePanel" title="Storage Map">
-      <!-- Grid icon -->
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg>
       <span class="label">Storage Map</span>
     </button>
     <div class="spacer"></div>
     <button class="icon-btn" data-target="ordersPanel" title="Orders">
-      <!-- Cart -->
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M3 4h2l2.5 12h10.5l2-8H7" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="20" r="1.5" fill="currentColor"/><circle cx="18" cy="20" r="1.5" fill="currentColor"/></svg>
       <span class="label">Orders</span>
     </button>
     <button class="icon-btn" data-target="receivedPanel" title="Received">
-      <!-- Inbox -->
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 14h5l2 3h4l2-3h5" stroke="currentColor" stroke-width="1.6"/></svg>
       <span class="label">Received</span>
     </button>
     <button class="icon-btn" data-target="labelsPanel" title="QR & Labels">
-      <!-- QR -->
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.6"/><path d="M14 14h7v7h-7v-3h3v-2h-3v-2Z" stroke="currentColor" stroke-width="1.6"/></svg>
       <span class="label">QR & Labels</span>
     </button>
@@ -206,20 +714,7 @@
                 </div>
               </div>
             </div>
-            
             <div class="row">
-              <div class="field" style="grid-column:1/-1">
-                <label>Product Image (Google Drive link)</label>
-                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                  <input id="r_image" type="url" placeholder="Paste Google Drive share link (or any image URL)" style="flex:1">
-                  <button id="r_image_preview_btn" class="btn" type="button">Preview</button>
-                </div>
-                <div style="font-size:12px; color: var(--muted); margin-top:6px;">
-                  Tip: Open the image in Google Drive &raquo; Share &raquo; "Anyone with the link" (Viewer), then paste the link here.
-                </div>
-              </div>
-            </div>
-<div class="row">
               <div class="field" style="grid-column:1/-1"><label>Notes</label><textarea id="r_notes" rows="4" placeholder="Optional notes (size, lot, expiry, packaging, pairing, etc.)"></textarea></div>
             </div>
             <hr style="border:0;border-top:1px solid var(--border);margin:12px 0">
@@ -252,7 +747,26 @@
           <aside class="card" style="border:none">
             <header><div>Recent Activities</div></header>
             <div class="body">
-              <div id="activityList" class="activity-list"></div>
+              
+<div class="activity-toolbar">
+  <div class="group left">
+    <span class="show-label">Show</span>
+    <select id="actShow" class="select">
+      <option value="all" selected>All</option>
+      <option value="-1d">Last 1 day</option>
+      <option value="-2d">Last 2 days</option>
+      <option value="-3d">Last 3 days</option>
+      <option value="-1w">Last 1 week</option>
+      <option value="-1m">Last 1 month</option>
+      <option value="custom">Custom...</option>
+    </select>
+    <input id="actCustomFrom" type="date" class="date-input" style="display:none">
+  </div>
+  <div class="group right">
+    <button id="actClearAll" class="btn danger">Clear History</button>
+  </div>
+</div>
+<div id="activityList" class="activity-list"> class="activity-list"></div>
             </div>
           </aside>
         </div>
@@ -264,7 +778,10 @@
       <section id="inventoryPanel" class="panel card">
         <header>
           <div>Inventory</div>
-          <div><button id="invExport" class="btn">Export CSV</button></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button id="invDeleteSel" class="btn danger">Delete selected</button>
+            <button id="invExport" class="btn">Export CSV</button>
+          </div>
         </header>
         <div class="body">
           <div class="toolbar">
@@ -289,6 +806,9 @@
               <button data-v="medium">Medium</button>
               <button data-v="low">Low</button>
             </div>
+            <label class="chip" style="margin-left:auto;display:flex;align-items:center;gap:6px">
+              <input id="invSelectAll" type="checkbox"> Select all
+            </label>
           </div>
           <div class="chips" style="margin:10px 0">
             <span class="chip stat" id="statTotal">Total items: 0</span>
@@ -301,22 +821,11 @@
           <div style="overflow:auto">
             <table id="invTable">
               <thead>
-                <tr>
-                  <th>SKU</th>
-                  <th>Product</th>
-                  <th>Supplier / System</th>
-                  <th>Type / Size</th>
-                  <th>Stock</th>
-                  <th>Min / Max / ROP</th>
-                  <th>Usage</th>
-                  <th>Location</th>
-                  <th>Status</th>
-                  <th>Updated</th>
-                  <th>Actions</th>
-                </tr>
+                <tr><th class="sel-col"><input id="invHeadSel" type="checkbox" /></th><th>SKU</th><th>Product</th><th>Supplier / System</th><th>Type / Size</th><th>Location</th><th>Stock</th><th>Min Qty</th><th>Max Qty</th><th>ROP</th><th>Usage</th><th>Var</th><th>Status</th><th>Updated</th><th>Actions</th><th>Flags</th></tr>
               </thead>
               <tbody></tbody>
             </table>
+        <div id="invMobile" class="m-list"></div>
           </div>
         </div>
       </section>
@@ -337,7 +846,7 @@
           </div>
         </header>
         <div class="body">
-          <div class="app-storage">
+          <div class"app-storage storage-tile">
             <div><div id="roomGrid" class="room-grid"></div></div>
             <div class="detail">
               <header>
@@ -390,7 +899,7 @@
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
   import {
     getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs,
-    updateDoc, deleteDoc, onSnapshot, query, where, writeBatch, orderBy, limit, serverTimestamp
+    updateDoc, deleteDoc, onSnapshot, query, where, writeBatch, orderBy, limit, serverTimestamp, Timestamp
   } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
   const app = initializeApp(window.firebaseConfig);
@@ -417,30 +926,140 @@
       await addDoc(collection(db,"activities"), { type, details, ref, createdAt: serverTimestamp() });
     }catch(e){ console.warn('Activity log failed', e); }
   }
-  function renderActivities(){
-    const list = $('#activityList'); if(!list) return;
-    onSnapshot(query(collection(db,"activities"), orderBy("createdAt","desc"), limit(25)), snap=>{
-      const rows = snap.docs.map(d=>({id:d.id, ...d.data()}));
-      if(rows.length===0){ list.innerHTML = '<div class="muted">No recent activity.</div>'; return; }
-      list.innerHTML = rows.map(a=>`<div class="activity">
-        <div class="when">${escapeHtml(tsToStr(a.createdAt))}</div>
-        <div>
-          <div class="type">${escapeHtml(a.type)}</div>
-          <div class="details">${escapeHtml(a.details||'')}</div>
-        </div>
-      </div>`).join('');
+
+  const actSelected = new Set();
+
+  async function deleteActivitiesByIds(ids){
+    if(!ids?.length) return;
+    const total = ids.length;
+    while(ids.length){
+      const chunk = ids.splice(0, 450);
+      const batch = writeBatch(db);
+      chunk.forEach(id => batch.delete(doc(db, "activities", id)));
+      await batch.commit();
+    }
+    await logActivity('Bulk Delete Activities', `Deleted ${total} activities`);
+  }
+
+  async function deleteActivitiesFromDate(dateStr){
+    if(!dateStr) { alert('Pick a start date.'); return; }
+    const start = new Date(dateStr + 'T00:00:00');
+    const qy = query(collection(db,"activities"), where("createdAt", ">=", Timestamp.fromDate(start)));
+    const snap = await getDocs(qy);
+    if(snap.empty){ alert('Nothing to delete for that range.'); return; }
+    if(!confirm(`Delete ${snap.size} activities from ${start.toLocaleDateString()} to now?`)) return;
+
+    const ids = snap.docs.map(d => d.id);
+    const total = ids.length;
+    while(ids.length){
+      const chunk = ids.splice(0, 450);
+      const batch = writeBatch(db);
+      chunk.forEach(id => batch.delete(doc(db, "activities", id)));
+      await batch.commit();
+    }
+    await logActivity('Clear Activities (range)', `From ${start.toLocaleDateString()} to now (deleted ${total})`);
+  }
+
+  
+// === Activities: filterable view + clear history ===
+let activityRows = [];
+
+function activityStartFrom(value){
+  const now = Date.now();
+  if(value === 'all') return null;
+  if(value === 'custom'){
+    const inp = document.getElementById('actCustomFrom');
+    if(!inp || !inp.value) return null;
+    return new Date(inp.value + 'T00:00:00').getTime();
+  }
+  if(value === '-1d') return now - 1*24*3600*1000;
+  if(value === '-2d') return now - 2*24*3600*1000;
+  if(value === '-3d') return now - 3*24*3600*1000;
+  if(value === '-1w') return now - 7*24*3600*1000;
+  if(value === '-1m'){ const d=new Date(); d.setMonth(d.getMonth()-1); return d.getTime(); }
+  return null;
+}
+
+function drawActivities(){
+  const list = document.getElementById('activityList'); if(!list) return;
+  const sel = document.getElementById('actShow');
+  const fromMs = sel ? activityStartFrom(sel.value) : null;
+  let rows = activityRows || [];
+  if(fromMs){
+    rows = rows.filter(a => {
+      try{
+        const t = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+        return t >= fromMs;
+      }catch{ return false; }
+    });
+  }
+  if(rows.length===0){ list.innerHTML = '<div class="muted">No recent activity.</div>'; return; }
+  list.innerHTML = rows.map(a=>`<div class="activity" data-id="${a.id}">
+    <input class="actSel" type="checkbox" />
+    <div class="when">${escapeHtml(tsToStr(a.createdAt))}</div>
+    <div>
+      <div class="type">${escapeHtml(a.type||'')}</div>
+      <div class="details">${escapeHtml(a.details||'')}</div>
+    </div>
+  </div>`).join('');
+
+  // wire selection checkboxes
+  const boxes = document.querySelectorAll('#activityList .actSel');
+  boxes.forEach((cb, idx)=>{
+    const id = rows[idx]?.id; if(!id) return;
+    cb.checked = false;
+    cb.onchange = ()=>{ if(cb.checked) actSelected.add(id); else actSelected.delete(id); };
+  });
+}
+function renderActivities(){
+
+  const list = $('#activityList'); if(!list) return;
+  onSnapshot(query(collection(db,"activities"), orderBy("createdAt","desc"), limit(200)), snap=>{
+    activityRows = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    actSelected.clear();
+    drawActivities();
+  });
+
+}
+
+  function bindActivityControls(){
+
+  const clearAll = document.getElementById('actClearAll');
+  const sel = document.getElementById('actShow');
+  const customInp = document.getElementById('actCustomFrom');
+
+  if(sel){
+    sel.addEventListener('change', ()=>{
+      if(sel.value === 'custom'){ customInp.style.display='inline-block'; }
+      else { customInp.style.display='none'; }
+      drawActivities();
+    });
+  }
+  if(customInp){
+    customInp.addEventListener('change', drawActivities);
+  }
+  if(clearAll){
+    clearAll.addEventListener('click', async ()=>{
+      const selVal = sel?.value || 'all';
+      if(selVal === 'all'){
+        if(!confirm('Delete ALL activities?')) return;
+        const snap = await getDocs(collection(db,'activities'));
+        const ids = snap.docs.map(d=>d.id);
+        await deleteActivitiesByIds(ids);
+        alert('Activity history cleared.');
+      }else if(selVal === 'custom'){
+        if(!customInp.value){ alert('Pick a start date.'); return; }
+        await deleteActivitiesFromDate(customInp.value);
+      }else{
+        const fromMs = activityStartFrom(selVal);
+        if(!fromMs){ alert('Pick a valid start date.'); return; }
+        const start = new Date(fromMs);
+        await deleteActivitiesFromDate(start.toISOString().slice(0,10));
+      }
     });
   }
 
-  /* ========= ensure Unplaced ========= */
-  await (async function ensureUnplaced(){
-    const rref = collection(db,"rooms");
-    const rs = await getDocs(query(rref, where("name","==", UNPLACED_ROOM)));
-    if(rs.empty){ await addDoc(rref,{name:UNPLACED_ROOM,kind:"Unplaced",floor:"—"}); await logActivity('Add Room', 'Auto-created __Unplaced__'); }
-    const sref = collection(db,"storages");
-    const ss = await getDocs(query(sref, where("id","==", UNPLACED_STORAGE_ID)));
-    if(ss.empty){ await addDoc(sref,{id:UNPLACED_STORAGE_ID,name:"Unplaced Bin",type:"System",location:UNPLACED_ROOM,drawers:[]}); await logActivity('Add Storage', 'Auto-created Unplaced Bin'); }
-  })();
+}
 
   /* ========= live snapshots ========= */
   onSnapshot(collection(db,"rooms"), snap=>{ rooms = snap.docs.map(d=>({id:d.id,...d.data()})); refreshAll(); });
@@ -448,6 +1067,61 @@
   onSnapshot(collection(db,"items"), snap=>{ items = snap.docs.map(d=>({id:d.id,...d.data()})); refreshAll(); });
 
   renderActivities();
+
+
+
+// === Mobile renderer ===
+function __statusClass(it){
+  const q = Number(it.qty||0), mn = Number(it.min||0), mx = Number(it.max||0), rp = Number(it.rop||0);
+  if(q <= rp) return 'over';
+  if(q < mn) return 'warn';
+  return 'ok';
+}
+function renderInventoryMobile(list){
+  const wrap = document.getElementById('invMobile'); if(!wrap) return;
+  const groups = {};
+  list.forEach(it=>{ const k = it.supplier || 'Unknown'; (groups[k] ||= []).push(it); });
+  const sections = Object.entries(groups).sort((a,b)=>a[0].localeCompare(b[0]));
+  wrap.innerHTML = sections.map(([supplier, items])=>{
+    const body = items.map(it=>{
+      const sObj = storages.find(s=>s.id===it?.location?.storage);
+      const storageName = sObj?.name || ''; const roomName = sObj?.location || '';
+      const loc = roomName ? `${roomName}${storageName?(' • '+storageName):''}${it?.location?.drawer?(' • '+it.location.drawer):''}${it?.location?.slot?(' • '+it.location.slot):''}` : 'Unplaced';
+      const cls = __statusClass(it);
+      return `<button class=\"m-item ${cls}\" type=\"button\" data-id=\"${it.id}\" data-type=\"${escapeHtml(it.type||'')}\">
+        <span class="m-var">${varianceLabel(it.usage, it.qty, it.max)}</span>
+        <span class="m-dot" aria-hidden="true"></span>
+        <div class="m-txt">
+          <div class="m-name">${escapeHtml(it.name||'')}</div><div class="m-size">${escapeHtml(it.size||'')}</div>
+          <div class="m-sub">${escapeHtml(it.system||'')}</div>
+          <div class="m-loc">${(roomName===UNPLACED_ROOM || sObj?.id===UNPLACED_STORAGE_ID) ? '<span class="unplaced-label">Unplaced</span>' : escapeHtml(loc)}</div>
+        </div>
+        <div class="m-badge">${it.qty||0}</div>
+        <span class="m-type">${escapeHtml((it.type||"").replace(/_/g," ").replace(/^\w/,c=>c.toUpperCase()))}</span>
+        <div class="m-details">
+          <div class="m-chips">
+            <span class="m-chip">SKU: ${escapeHtml(it.sku||'')}</span>
+            <span class="m-chip">Type: ${escapeHtml(it.type||'')} • Size: ${escapeHtml(it.size||'')}</span>
+            <span class="m-chip">Min/Max/ROP: ${it.min||0}/${it.max||0}/${it.rop||0}</span>
+            <span class="m-chip">Usage: ${(it.usage||'').replace(/^\w/,c=>c.toUpperCase())}</span>
+            <span class="m-chip">Updated: ${escapeHtml(tsToStr(it.updatedAt)||'')}</span>
+          </div>
+        </div>
+      </button>`;
+    }).join('');
+    return `<section class="m-group open">
+      <div class="m-ghead" role="button" tabindex="0"><div class="chev">▶</div><div style="font-weight:800">${escapeHtml(supplier)}</div><div class="m-gcount">${items.length}</div></div>
+      <div class="m-gbody">${body}</div>
+    </section>`;
+  }).join('');
+  wrap.querySelectorAll('.m-item').forEach(btn=>btn.addEventListener('click', ()=>btn.classList.toggle('expanded')));
+  wrap.querySelectorAll('.m-ghead').forEach(h=>{
+    const sec = h.closest('.m-group');
+    h.addEventListener('click', ()=>sec.classList.toggle('open'));
+  });
+}
+
+  bindActivityControls();
 
   function refreshAll(){
     populateRegisterLocSelectors();
@@ -501,21 +1175,8 @@
   $('#r_room').addEventListener('change', updateRegStorage);
   $('#r_storage').addEventListener('change', ()=>{ updateRegDrawer(); updateRegSlot(); });
 
-  // Image preview button
-  (function(){
-    const previewBtn = document.getElementById('r_image_preview_btn');
-    if(previewBtn){
-      previewBtn.addEventListener('click', ()=>{
-        const raw = document.getElementById('r_image').value;
-        const norm = normalizeDriveLink(raw);
-        if(!norm){ alert('Paste a link first.'); return; }
-        window.open(norm, '_blank', 'noopener');
-      });
-    }
-  })();
-
   $('#r_clear').addEventListener('click', ()=>{
-    $('#r_supplier').value=''; $('#r_name').value=''; $('#r_system').value=''; $('#r_type').value='consumable'; $('#r_image').value='';
+    $('#r_supplier').value=''; $('#r_name').value=''; $('#r_system').value=''; $('#r_type').value='consumable';
     $('#r_size').value=''; $('#r_qty').value=0; $('#r_rop').value=0; $('#r_min').value=0; $('#r_max').value=0; $('#r_sku').value=''; $('#r_notes').value='';
     usage='medium'; $$('#r_usage_seg button').forEach(b=>b.classList.toggle('active', b.dataset.v==='medium'));
   });
@@ -532,28 +1193,81 @@
     const max=Number($('#r_max').value||0);
     const sku=$('#r_sku').value.trim();
     const notes=$('#r_notes').value.trim();
-    const imageUrl = normalizeDriveLink($('#r_image').value.trim());
-    const roomName=$('#r_room').value;
     const storageId=$('#r_storage').value;
     const drawer=$('#r_drawer').value || null;
     const slot=$('#r_slot').value ? Number($('#r_slot').value) : null;
     if(!supplier || !name){ alert('Supplier and Product Name are required.'); return; }
     if(!storageId){ alert('Please choose a storage.'); return; }
-    const docRef = await addDoc(collection(db,"items"), { supplier, name, system, type, size, qty, rop, min, max, sku, usage, notes, imageUrl, location:{ storage:storageId, drawer, slot }, updatedAt: serverTimestamp() });
+    const docRef = await addDoc(collection(db,"items"), { supplier, name, system, type, size, qty, rop, min, max, sku, usage, notes, location:{ storage:storageId, drawer, slot }, updatedAt: serverTimestamp() });
     await logActivity('Register', `${name} (${sku||'no SKU'}) added to ${roomOf(storageId)} / ${storageId}${drawer?(' / '+drawer):''}${slot?(' / '+slot):''}`, {itemId: docRef.id});
     alert('Saved.');
     $('#r_clear').click();
   });
 
   /* ========= Inventory ========= */
+  const invSelected = new Set();
   $('#filSupplier').addEventListener('change', refreshAll);
   $('#filSystem').addEventListener('change', renderInventory);
   $('#filType').addEventListener('change', renderInventory);
   $('#invSearch').addEventListener('input', renderInventory);
   $('#filUsage').addEventListener('click', e=>{ if(e.target.tagName!=='BUTTON') return; $$('#filUsage button').forEach(b=>b.classList.remove('active')); e.target.classList.add('active'); renderInventory(); });
 
-  function renderInventory(){
+  $('#invDeleteSel').addEventListener('click', async ()=>{
+    if(invSelected.size===0){ alert('Select at least one item.'); return; }
+    const ids = Array.from(invSelected);
+    if(!confirm(`Delete ${ids.length} selected inventory items?`)) return;
+    try{
+      while(ids.length){
+        const chunk = ids.splice(0, 450);
+        const batch = writeBatch(db);
+        chunk.forEach(id => batch.delete(doc(db, "items", id)));
+        await batch.commit();
+      }
+      await logActivity('Bulk Delete Items', `Deleted ${Array.from(invSelected).length} items`);
+      invSelected.clear();
+      const headSel = $('#invHeadSel'); const selAll = $('#invSelectAll');
+      if(headSel) headSel.checked = false;
+      if(selAll) selAll.checked = false;
+      alert('Selected items deleted.');
+    }catch(e){
+      console.error(e);
+      alert('Failed to delete selected items.');
+    }
+  });
+
+  $('#invSelectAll').addEventListener('change', ()=>{
+    const head = $('#invHeadSel');
+    const want = $('#invSelectAll').checked;
+    if(head){ head.checked = want; head.dispatchEvent(new Event('change')); }
+  });
+
+  
+// === Inventory variance label (usage, qty, max) ===
+function varianceLabel(usage, current, maxVal){
+  const u = (usage || '').trim().toUpperCase();
+  const cur = Number(current||0);
+  const max = Number(maxVal||0);
+  if (!Number.isFinite(max)) return '-';
+  if (max === cur) return 'Full';
+  const up = (n)=> String(Math.ceil(Math.max(0, n)));
+  if (u === 'HIGH'){
+    return cur < max ? '↓ ' + up((max - cur)*2)
+                     : '↑ ' + up((cur - max)*0.5);
+  }
+  if (u === 'MEDIUM'){
+    return cur < max ? '↓ ' + up(max - cur)
+                     : '↑ ' + up(cur - max);
+  }
+  if (u === 'LOW'){
+    return cur < max ? '↓ ' + up((max - cur)*0.5)
+                     : '↑ ' + up((cur - max)*2);
+  }
+  return '-';
+}
+
+function renderInventory(){
     const tbody = $('#invTable tbody'); if(!tbody) return;
+    invSelected.clear();
     const q = ($('#invSearch').value||'').toLowerCase();
     const fs = $('#filSupplier').value||'';
     const fy = $('#filSystem').value||'';
@@ -586,26 +1300,50 @@
     $('#statOver').textContent = `Over max: ${counts.over}`;
     $('#statUsage').textContent = `Usage (H/M/L): ${counts.usageH}/${counts.usageM}/${counts.usageL}`;
 
+    renderInventoryMobile(filtered);
     tbody.innerHTML = filtered.map(it=>{
       const sObj = storages.find(s=>s.id===it?.location?.storage);
       const storageName = sObj?.name || '';
       const roomName = sObj?.location || '';
       const lev = level(it);
       const updated = tsToStr(it.updatedAt);
-      return `<tr data-id="${it.id}">
+      return `<tr data-id=\"${it.id}\" data-type=\"${escapeHtml(it.type||'')}\">
+        <td class="sel-cell"><input class="invSel" type="checkbox"></td>
         <td class="mono">${escapeHtml(it.sku||'')}</td>
-        <td>${it.imageUrl?`<a href="${escapeHtml(it.imageUrl)}" target="_blank" rel="noopener"><strong>${escapeHtml(it.name||'')}</strong></a>`:`<strong>${escapeHtml(it.name||'')}</strong>`}</td>
+        <td><strong>${escapeHtml(it.name||'')}</strong></td>
         <td>${escapeHtml(it.supplier||'')}<div style="color:var(--muted);font-size:12px">${escapeHtml(it.system||'')}</div></td>
         <td>${escapeHtml(it.type||'')}<div style="color:var(--muted);font-size:12px">${escapeHtml(it.size||'')}</div></td>
-        <td class="mono">${it.qty||0}</td>
-        <td class="mono">${it.min||0} / ${it.max||0} / ${it.rop||0}</td>
+        <td>${(sObj?.id===UNPLACED_STORAGE_ID || roomName===UNPLACED_ROOM) ? '<span class="unplaced-label">Unplaced</span>' : (escapeHtml(roomName) + '<div style="color:var(--muted);font-size:12px">' + escapeHtml(storageName)   + (it?.location?.drawer?(' • '+escapeHtml(it.location.drawer)) : '')   + (it?.location?.slot?(' • '+escapeHtml(it.location.slot)) : '') + '</div>')}</td>
+        <td class="mono" data-field="qty">${it.qty||0}</td>
+        <td class="mono" data-field="min">${it.min||0}</td>
+        <td class="mono" data-field="max">${it.max||0}</td>
+        <td class="mono" data-field="rop">${it.rop||0}</td>
         <td>${(it.usage||'').replace(/^\w/,c=>c.toUpperCase())}</td>
-        <td>${escapeHtml(roomName)}<div style="color:var(--muted);font-size:12px">${escapeHtml(storageName)} ${it?.location?.drawer?('• '+escapeHtml(it.location.drawer)) : ''} ${it?.location?.slot?('• '+escapeHtml(it.location.slot)) : ''}</div></td>
+        <td class=\"var-col\">${varianceLabel(it.usage, it.qty, it.max)}</td>
+        
         <td><span class="level-dot ${lev}"></span>${lev}</td>
         <td>${escapeHtml(updated)}</td>
-        <td><button class="mini" data-act="move">Move</button> <button class="mini" data-act="inc">+1</button> <button class="mini danger" data-act="del">Delete</button></td>
-      </tr>`;
+        <td><button class="mini" data-act="move">Move</button> <button class="mini danger" data-act="del">Delete</button> <a href="#" class="note-link" data-id="${it.id}" data-has-note="${(it.notes && it.notes.trim() !== '') ? '1' : '0'}">${(it.notes && it.notes.trim() !== '') ? 'View Note' : 'Add Note'}</a></td><td class="inv-flags"></td></tr>`;
     }).join('');
+
+    document.dispatchEvent(new Event('inventory:rendered'));
+    // Selection wiring
+    const rowBoxes = $$('.invSel');
+    rowBoxes.forEach((cb, idx)=>{
+      const id = filtered[idx].id;
+      cb.checked = false;
+      cb.onchange = ()=>{ if(cb.checked) invSelected.add(id); else invSelected.delete(id); };
+    });
+
+    const headSel = $('#invHeadSel');
+    if(headSel){
+      headSel.checked = false;
+      headSel.onchange = ()=>{
+        const want = headSel.checked;
+        const boxes = $$('.invSel');
+        boxes.forEach(b => { b.checked = want; b.dispatchEvent(new Event('change')); });
+      };
+    }
 
     // Row actions
     $$('#invTable [data-act="move"]').forEach(btn=>btn.onclick=()=>{
@@ -624,15 +1362,38 @@
     $$('#invTable [data-act="del"]').forEach(btn=>btn.onclick=async ()=>{
       const id = btn.closest('tr').getAttribute('data-id');
       const it = items.find(x=>x.id===id);
-      if(confirm('Delete this item?')){ await deleteDoc(doc(db,"items", id)); await logActivity('Delete Item', `${it?.name||'Item'} removed`, {itemId:id}); }
+      if(confirm('Delete this item?')){ await deleteDoc(doc(db,"items", id)); await logActivity('Delete Item', `${it?.name||'Item'} removed`, {itemId:id}); 
+    // Note link handlers
+    $$('#invTable .note-link').forEach(a=>a.onclick=async (e)=>{
+      e.preventDefault();
+      const id = a.dataset.id;
+      const has = a.dataset.hasNote === '1';
+      if(has){
+        try{
+          const snap = await getDoc(doc(db,'items',id));
+          const note = (snap.exists() && snap.data().notes) ? snap.data().notes : '(No note)';
+          alert('Note:\n\n' + note);
+        }catch(err){ console.error(err); alert('Could not load note.'); }
+      }else{
+        const newNote = prompt('Enter a note:');
+        if(newNote && newNote.trim() !== ''){
+          try{
+            await updateDoc(doc(db,'items',id), { notes: newNote.trim(), updatedAt: serverTimestamp() });
+            a.textContent = 'View Note';
+            a.dataset.hasNote = '1';
+          }catch(err){ console.error(err); alert('Could not save note.'); }
+        }
+      }
+    });
+}
     });
   }
 
   $('#invExport').addEventListener('click', ()=>{
-    const rows = [['SKU','Product','Supplier','System','Type','Size','Qty','Min','Max','ROP','Usage','Room','Storage','Drawer','Slot','Notes','ImageURL']];
+    const rows = [['SKU','Product','Supplier','System','Type','Size','Qty','Min','Max','ROP','Usage','Room','Storage','Drawer','Slot','Notes']];
     items.forEach(it=>{
       const sObj=storages.find(s=>s.id===it?.location?.storage);
-      rows.push([it.sku||'', it.name||'', it.supplier||'', it.system||'', it.type||'', it.size||'', it.qty||0, it.min||0, it.max||0, it.rop||0, it.usage||'', sObj?.location||'', sObj?.name||'', it?.location?.drawer||'', it?.location?.slot||'', (it.notes||'').replace(/\n/g,' '), it.imageUrl||'' ]);
+      rows.push([it.sku||'', it.name||'', it.supplier||'', it.system||'', it.type||'', it.size||'', it.qty||0, it.min||0, it.max||0, it.rop||0, it.usage||'', sObj?.location||'', sObj?.name||'', it?.location?.drawer||'', it?.location?.slot||'', (it.notes||'').replace(/\n/g,' ') ]);
     });
     const csv = rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');
     const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='inventory.csv'; a.click();
@@ -660,8 +1421,8 @@
             <div class="title">${roomName===UNPLACED_ROOM?'Unplaced':escapeHtml(roomName)}${roomName===UNPLACED_ROOM?'':(kind?`<span class="kind">• ${escapeHtml(kind)}</span>`:'')}${roomName===UNPLACED_ROOM?'':(floor?`<span class="kind">• ${escapeHtml(floor)}</span>`:'')}</div>
           </div>
           <div class="actions">
-            <span class="count">${(storages.filter(s=>s.location===roomName).length)} storage</span>
-            ${roomName===UNPLACED_ROOM?'':`<button class="mini" data-action="edit">Edit</button><button class="mini danger" data-action="remove">Remove</button>`}
+            <span class="count">${(()=>{const n=storages.filter(s=>s.location===roomName).length; return n+" "+(n===1?"Storage":"Storages");})()}</span>
+            ${roomName===UNPLACED_ROOM?'':`<button class="mini edit" data-action="edit">Edit</button><button class="mini danger" data-action="remove">Remove</button>`}
           </div>
         </header>
         <div class="list"></div>`;
@@ -689,13 +1450,15 @@
       });
 
       if(roomName!==UNPLACED_ROOM){
-        const controls=document.createElement('div'); controls.style.display='flex'; controls.style.gap='8px';
-        const add=document.createElement('button'); add.className='add-storage'; add.textContent='+ New storage';
-        add.onclick=()=>openCreateStorage(roomName);
-        const rem=document.createElement('button'); rem.className='add-storage'; rem.textContent='− Remove';
-        rem.onclick=()=>removeSelectedStorage(roomName);
-        controls.appendChild(add); controls.appendChild(rem);
-        listEl.appendChild(controls);
+        const controls=document.createElement('div'); controls.className='storage-controls';
+controls.innerHTML=`<div class"storage-spinner storage-tile">
+  <button class="spin-btn plus" aria-label="Add storage">+</button>
+  <span class="spin-label">Storage</span>
+  <button class="spin-btn minus" aria-label="Remove storage">−</button>
+</div>`;
+controls.querySelector('.plus').onclick=()=>openCreateStorage(roomName);
+controls.querySelector('.minus').onclick=()=>removeSelectedStorage(roomName);
+listEl.appendChild(controls);
       }
     });
   }
@@ -714,44 +1477,47 @@
     }
 
     const drawers = Array.isArray(s.drawers)? s.drawers:[];
+    // Shared global "Unplaced" drawer
+    {
+      const row = document.createElement('div'); row.className = 'drawer-row';
+      const lab = document.createElement('div'); lab.className = 'drawer-label'; lab.textContent = 'Unplaced';
+      row.appendChild(lab);
+
+      const slots = document.createElement('div'); slots.className = 'slots';
+      attachDrawerDrop(slots, UNPLACED_STORAGE_ID, null);
+
+      const list = items.filter(x => x?.location?.storage === UNPLACED_STORAGE_ID);
+      list.forEach(it => { const card = renderItemCard(it); slots.appendChild(card); });
+
+      slots.addEventListener('dblclick', () => addItemPrompt(UNPLACED_STORAGE_ID, null, null));
+
+      row.appendChild(slots);
+      wrap.appendChild(row);
+    }
+
     for(const label of drawers){
       const row=document.createElement('div'); row.className='drawer-row';
       const lab=document.createElement('div'); const isNum=/^\d+$/.test(String(label)); lab.className='drawer-label'+(isNum?' circle':''); lab.textContent=label; row.appendChild(lab);
       const slots=document.createElement('div'); slots.className='slots';
-      for(let i=1;i<=10;i++){
-        const cell=document.createElement('div'); cell.className='slot'; cell.dataset.slot=i; cell.dataset.drawer=label; cell.dataset.storage=s.id;
-        attachCellDrop(cell, s.id, label, i);
-        const it=items.find(x=>x?.location?.storage===s.id && x?.location?.drawer===label && x?.location?.slot===i);
-        if(it){ const box=renderItemBox(it); cell.appendChild(box); } else { cell.addEventListener('dblclick',()=>addItemPrompt(s.id,label,i)); }
-        slots.appendChild(cell);
-      }
+      attachDrawerDrop(slots, s.id, label);
+      slots.addEventListener('dblclick',()=>addItemPrompt(s.id,label,null));
+      const list=items.filter(x=>x?.location?.storage===s.id && x?.location?.drawer===label);
+      list.forEach(it=>{ const box=renderItemBox(it); slots.appendChild(box); });
       row.appendChild(slots); wrap.appendChild(row);
     }
-
-    const unplaced = items.filter(x => x?.location?.storage === UNPLACED_STORAGE_ID);
-const sec=document.createElement('div'); sec.className='unplaced';
-    sec.innerHTML=`<header><strong>Unplaced (Global)</strong><span>${unplaced.length} item(s)</span></header>`;
-    const grid=document.createElement('div'); grid.className='unplaced-grid';
-    const dz=document.createElement('div'); dz.className='dropzone'; dz.textContent='Drop items here to leave unplaced';
-    dz.addEventListener('dragover',(e)=>{ if(!state.draggingItemId) return; e.preventDefault(); dz.classList.add('drop-over'); });
-    dz.addEventListener('dragleave',()=>dz.classList.remove('drop-over'));
-    dz.addEventListener('drop',async (e)=>{ if(!state.draggingItemId) return; e.preventDefault(); dz.classList.remove('drop-over'); await moveItemToUnplaced(state.draggingItemId, UNPLACED_STORAGE_ID); });
-    grid.appendChild(dz);
-    unplaced.forEach(it=>{ const card=renderItemCard(it); grid.appendChild(card); });
-    sec.appendChild(grid); wrap.appendChild(sec);
   }
 
   function renderItemBox(it){
-    const box=document.createElement('div'); box.className='item'; box.draggable=true;
-    box.innerHTML=`<div class="name">${it.imageUrl?`<a href="${escapeHtml(it.imageUrl)}" target="_blank" rel="noopener">${escapeHtml(it.name)}</a>`:escapeHtml(it.name)}</div><div class="meta">${escapeHtml(it.sku)} • ${escapeHtml(it.supplier)} • ${escapeHtml(it.type)} • Qty ${it.qty}</div><span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>`;
+    const box=document.createElement('div'); box.className='item'; box.setAttribute('data-type',(it.type||'')); box.draggable=true;
+    box.innerHTML=`<div class="name">${escapeHtml(it.name)}</div><div class="size">${escapeHtml(it.size||"")}</div><div class="meta">${escapeHtml(it.sku)} • ${escapeHtml(it.supplier)}  •  Qty ${it.qty}</div><span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>`;
     box.addEventListener('dragstart',(e)=>{ state.draggingItemId=it.id; e.dataTransfer.setData('text/plain',it.id); e.dataTransfer.effectAllowed='move'; });
     box.addEventListener('dragend',()=>{ state.draggingItemId=null; document.querySelectorAll('.drop-over').forEach(el=>el.classList.remove('drop-over')); });
     box.addEventListener('dblclick',()=>editItemPrompt(it));
     return box;
   }
   function renderItemCard(it){
-    const card=document.createElement('div'); card.className='item'; card.style.minHeight='unset'; card.draggable=true; card.style.position='relative';
-    card.innerHTML=`<button type="button" class="mini remove-item" style="position:absolute; right:6px; top:6px;">Remove</button><div class="name">${it.imageUrl?`<a href="${escapeHtml(it.imageUrl)}" target="_blank" rel="noopener">${escapeHtml(it.name)}</a>`:escapeHtml(it.name)}</div><div class="meta">${escapeHtml(it.sku)} • ${escapeHtml(it.supplier)} • ${escapeHtml(it.type)} • Qty ${it.qty}</div><span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>`;
+    const card=document.createElement('div'); card.className='item'; card.setAttribute('data-type',(it.type||'')); card.style.minHeight='unset'; card.draggable=true; card.style.position='relative';
+    card.innerHTML=`<button type="button" class="mini remove-item" style="position:absolute; right:28px; top:6px;">&minus;</button><div class="name">${escapeHtml(it.name)}</div><div class="size">${escapeHtml(it.size||"")}</div><div class="meta">${escapeHtml(it.sku)} • ${escapeHtml(it.supplier)}  •  Qty ${it.qty}</div><span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>`;
     card.addEventListener('dragstart',(e)=>{ state.draggingItemId=it.id; e.dataTransfer.setData('text/plain',it.id); e.dataTransfer.effectAllowed='move'; });
     card.addEventListener('dragend',()=>{ state.draggingItemId=null; document.querySelectorAll('.drop-over').forEach(el=>el.classList.remove('drop-over')); });
     card.addEventListener('dblclick',()=>editItemPrompt(it));
@@ -762,6 +1528,11 @@ const sec=document.createElement('div'); sec.className='unplaced';
     cell.addEventListener('dragover',(e)=>{ if(!state.draggingItemId) return; e.preventDefault(); cell.classList.add('drop-over'); });
     cell.addEventListener('dragleave',()=>cell.classList.remove('drop-over'));
     cell.addEventListener('drop',async (e)=>{ if(!state.draggingItemId) return; e.preventDefault(); cell.classList.remove('drop-over'); await moveItemTo(storageId,drawer,slot); });
+  }
+  function attachDrawerDrop(container, storageId, drawer){
+    container.addEventListener('dragover',(e)=>{ if(!state.draggingItemId) return; e.preventDefault(); container.classList.add('drop-over'); });
+    container.addEventListener('dragleave',()=>container.classList.remove('drop-over'));
+    container.addEventListener('drop',async (e)=>{ if(!state.draggingItemId) return; e.preventDefault(); container.classList.remove('drop-over'); await moveItemTo(storageId,drawer,null); });
   }
 
   async function openCreateStorage(roomName){
@@ -833,72 +1604,543 @@ const sec=document.createElement('div'); sec.className='unplaced';
     const rop = Number(prompt("ROP:","0")||0);
     const sku = prompt("SKU:","")||"";
     const usage = prompt("Usage (high/medium/low):","medium")||"medium";
-    const imageUrl = normalizeDriveLink(prompt("Image link (optional, Google Drive share URL):","")||"");
     const notes = prompt("Notes:","")||"";
     (async ()=>{
-      const ref = await addDoc(collection(db,"items"), { supplier, name, system, type, size, qty, min, max, rop, sku, usage, notes, imageUrl, location:{storage:storageId, drawer, slot}, updatedAt: serverTimestamp() });
+      const ref = await addDoc(collection(db,"items"), { supplier, name, system, type, size, qty, min, max, rop, sku, usage, notes, location:{storage:storageId, drawer, slot}, updatedAt: serverTimestamp() });
       await logActivity('Register', `${name} placed into ${roomOf(storageId)} / ${storageId}${drawer?(' / '+drawer):''}${slot?(' / '+slot):''}`, {itemId: ref.id});
     })();
   }
   function editItemPrompt(it){
     const name = prompt("Item name:", it.name) || it.name;
-    const imageUrl = normalizeDriveLink(prompt("Image link (leave blank to keep):", it.imageUrl||"")||it.imageUrl||"");
     const qty = Number(prompt("Quantity:", String(it.qty))||it.qty);
-    (async ()=>{ await updateDoc(doc(db,"items", it.id), { name, qty, imageUrl, updatedAt: serverTimestamp() }); await logActivity('Update Item', `${it.name} → ${name}; qty ${it.qty} → ${qty}`, {itemId: it.id}); })();
+    (async ()=>{ await updateDoc(doc(db,"items", it.id), { name, qty, updatedAt: serverTimestamp() }); await logActivity('Update Item', `${it.name} → ${name}; qty ${it.qty} → ${qty}`, {itemId: it.id}); })();
   }
 
   async function moveItemTo(storageId,drawer,slot){
-    const it=items.find(x=>x.id===state.draggingItemId); if(!it) return;
-    const occ=items.find(x=>x?.location?.storage===storageId && x?.location?.drawer===drawer && x?.location?.slot===slot);
-    if(occ){
-      const batch = writeBatch(db);
-      batch.update(doc(db,"items", occ.id), { location:{...it.location}, updatedAt: serverTimestamp() });
-      batch.update(doc(db,"items", it.id), { location:{storage:storageId, drawer, slot}, updatedAt: serverTimestamp() });
-      await batch.commit();
-    } else {
-      await updateDoc(doc(db,"items", it.id), { location:{storage:storageId, drawer, slot}, updatedAt: serverTimestamp() });
+    if(slot==null || slot===undefined){
+      const it=items.find(x=>x.id===state.draggingItemId); if(!it) return;
+      await updateDoc(doc(db,"items", it.id), { location:{storage:storageId, drawer, slot:null}, updatedAt: serverTimestamp() });
+      await logActivity('Move Item', `${it.name} moved to ${roomOf(storageId)}${drawer?(' / '+drawer):''}`, {itemId: it.id});
+      return;
     }
-    await logActivity('Move Item', `${it.name} moved to ${roomOf(storageId)} / ${storageId}${drawer?(' / '+drawer):''}${slot?(' / '+slot):''}`, {itemId: it.id});
-  }
-  async function moveItemToUnplaced(itemId, storageId){
-    const it=items.find(x=>x.id===itemId); if(!it) return;
-    await updateDoc(doc(db,"items", it.id), { location:{storage:storageId, drawer:null, slot:null}, updatedAt: serverTimestamp() });
-    await logActivity('Unplace Item', `${it.name} moved to Unplaced in ${roomOf(storageId)}`, {itemId: it.id});
+
+    const it=items.find(x=>x.id===state.draggingItemId); if(!it) return;
+    await updateDoc(doc(db,"items", it.id), { location:{storage:storageId, drawer, slot}, updatedAt: serverTimestamp() });
+    await logActivity('Move Item', `${it.name} moved to ${roomOf(storageId)} / slot ${slot}${drawer?(' / '+drawer):''}`, {itemId: it.id});
   }
 
-  document.getElementById('addDrawerBtn').addEventListener('click', async ()=>{
-    const s=storages.find(x=>x.id===state.selectedStorageId); if(!s) return;
-    const next = prompt("New drawer/layer label (e.g., 6 or 'Top'):","");
-    if(!next) return;
-    const updated = [...(s.drawers||[])];
-    if(!updated.includes(next)) updated.push(next);
-    await updateDoc(doc(db,"storages", s.docId), { drawers: updated });
-    await logActivity('Add Drawer', `${next} in ${s.name}`);
+  /* ========= One-time bindings ========= */
+  // Add room & drawer handlers (placeholder wiring to be implemented as needed)
+  $('#addDrawerBtn')?.addEventListener('click', async ()=>{
+    const s=storages.find(x=>x.id===state.selectedStorageId); if(!s) return alert('Select a storage');
+    const next = prompt('Add drawer/layer label (e.g., 6 or A):',''); if(!next) return;
+    const drawers = Array.isArray(s.drawers)? [...s.drawers] : [];
+    drawers.push(next);
+    await updateDoc(doc(db,'storages', s.docId), { drawers });
+    await logActivity('Add Drawer', `${s.name} • drawer ${next}`);
   });
-  document.getElementById('removeDrawerBtn').addEventListener('click', async ()=>{
-    const s=storages.find(x=>x.id===state.selectedStorageId); if(!s) return;
-    const target = prompt("Remove which drawer/layer label?","");
-    if(!target) return;
-    const updated = (s.drawers||[]).filter(d=>String(d)!==String(target));
-    const batch = writeBatch(db);
-    items.filter(it=>it?.location?.storage===s.id && String(it?.location?.drawer)===String(target))
-         .forEach(it=> batch.update(doc(db,"items", it.id), { location:{storage:s.id, drawer:null, slot:null}, updatedAt: serverTimestamp() }));
-    batch.update(doc(db,"storages", s.docId), { drawers: updated });
-    await batch.commit();
-    await logActivity('Remove Drawer', `${target} from ${s.name}`);
-  });
-
-  document.getElementById('addRoomBtn').addEventListener('click', async ()=>{
-    const name = prompt("Location name:"); if(!name) return;
-    const kind = prompt("Description (e.g., Room, Cupboard):","Room") || "Room";
-    const floor = prompt("Floor:","Unassigned") || "Unassigned";
-    await addDoc(collection(db,"rooms"), {name,kind,floor});
-    await logActivity('Add Room', `${name} (${kind}, ${floor})`);
+  $('#removeDrawerBtn')?.addEventListener('click', async ()=>{
+    const s=storages.find(x=>x.id===state.selectedStorageId); if(!s) return alert('Select a storage');
+    const drawers = Array.isArray(s.drawers)? [...s.drawers] : [];
+    if(drawers.length===0) return alert('No drawers to remove.');
+    const last = drawers[drawers.length-1];
+    if(!confirm(`Remove last drawer "${last}"? Items remain in storage (Unplaced area).`)) return;
+    drawers.pop();
+    await updateDoc(doc(db,'storages', s.docId), { drawers });
+    await logActivity('Remove Drawer', `${s.name} • drawer ${last}`);
   });
 
-  document.getElementById('searchBox').addEventListener('input', renderRoomGrid);
 
-  renderInventory(); renderRoomGrid(); renderDetail();
+/* === Enable drag-resize for inventory table columns === */
+function enableColumnResize(table){
+  if(!table || !table.tHead || !table.tHead.rows.length) return;
+  const headerCells = Array.from(table.tHead.rows[0].cells);
+  headerCells.forEach((th, idx) => {
+    // Skip select checkbox column or already processed headers
+    if(th.classList.contains('sel-col')) return;
+    if(th.dataset.resizable === '1') return;
+    th.style.position = 'relative';
+    const grip = document.createElement('div');
+    grip.className = 'col-resizer';
+    th.appendChild(grip);
+    th.dataset.resizable = '1';
+    let startX = 0, startW = 0;
+    const onDown = (e) => {
+      startX = e.pageX;
+      startW = th.offsetWidth;
+      document.body.style.cursor = 'col-resize';
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+      e.preventDefault();
+    };
+    const onMove = (e) => {
+      const w = Math.max(50, startW + (e.pageX - startX));
+      th.style.width = w + 'px';
+      // Apply width to body cells in the same column
+      Array.from(table.tBodies).forEach(tb => {
+        Array.from(tb.rows).forEach(row => {
+          const cell = row.cells[idx];
+          if(cell) cell.style.width = w + 'px';
+        });
+      });
+    };
+    const onUp = () => {
+      document.body.style.cursor = '';
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+    grip.addEventListener('mousedown', onDown);
+  });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const t = document.getElementById('invTable');
+  if(t) enableColumnResize(t);
+});
+
+/* === Inventory Context Menu Logic === */
+(function(){
+  const table = document.getElementById('invTable');
+  if(!table) return;
+  const menu = document.getElementById('invContextMenu');
+  let currentCell = null, currentRow = null;
+
+  // open menu
+  table.addEventListener('contextmenu', (e) => {
+    const cell = e.target.closest('td');
+    const row = e.target.closest('tr');
+    if(!cell || !row) return;
+    e.preventDefault();
+    currentCell = cell;
+    currentRow = row;
+    menu.style.display = 'block';
+    const x = e.pageX, y = e.pageY;
+    // keep menu within viewport
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const mw = 200, mh = 160;
+    menu.style.left = Math.min(x, vw - mw) + 'px';
+    menu.style.top = Math.min(y, vh - mh) + 'px';
+  });
+
+  // close menu on click elsewhere or escape
+  document.addEventListener('click', () => menu.style.display = 'none');
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape') menu.style.display='none'; });
+
+  // handle menu actions
+  menu.addEventListener('click', async (e) => {
+    const action = e.target.dataset.action;
+    if(!action || !currentRow) return;
+    const tbody = table.tBodies[0];
+    const id = currentRow.dataset.id;
+    const field = currentCell?.dataset?.field;
+
+    if(action === 'edit'){
+      // only allow editing for cells that map to numeric fields
+      if(!field) return;
+      const oldVal = (currentCell.textContent || '').trim();
+      currentCell.classList.add('editing');
+      currentCell.innerHTML = `<input type="number" min="0" step="1" value="${oldVal || 0}" class="cell-editor">`;
+      const input = currentCell.querySelector('input');
+      input.focus();
+      const commit = async () => {
+        const newVal = parseInt(input.value) || 0;
+        currentCell.classList.remove('editing');
+        currentCell.textContent = newVal;
+        if (typeof updateDoc === 'function') {
+          try {
+            await updateDoc(doc(db, 'items', id), { [field]: newVal });
+            if (typeof logActivity === 'function') {
+              await logActivity('Update', `Changed ${field} of ${id} → ${newVal}`);
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      };
+      input.addEventListener('blur', commit, { once:true });
+      input.addEventListener('keydown', (ke)=>{
+        if(ke.key==='Enter'){ input.blur(); }
+        if(ke.key==='Escape'){ currentCell.classList.remove('editing'); currentCell.textContent = oldVal; }
+      });
+      return;
+    }
+
+    if(action === 'pin'){
+      if(currentRow.classList.contains('inv-pinned')){
+        currentRow.classList.remove('inv-pinned','inv-watched','inv-urgent');
+        tbody.appendChild(currentRow);
+      updateFlags(currentRow);
+        }else{
+        currentRow.classList.add('inv-pinned');
+        const pinned = tbody.querySelectorAll('.inv-pinned');
+        if(pinned.length > 1){
+          tbody.insertBefore(currentRow, pinned[pinned.length - 1].nextSibling);
+        updateFlags(currentRow);
+        }else{
+          tbody.insertBefore(currentRow, tbody.firstChild);
+        }
+        }
+      return;
+    }
+
+    if(action === 'watch'){
+      currentRow.classList.toggle('inv-watched');
+      updateFlags(currentRow);
+      return;
+    }
+
+    if(action === 'urgent'){
+      currentRow.classList.toggle('inv-urgent');
+      updateFlags(currentRow);
+      return;
+    }
+  });
+})();
+
+/* === Inventory Flags Rendering === */
+function updateFlags(row){
+  try{
+    const cell = row.querySelector('.inv-flags');
+    if(!cell) return;
+    const icons = [];
+    if(row.classList.contains('inv-pinned')) icons.push('📌');
+    if(row.classList.contains('inv-watched')) icons.push('👁️');
+    if(row.classList.contains('inv-urgent')) icons.push('❗');
+    cell.textContent = icons.join(' ');
+  }catch(e){ console.warn(e); }
+}
 </script>
+
+<!-- Inventory Context Menu -->
+<ul id="invContextMenu" class="context-menu">
+  <li data-action="edit">✏️ Edit</li>
+  <li data-action="pin">📌 Pin</li>
+  <li data-action="watch">👁️ Mark as Watched</li>
+  <li data-action="urgent">❗ Needs Urgent Action</li>
+</ul>
+
+
+<script>
+// --- Single-Icon Flags (urgent > watch > pin) ---
+(function(){
+  function updateFlags(row){
+    const cell = row.querySelector('.inv-flags');
+    if(!cell) return;
+    let icon = '';
+    if(row.classList.contains('inv-urgent'))      icon = '❗';
+    else if(row.classList.contains('inv-watched')) icon = '👁️';
+    else if(row.classList.contains('inv-pinned'))  icon = '📌';
+    cell.textContent = icon;
+  }
+  function refreshAllFlags(){
+    document.querySelectorAll('#invTable tbody tr').forEach(updateFlags);
+  }
+  // initial + on future inventory renders
+  window.addEventListener('load', refreshAllFlags);
+  document.addEventListener('inventory:rendered', refreshAllFlags);
+  // As a fallback, observe tbody changes and refresh
+  const tbody = document.querySelector('#invTable tbody');
+  if (tbody && 'MutationObserver' in window) {
+    const mo = new MutationObserver(refreshAllFlags);
+    mo.observe(tbody, { childList: true });
+  }
+  // expose to global so existing context menu code can call if needed
+  window.updateFlags = updateFlags;
+})();
+</script>
+
+
+<script>
+// --- Normalize Location cells: show 'Unplaced' in amber when room is __Unplaced__ ---
+(function(){
+  function normalizeLocationCells(){
+    const rows = document.querySelectorAll('#invTable tbody tr');
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      // Heuristic: Location column header text is 'Location'; find its index once
+    });
+  }
+  // Determine the Location column index from the header
+  function getLocationColIndex(){
+    const ths = document.querySelectorAll('#invTable thead th');
+    for (let i=0;i<ths.length;i++){
+      if (ths[i].textContent.trim().toLowerCase() === 'location') return i;
+    }
+    return -1;
+  }
+  function apply(){
+    const idx = getLocationColIndex();
+    if (idx === -1) return;
+    document.querySelectorAll('#invTable tbody tr').forEach(tr => {
+      const td = tr.children[idx];
+      if (!td) return;
+      const raw = td.textContent.replace(/\s+/g,' ').trim();
+      if (raw.includes('__Unplaced__') || raw.toLowerCase().includes('unplaced bin')) {
+        td.innerHTML = '<span class="unplaced-label">Unplaced</span>';
+      }
+    });
+  }
+  window.addEventListener('load', apply);
+  document.addEventListener('inventory:rendered', apply);
+})();
+</script>
+
+
+<script>
+// --- Inventory Notes: Add/View from Actions column ---
+document.addEventListener('click', async function(e){
+  const a = e.target.closest('.note-link');
+  if(!a) return;
+  e.preventDefault();
+  const id = a.dataset.id;
+  const has = a.dataset.hasNote === '1';
+  try{
+    if(has){
+      // View note
+      if (window.getDoc && window.doc && window.db){
+        const snap = await getDoc(doc(db,'items',id));
+        const note = (snap.exists() && snap.data().notes) ? snap.data().notes : '(No note)';
+        alert('Note:\n\n' + note);
+      } else {
+        alert('Note viewer requires Firestore.');
+      }
+    }else{
+      // Add note
+      const newNote = prompt('Enter a note:');
+      if(newNote && newNote.trim() !== ''){
+        if (window.updateDoc && window.doc && window.db){
+          await updateDoc(doc(db,'items',id), { notes: newNote.trim() });
+        }
+        a.textContent = 'View Note';
+        a.dataset.hasNote = '1';
+      }
+    }
+  }catch(err){
+    console.error(err);
+    alert('Sorry, there was a problem saving/viewing the note.');
+  }
+});
+</script>
+
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const typeMap = {
+    "consumable":"consumable",
+    "instrument tray":"instrument_tray",
+    "single pack":"single_pack",
+    "implant":"implant",
+    "medical device":"medical_device",
+    "table & attachments":"table_attach",
+    "table attachments":"table_attach"
+  };
+  const candidates = document.querySelectorAll('.chip, .pill, .filter-chip, .type-chip, .tag');
+  candidates.forEach(el => {
+    const txt = (el.textContent||"").trim().toLowerCase();
+    if (typeMap[txt]) {
+      el.classList.add('type-' + typeMap[txt]);
+    }
+  });
+});
+</script>
+
+
+<style>
+/* === Overrides: horizontal action buttons + visible 'Remove' text === */
+.room header .actions { display:flex !important; flex-direction:row !important; align-items:center; gap:8px; flex-wrap:wrap; }
+.room header .actions .mini { font-size:14px !important; }
+.mini.danger[data-action="remove"] { font-size:inherit !important; padding:6px 10px; }
+.mini.danger[data-action="remove"]::before { content:none !important; }
+.mini.danger[data-action="remove"] { background:transparent; color:#ef4444; border:1.5px solid #ef4444; }
+</style>
+
+
+<style>
+/* === Tile size + layout overrides === */
+.storage-tile {
+  padding: 6px 8px !important;
+  min-height: 46px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+}
+.storage-tile .name { font-weight:700; font-size:13px !important; }
+.storage-tile .type,
+.storage-tile .size,
+.storage-tile .meta { font-size:11px !important; line-height:1.3; }
+
+/* Green status dot fix */
+.level-dot {
+  position:absolute !important;
+  top:6px !important;
+  right:6px !important;
+  width:10px !important;
+  height:10px !important;
+}
+
+/* Remove button inside tile */
+.mini.remove-item {
+  position:absolute !important;
+  top:6px !important;
+  right:22px !important; /* shift left so it doesn’t overlap green dot */
+  font-size:12px !important;
+  padding:4px 6px !important;
+  border-radius:6px !important;
+}
+</style>
+
+
+<style>
+/* === Compact storage tile + icon alignment fixes === */
+.storage-tile{ padding:6px 8px !important; min-height:46px !important; border-radius:8px !important; }
+.storage-tile .name{ font-size:13px !important; font-weight:700 !important; }
+.storage-tile .meta, .storage-tile .size, .storage-tile .type{ font-size:11px !important; line-height:1.3 !important; }
+.storage-tile .badge, .type-pill{ font-size:11px !important; padding:2px 8px !important; border-radius:8px !important; }
+.level-dot{ position:absolute !important; top:6px !important; right:6px !important; width:10px !important; height:10px !important; }
+.mini.remove-item{ position:absolute !important; top:6px !important; right:28px !important; font-size:12px !important; padding:4px 6px !important; border-radius:6px !important; z-index:2; }
+</style>
+
+
+<style>
+/* === (1) Storage count: inline chip layout (no overlap) === */
+.storage-tile{
+  display:grid !important;
+  grid-template-columns: 1fr auto !important;
+  grid-template-rows:auto auto !important;
+  grid-template-areas:
+    "name count"
+    "type count" !important;
+  align-items:start !important;
+  gap:2px 10px !important;
+}
+.storage-tile .name{ grid-area:name !important; }
+.storage-tile .type{ grid-area:type !important; }
+.storage-tile .count{
+  grid-area:count !important;
+  position:static !important;
+  display:inline-block !important;
+  align-self:start !important;
+  margin:0 !important;
+  font-size:12px !important;
+  padding:2px 8px !important;
+  border:1px solid var(--accent-200) !important;
+  border-radius:999px !important;
+  background:#fff !important;
+}
+@media (max-width:768px){
+  .storage-tile{ gap:2px 8px !important; }
+  .storage-tile .count{ font-size:11px !important; padding:2px 6px !important; }
+}
+
+/* === (2) Storage: steel label (rooms keep neon) === */
+.detail .title{
+  background:#eef2f7 !important;
+  border:1px solid #d8e1f2 !important;
+  color:#0f172a !important;
+  padding:8px 10px !important;
+  border-radius:10px !important;
+  display:inline-block !important;
+}
+.storage-tile .name{
+  display:inline-block !important;
+  background:#eef2f7 !important;
+  border:1px solid #d8e1f2 !important;
+  padding:4px 8px !important;
+  border-radius:8px !important;
+}
+.detail header + .body .legend,
+.detail .body .legend{ margin-top:4px !important; }
+
+/* === (3) Type chips: match existing palette === */
+.chip.type-consumable, .chip[data-type="consumable"]{
+  background:rgba(37,99,235,.18) !important; color:#1e3a8a !important; border:1px solid rgba(37,99,235,.25) !important;
+}
+.chip.type-implant, .chip[data-type="implant"]{
+  background:rgba(124,58,237,.18) !important; color:#4c1d95 !important; border:1px solid rgba(124,58,237,.25) !important;
+}
+.chip.type-instrument_tray, .chip[data-type="instrument_tray"]{
+  background:rgba(67,56,202,.18) !important; color:#1e1b4b !important; border:1px solid rgba(67,56,202,.25) !important;
+}
+.chip.type-single_pack, .chip[data-type="single_pack"]{
+  background:rgba(219,39,119,.18) !important; color:#831843 !important; border:1px solid rgba(219,39,119,.25) !important;
+}
+.chip.type-medical_device, .chip[data-type="medical_device"]{
+  background:rgba(15,118,110,.18) !important; color:#064e3b !important; border:1px solid rgba(15,118,110,.25) !important;
+}
+.chip.type-table_attach, .chip[data-type="table_attach"]{
+  background:rgba(217,119,6,.18) !important; color:#78350f !important; border:1px solid rgba(217,119,6,.25) !important;
+}
+.legend .chip{ white-space:nowrap !important; }
+</style>
+
+<script>
+// === (4) Auto-upgrade chips: add data-type/class from text ===
+(function(){
+  const map = new Map([
+    ['consumable','consumable'],
+    ['implant','implant'],
+    ['instrument tray','instrument_tray'],
+    ['instrument_tray','instrument_tray'],
+    ['single pack','single_pack'],
+    ['single_pack','single_pack'],
+    ['medical device','medical_device'],
+    ['medical_device','medical_device'],
+    ['table & attachments','table_attach'],
+    ['table attachments','table_attach'],
+    ['table & attach','table_attach'],
+    ['table attach','table_attach']
+  ]);
+  function normalize(t){ return (t||'').toString().trim().toLowerCase(); }
+  function retag(node){
+    const chips = node.querySelectorAll('.chip');
+    chips.forEach(ch => {
+      const key = map.get(normalize(ch.textContent)) || ch.getAttribute('data-type');
+      if(!key) return;
+      ch.setAttribute('data-type', key);
+      ch.classList.add('type-' + key);
+    });
+  }
+  // run once now
+  document.addEventListener('DOMContentLoaded', () => retag(document));
+  // watch for future legend chips
+  const mo = new MutationObserver(muts => muts.forEach(m => m.addedNodes.forEach(n => {
+    if(!(n instanceof HTMLElement)) return;
+    if(n.matches('.chip')) retag(n.parentElement || n);
+    if(n.querySelectorAll) retag(n);
+  })) );
+  mo.observe(document.documentElement, {childList:true, subtree:true});
+})();
+</script>
+
+
+<style>
+/* === Keep storage tile fully light yellow: remove grey label === */
+.storage-tile .name{
+  background: transparent !important;
+  border: none !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+}
+
+/* === Round the + / - storage buttons === */
+#addDrawerBtn.btn,
+#removeDrawerBtn.btn{
+  border-radius: 12px !important;
+  padding: 8px 12px !important;
+}
+
+/* Also catch generic "+ Storage" spinner buttons if present */
+.storage-spinner .spin-btn{
+  border-radius: 999px !important;
+}
+</style>
+
 </body>
 </html>

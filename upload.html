@@ -6,30 +6,30 @@
 <title>RLH Trauma & Orthopaedic Theatres Inventory Manager</title>
 <style>
   :root{
-    --bg:#f6f8fc; --panel:#fff; --text:#0f172a; --muted:#52607a; --border:#e6e9f2;
-    --accent:#2563eb; --accent-200:#cfe0ff; --shadow:0 4px 10px rgba(10,16,28,.06);
+    --bg:#0f0f18; --panel:#fff; --text:#0f172a; --muted:#52607a; --border:#e6e9f2;
+    --accent:#8E2DE2; --accent-200:#F2E6FF; --shadow:0 4px 10px rgba(10,16,28,.06);
     --ok:#10b981; --below:#f59e0b; --over:#ef4444;
-    --chip:#eef3ff;
+    --chip:#F7F2FF;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial}
+  body{margin:0;background:radial-gradient(1200px 600px at 80% -10%, #311b72 0%, #221445 55%, #160f2a 100%);color:var(--text);font:15px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial}
 
   .app{display:grid;grid-template-columns:72px 1fr;min-height:100vh}
   /* Sidebar */
-  .side{position:sticky;top:0;height:100vh;background:linear-gradient(180deg,#0b1224,#0f1933);display:flex;flex-direction:column;align-items:center;padding:14px 10px;gap:12px}
+  .side{position:sticky;top:0;height:100vh;background:linear-gradient(180deg,#24144d,#3a1a7a);display:flex;flex-direction:column;align-items:center;padding:14px 10px;gap:12px}
   .logo{width:42px;height:42px;border-radius:12px;background:#1b2a55;display:grid;place-items:center;color:#cfe0ff;font-weight:800;margin:2px 0 10px;border:1px solid rgba(255,255,255,.08);letter-spacing:.5px}
   .icon-btn{position:relative;width:52px;height:52px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);display:grid;place-items:center;color:#e3ecff;cursor:pointer;transition:.18s transform,.18s background,.18s box-shadow}
   .icon-btn:hover{transform:translateX(5px);background:rgba(255,255,255,.1)}
-  .icon-btn.active{background:#1f2d59;border-color:#3a55a4;box-shadow:0 0 0 2px rgba(37,99,235,.25) inset}
+  .icon-btn.active{background:#32225f;border-color:#a980ff;box-shadow:0 0 0 2px rgba(142,45,226,.35) inset}
   .icon-btn svg{opacity:.95}
   .icon-btn .label{position:absolute;left:60px;top:50%;transform:translate(0,-50%) translateX(-8px);opacity:0;pointer-events:none;white-space:nowrap;background:#0f172a;color:#e6f0ff;border:1px solid #29407d;padding:7px 12px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.3);transition:.18s; font-size:13px}
   .icon-btn:hover .label{opacity:1;transform:translate(0,-50%) translateX(0)}
   .side .spacer{flex:1}
 
   /* Topbar */
-  header.top{position:sticky;top:0;background:linear-gradient(#fff,#f7f9ff);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:14px;z-index:2}
+  header.top{position:sticky;top:0;background:linear-gradient(90deg,#2a1f4b,#3b1f6b);color:#f3ecff;border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:14px;z-index:2}
   .top-title{font-weight:900;font-size:18px}
-  .badge{font-size:13px;border:1px solid var(--border);padding:6px 10px;border-radius:999px;background:#fff;color:var(--muted)}
+  .badge{font-size:13px;border:1px solid rgba(255,255,255,.25);padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);color:#f3ecff}
 
   main{padding:18px;display:flex;flex-direction:column;gap:18px;width:100%;max-width:none}
   .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
@@ -39,7 +39,7 @@
   .field{display:flex;flex-direction:column;gap:6px}
   .field label{font-size:12px;color:var(--muted);font-weight:600}
   .field input,.field select, .field textarea{padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font:inherit;background:#fff;box-shadow:inset 0 1px 0 rgba(16,24,40,.02)}
-  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#c7d6ff;box-shadow:0 0 0 4px rgba(37,99,235,.08)}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#F2E6FF;box-shadow:0 0 0 4px rgba(142,45,226,.18)}
   .field input::placeholder,.field textarea::placeholder{color:#94a3b8}
   .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   .row-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
@@ -54,9 +54,9 @@
   .search input{border:0;outline:0;flex:1;background:transparent;font:inherit}
   .chips{display:flex;gap:8px;flex-wrap:wrap}
   .chip{padding:7px 12px;border:1px solid var(--border);background:#fff;border-radius:999px;font-size:13px}
-  .chip.stat{background:var(--chip)}
+  .chip.stat{background:#F7F2FF}
   .btn{padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font:inherit;display:inline-flex;align-items:center;gap:8px}
-  .btn.primary{border-color:var(--accent-200);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+  .btn.primary{border:0;background:linear-gradient(90deg, #FF9A44,#8E2DE2);color:#fff;box-shadow:0 4px 14px rgba(142,45,226,.25)}
   .btn.danger{border-color:#fecaca;background:#fff1f2}
 
   /* Segmented */
@@ -78,7 +78,7 @@
   .room-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;align-content:start}
   .room[data-room='__Unplaced__']{display:none;}
   .room{background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
-  .room header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(#fff,#f7f9ff);border-bottom:1px solid var(--border)}
+  .room header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(#fff,#f8f4ff);border-bottom:1px solid var(--border)}
   .room.collapsed header{background:#fff;border-bottom:0}
   .room .bar{display:flex;align-items:center;gap:10px;cursor:pointer;flex:1;min-width:0}
   .room .title{font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -89,11 +89,11 @@
   .storage-tile{position:relative;display:flex;flex-direction:column;gap:2px;align-items:flex-start;padding:10px 12px;background:#fff;border:1px solid #ecf0f8;border-radius:12px;min-height:56px;cursor:pointer;text-align:left}
   .storage-tile .name{font-weight:800}.storage-tile .type{font-size:11px;color:var(--muted)}
   .storage-tile .count{position:absolute;right:8px;top:6px;font-size:11px;padding:2px 6px;border:1px solid var(--accent-200);border-radius:999px}
-  .add-storage{border:1px dashed var(--accent-200);background:#f7fbff;padding:10px;border-radius:12px;display:flex;align-items:center;justify-content:center}
+  .add-storage{border:1px dashed var(--accent-200);background:linear-gradient(90deg,#fff7ee,#f8f4ff);padding:10px;border-radius:12px;display:flex;align-items:center;justify-content:center}
   .actions{display:flex;gap:8px;align-items:center}
   .mini{padding:6px 8px;font-size:12px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer}
   .danger{border-color:#fecaca;background:#fff1f2}
-  .detail{position:sticky;top:0;height:100%;border:1px solid var(--border);background:linear-gradient(180deg,#fcfdff,#f6f8ff);display:flex;flex-direction:column;border-radius:14px;overflow:hidden}
+  .detail{position:sticky;top:0;height:100%;border:1px solid var(--border);background:linear-gradient(180deg,#fffaf5,#f7f2ff);display:flex;flex-direction:column;border-radius:14px;overflow:hidden}
   .detail header{padding:12px 16px;border-bottom:1px solid var(--border);background:var(--panel);display:flex;align-items:center;justify-content:space-between;gap:8px}
   .detail .title{font-weight:900;font-size:18px}.detail .subtitle{color:#64748b;font-size:12px}
   .detail .body{padding:14px 16px;overflow:auto;display:flex;flex-direction:column;gap:12px}
@@ -194,37 +194,60 @@
 
   .unplaced{display:none!important}
 
-/* === Inventory table: compact + zebra + resizable columns === */
-#invTable{table-layout:auto;border-collapse:separate;border-spacing:0}
-#invTable th,#invTable td{padding:6px 8px;font-size:13px;line-height:1.2;vertical-align:middle}
-#invTable th,#invTable td{white-space:nowrap}
-#invTable td{overflow:hidden;text-overflow:ellipsis}
+
+/* === Inventory table: compact + zebra + resizable columns (CLEAN) === */
+#invTable{
+  width:100%;
+  table-layout:fixed;           /* keep column widths consistent between thead/tbody */
+  border-collapse:collapse;     /* single border model */
+  border-spacing:0;
+}
+#invTable thead th,
+#invTable tbody td{
+  padding:6px 8px;
+  font-size:13px;
+  line-height:1.2;
+  vertical-align:middle;
+  text-align:left;              /* consistent alignment */
+  white-space:nowrap;           /* prevent wrap to keep columns clean */
+  overflow:hidden;
+  text-overflow:ellipsis;
+  border:1px dashed #d0d0d0;    /* keep spreadsheet vibe */
+}
+#invTable thead th{
+  position:relative;            /* for resizer */
+  background:#f4f6fa;
+  font-weight:600;
+}
+#invTable .col-resizer{
+  position:absolute;right:0;top:0;height:100%;width:6px;cursor:col-resize;user-select:none;-webkit-user-select:none
+}
+#invTable .col-resizer:hover{background:rgba(142,45,226,.20)}
+
+/* zebra */
 #invTable tbody tr:nth-child(odd) td{background:#ffffff}
 #invTable tbody tr:nth-child(even) td{background:#f6f7fb}
-#invTable thead th{position:relative}
-#invTable .col-resizer{position:absolute;right:0;top:0;height:100%;width:6px;cursor:col-resize;user-select:none;-webkit-user-select:none}
-#invTable .col-resizer:hover{background:rgba(37,99,235,.15)}
+
+/* keep first column (checkbox/sku) left-aligned */
+#invTable td:first-child,#invTable th:first-child{ text-align:left; }
+
+/* numeric-ish columns can be centered later with classes if desired */
+/* #invTable td.num, #invTable th.num{ text-align:center; } */
+
+/* cell editing */
+#invTable td.editing{padding:0}
+#invTable td.editing input{width:100%;height:100%;box-sizing:border-box;border:0;padding:6px 8px;font-size:13px}
+/* Flags cell */
+#invTable td.inv-flags{min-width:60px;text-align:center}
 
 
 /* === Inventory: context menu + row states === */
-.context-menu{display:none;position:absolute;z-index:10000;background:#fff;border:1px solid #ccc;border-radius:6px;padding:6px 0;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:180px}
+.context-menu{display:none;position:absolute;z-index:2147483000;background:#fff;border:1px solid #ccc;border-radius:6px;padding:6px 0;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:180px}
 .context-menu li{list-style:none;padding:8px 14px;cursor:pointer;font-size:14px}
 .context-menu li:hover{background:#f5f7fb}
 .inv-pinned{background:#fff7e6 !important}
 #invTable td.editing{padding:0}
 #invTable td.editing input{width:100%;height:100%;box-sizing:border-box;border:0;padding:6px 8px;font-size:13px}
-
-
-/* === Inventory table: spreadsheet look + compact editors === */
-#invTable{border-collapse:collapse}
-#invTable th,#invTable td{border:1px dashed #d0d0d0;padding:4px 6px;vertical-align:middle}
-#invTable thead th{background:#f4f6fa;font-weight:600;text-align:center}
-#invTable tbody td{text-align:center}
-#invTable td:first-child,#invTable th:first-child{text-align:left} /* keep first column (Item) left-aligned */
-#invTable input[type=number].cell-editor{
-  width:5ch;min-width:50px;border:1px solid #aaa;border-radius:3px;
-  padding:2px 3px;font-size:13px;box-sizing:content-box
-}
 
 
 /* Flags cell centering */
@@ -309,19 +332,25 @@
     --type-instrument_tray:#4338ca;
     --type-single_pack:#db2777;
   }
-  /* Desktop: color stripe on left of each inventory row by type */
-  #invTable tr[data-type] td:first-child{ position: relative; }
-  #invTable tr[data-type]::before{
+  /* === Desktop Type/Size stripe moved to cell to keep alignment === */
+  #invTable th:first-child, #invTable td:first-child{ 
+    padding-left: 10px; /* 6px base + 4px stripe space */
+    position: relative;
+  }
+  /* Remove old tr::before rule and replace with td::before */
+  #invTable tr[data-type] td:first-child::before{
     content:"";
     position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:4px 0 0 4px;
   }
-  #invTable tr[data-type="consumable"]::before{ background:var(--type-consumable); }
-  #invTable tr[data-type="implant"]::before{ background:var(--type-implant); }
-  #invTable tr[data-type="table_attach"]::before{ background:var(--type-table_attach); }
-  #invTable tr[data-type="medical_device"]::before{ background:var(--type-medical_device); }
-  #invTable tr[data-type="instrument_tray"]::before{ background:var(--type-instrument_tray); }
-  #invTable tr[data-type="single_pack"]::before{ background:var(--type-single_pack); }
+  #invTable tr[data-type="consumable"] td:first-child::before{ background:var(--type-consumable); }
+  #invTable tr[data-type="implant"] td:first-child::before{ background:var(--type-implant); }
+  #invTable tr[data-type="table_attach"] td:first-child::before{ background:var(--type-table_attach); }
+  #invTable tr[data-type="medical_device"] td:first-child::before{ background:var(--type-medical_device); }
+  #invTable tr[data-type="instrument_tray"] td:first-child::before{ background:var(--type-instrument_tray); }
+  #invTable tr[data-type="single_pack"] td:first-child::before{ background:var(--type-single_pack); }
 
+  /* Desktop: color stripe on left of each inventory row by type */
+  
   /* Mobile: subtle border + badge background per type */
   @media (max-width:768px){
     .m-item[data-type="consumable"]{ border-color: rgba(37,99,235,.35); box-shadow:0 1px 6px rgba(37,99,235,.15); }
@@ -545,8 +574,8 @@
     overflow:visible;
     overflow-wrap:anywhere;
     text-overflow:initial;
-    background:#00e5ff; /* neon blue */
-    color:#000;
+    background:linear-gradient(90deg,#FF9A44,#8E2DE2); /* travelix pill */
+    color:#fff;
     font-weight:800;
     padding:8px 10px;
     border-radius:10px;
@@ -591,6 +620,27 @@
   .room header .actions .mini.edit{background:#3b82f6; color:#fff}
   .room header .actions .mini.danger{background:transparent; color:#ef4444; border:1.5px solid #ef4444}
 
+
+/* === Travelix: improve legibility over gradient title chip === */
+.room .title{
+  color:#ffffff !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.55);
+}
+.room .kind{
+  color: rgba(255,255,255,.92) !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,.45);
+}
+
+/* === Guided Tour Overlay (robust) === */
+.tour-backdrop{ position:fixed; inset:0; background:rgba(9,11,20,.55); z-index:9998; display:none; pointer-events:none; }
+.tour-highlight{ position:fixed; border:2px solid #fff; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,.35), 0 0 0 6px rgba(255,255,255,.25) inset; z-index:9999; display:none; pointer-events:none; }
+.tour-highlight::after{ content:""; position:absolute; inset:-6px; border-radius:14px; border:2px dashed rgba(255,255,255,.65); animation: tourPulse 1.3s infinite ease-in-out; }
+@keyframes tourPulse{ 0%{opacity:.7} 50%{opacity:.25} 100%{opacity:.7} }
+.tour-pop{ pointer-events:auto; position:fixed; z-index:2147483000; display:none; background:#111827; color:#e5edff; border:1px solid rgba(255,255,255,.15); border-radius:12px; max-width:min(380px, 92vw); padding:14px 14px 12px 14px; box-shadow:0 14px 32px rgba(0,0,0,.35); }
+.tour-pop h4{ margin:0 0 6px 0; font-size:16px } .tour-pop p{ margin:0 0 10px 0; color:#cbd5e1; font-size:14px }
+.tour-pop .controls{ display:flex; justify-content:flex-end; gap:8px } .tour-pop .controls .btn{ padding:6px 10px; border-radius:10px }
+.tour-pop .step{ font-size:12px; color:#9fb1ff; margin-right:auto }
+.tour-hidden{ display:none !important }
 </style>
   <link rel="manifest" href="manifest.webmanifest">
 <style>
@@ -649,6 +699,13 @@
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg>
       <span class="label">Storage Map</span>
     </button>
+    <button class="icon-btn" data-target="tutorialPanel" title="Tutorial">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+        <path d="M12 3a9 9 0 1 0 .001 18.001A9 9 0 0 0 12 3Zm0 13.2a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Zm1.2-2.4h-2.1c0-2.4 2.4-2.4 2.4-3.9 0-.9-.7-1.5-1.65-1.5-.88 0-1.66.47-2.04 1.35l-1.74-.75C8.85 5.85 10.2 5 11.95 5 14 5 15.6 6.21 15.6 8.1c0 2.61-2.4 2.85-2.4 5.7Z" stroke="currentColor" stroke-width="1.2" fill="currentColor"/>
+      </svg>
+      <span class="label">Tutorial</span>
+    </button>
+    
     <div class="spacer"></div>
     <button class="icon-btn" data-target="ordersPanel" title="Orders">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M3 4h2l2.5 12h10.5l2-8H7" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="20" r="1.5" fill="currentColor"/><circle cx="18" cy="20" r="1.5" fill="currentColor"/></svg>
@@ -829,6 +886,22 @@
         </div>
       </section>
 
+      
+      <!-- Tutorial -->
+      <section id="tutorialPanel" class="panel card">
+        <header>
+          <div>Interactive Tutorial</div>
+          <div class="actions"><button class="btn primary tour-btn" data-tour="quick">Start Quick Tour</button><button class="btn tour-btn" data-tour="storage">Storage & Locations</button><button class="btn tour-btn" data-tour="inventory">Inventory & Flags</button><button class="btn tour-btn" data-tour="register">Register & Images</button></div>
+        </header>
+        <div class="body">
+          <p>This step-by-step guide will highlight controls and wait for your clicks. Choose a tour above.</p>
+          <ul>
+            <li>Use <strong>Next</strong> / <strong>Back</strong> or click the highlighted control.</li>
+            <li>Press <kbd>Shift</kbd> + <kbd>?</kbd> any time to restart.</li>
+          </ul>
+        </div>
+      </section>
+    
       <!-- Storage Map -->
       <section id="storagePanel" class="panel card">
         <header>
@@ -877,6 +950,21 @@
         <div class="body"><em>Wire to Firestore later.</em></div>
       </section>
     </main>
+
+<div id="tourBackdrop" class="tour-backdrop"></div>
+<div id="tourHighlight" class="tour-highlight" aria-hidden="true"></div>
+<div id="tourPop" class="tour-pop" role="dialog" aria-modal="true" aria-live="polite">
+  <div class="step" id="tourStep"></div>
+  <h4 id="tourTitle">Welcome</h4>
+  <p id="tourText">This guide will walk you through the essentials.</p>
+  <div class="controls">
+    <button id="tourSkip" class="btn">Skip</button>
+    <button id="tourPrev" class="btn">Back</button>
+    <button id="tourDo" class="btn">Do it</button>
+    <button id="tourNext" class="btn primary">Next</button>
+  </div>
+</div>
+
   </div>
 </div>
 
@@ -1091,7 +1179,7 @@ function renderInventoryMobile(list){
         <span class="m-var">${varianceLabel(it.usage, it.qty, it.max)}</span>
         <span class="m-dot" aria-hidden="true"></span>
         <div class="m-txt">
-          <div class="m-name">${escapeHtml(it.name||"")}</div>${it.image?`<div class="m-actions"><a href="${escapeHtml(it.image)}" target="_blank" rel="noopener noreferrer">View Image</a>${it.type==="instrument_tray" && it.trayList?` • <a href="${escapeHtml(it.trayList)}" target="_blank" rel="noopener noreferrer">Instrument list (login)</a>`:""}</div>`:""}<div class="m-size">${escapeHtml(it.size||'')}</div>
+          <div class="m-name">${escapeHtml(it.name||"")}</div><div class="m-size">${escapeHtml(it.size||'')}</div>
           <div class="m-sub">${escapeHtml(it.system||'')}</div>
           <div class="m-loc">${(roomName===UNPLACED_ROOM || sObj?.id===UNPLACED_STORAGE_ID) ? '<span class="unplaced-label">Unplaced</span>' : escapeHtml(loc)}</div>${it.image?`<div class="m-actions"><a href="${escapeHtml(it.image)}" target="_blank" rel="noopener noreferrer">View Image</a>${it.type==="instrument_tray" && it.trayList?` • <a href="${escapeHtml(it.trayList)}" target="_blank" rel="noopener noreferrer">Instrument list (login)</a>`:""}</div>`:""}
         </div>
@@ -1510,7 +1598,12 @@ listEl.appendChild(controls);
 
   function renderItemBox(it){
     const box=document.createElement('div'); box.className='item'; box.setAttribute('data-type',(it.type||'')); box.draggable=true;
-    box.innerHTML=`<div class="name">${escapeHtml(it.name)}</div><div class="size">${escapeHtml(it.size||"")}</div><div class="meta sm-center"><div class="sm-ref mono">${escapeHtml(it.sku||"")}</div><div class="sm-sys">${escapeHtml(it.system||"")}</div><div class="sm-qty">Qty ${it.qty||0}</div></div><span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>`;
+    box.innerHTML=`<div class="name">${escapeHtml(it.name)}</div><div class="size">${escapeHtml(it.size||"")}</div><div class="meta sm-center"><div class="sm-ref mono">${escapeHtml(it.sku||"")}</div><div class="sm-sys">${escapeHtml(it.system||"")}</div><div class="sm-qty">Qty ${it.qty||0}</div></div>
+      ${ it.image ? `<div class="drawer-actions" aria-label="links">
+        <a draggable="false" href="${escapeHtml(it.image)}" target="_blank" rel="noopener noreferrer">View Image</a>
+        ${ (it.type==='instrument_tray' && it.trayList) ? ` • <a draggable="false" href="${escapeHtml(it.trayList)}" target="_blank" rel="noopener noreferrer">Instrument list (login)</a>` : ``}
+      </div>` : `` }
+    <span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>`;
     box.addEventListener('dragstart',(e)=>{ state.draggingItemId=it.id; e.dataTransfer.setData('text/plain',it.id); e.dataTransfer.effectAllowed='move'; });
     box.addEventListener('dragend',()=>{ state.draggingItemId=null; document.querySelectorAll('.drop-over').forEach(el=>el.classList.remove('drop-over')); });
     box.addEventListener('dblclick',()=>editItemPrompt(it));
@@ -2234,5 +2327,280 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 </style>
 
+
+<style>
+/* Links only on drawer tiles; keep footprint small to preserve DnD */
+.drawer-row .item .drawer-actions{
+  font-size: 12px;
+  margin: 6px 8px 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.drawer-row .item .drawer-actions a{ text-decoration: underline; }
+</style>
+
+
+<script>
+(function(){
+  function $(q){ return document.querySelector(q); }
+  function all(q){ return Array.from(document.querySelectorAll(q)); }
+
+  const steps = [
+    {id:'openInventory', target:'[data-target="inventoryPanel"]', title:'Open Inventory', text:'Click this to view your Inventory.', panel:null, place:'right', wait:true},
+    {id:'invSearch', target:'#invSearch', title:'Search', text:'Type to find items by name, SKU, supplier or system.', panel:'inventoryPanel', place:'bottom'},
+    {id:'invFilters', target:'#filType', title:'Filters', text:'Use filters to narrow the table quickly.', panel:'inventoryPanel', place:'bottom'},
+    {id:'invTable', target:'#invTable', title:'Table', text:'View stock, ROP, min/max and actions here.', panel:'inventoryPanel', place:'top'},
+    {id:'openRegister', target:'[data-target="registerPanel"]', title:'Open Register', text:'Click to go to product registration.', panel:null, place:'right', wait:true},
+    {id:'register', target:'#registerPanel .row', title:'Register products', text:'Fill in supplier, product and stock details.', panel:'registerPanel', place:'bottom'},
+    {id:'openStorage', target:'[data-target="storagePanel"]', title:'Open Storage Map', text:'Click to manage rooms & storages.', panel:null, place:'right', wait:true},
+    {id:'rooms', target:'#roomGrid', title:'Rooms & Storages', text:'Each card is a room. Add storages and see totals live.', panel:'storagePanel', place:'top'},
+    {id:'detail', target:'.detail', title:'Drawer view', text:'Select a room to manage drawers & slots.', panel:'storagePanel', place:'left'},
+    {id:'finish', target:'[data-target="tutorialPanel"]', title:'You’re done!', text:'Re-run the tour any time from the Tutorial tab.', panel:null, place:'right'}
+  ];
+
+  const els = {
+    bd: $('#tourBackdrop'), hi: $('#tourHighlight'), pop: $('#tourPop'),
+    step: $('#tourStep'), title: $('#tourTitle'), text: $('#tourText'),
+    next: $('#tourNext'), prev: $('#tourPrev'), skip: $('#tourSkip'), do: $('#tourDo')
+  };
+
+  let i=0, clickForward=null;
+
+  function openPanel(panelId){
+    if(!panelId) return;
+    const btn = document.querySelector('[data-target="'+panelId+'"]');
+    if(btn) btn.click();
+  }
+
+  function clearClickForward(){
+    if(clickForward){ document.removeEventListener('click', clickForward, true); clickForward=null; }
+    els.do.classList.add('tour-hidden');
+  }
+
+  function placePop(r, place){
+    const pad = 10; let x=r.left, y=r.bottom+pad; els.pop.style.transform='';
+    if(place==='top'){ y=r.top-pad; els.pop.style.transform='translateY(-100%)'; }
+    else if(place==='left'){ x=r.left-pad; y=r.top; els.pop.style.transform='translateX(-100%)'; }
+    else if(place==='right'){ x=r.right+pad; y=r.top; }
+    els.pop.style.left = x+'px'; els.pop.style.top = y+'px';
+  }
+
+  function show(idx){
+    clearClickForward();
+    i = Math.max(0, Math.min(idx, steps.length-1));
+    const s = steps[i];
+
+    openPanel(s.panel);
+    const t = document.querySelector(s.target);
+    if(!t){ return next(); }
+
+    t.scrollIntoView({behavior:'smooth', block:'center'});
+    const r = t.getBoundingClientRect();
+    Object.assign(els.hi.style, {display:'block', left:(r.left-6)+'px', top:(r.top-6)+'px', width:(r.width+12)+'px', height:(r.height+12)+'px'});
+    Object.assign(els.pop.style, {display:'block'});
+    els.bd.style.display='block';
+
+    els.step.textContent = 'Step ' + (i+1) + ' of ' + steps.length;
+    els.title.textContent = s.title;
+    els.text.textContent = s.text;
+    placePop(r, s.place);
+
+    els.prev.disabled = i===0;
+    els.next.textContent = i===steps.length-1 ? 'Finish' : 'Next';
+
+    if(s.wait){
+      els.do.classList.remove('tour-hidden');
+      clickForward = (e)=>{
+        if(t.contains(e.target) || e.target===t){ setTimeout(next, 100); clearClickForward(); }
+      };
+      document.addEventListener('click', clickForward, true);
+      els.do.onclick = ()=>{ t.click && t.click(); setTimeout(next, 100); clearClickForward(); };
+    }
+  }
+
+  function next(){ if(i<steps.length-1) show(i+1); else end(); }
+  function prev(){ if(i>0) show(i-1); }
+  function end(){
+    clearClickForward();
+    els.bd.style.display='none'; els.hi.style.display='none'; els.pop.style.display='none';
+  }
+  function start(){ show(0); }
+
+  // Wire buttons (even if Tutorial panel not visible)
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.id==='tourStart'){ start(); }
+    if(e.target && e.target.id==='tourRestart'){ start(); }
+  });
+  els.next.addEventListener('click', next);
+  els.prev.addEventListener('click', prev);
+  els.skip.addEventListener('click', end);
+  window.addEventListener('keydown', (e)=>{ if(e.shiftKey && e.key==='?'){ start(); } });
+})();
+</script>
+
+
+
+
 </body>
 </html>
+
+<script>
+(function(){
+  const $ = (q,ctx=document)=>ctx.querySelector(q);
+  const $$ = (q,ctx=document)=>Array.from(ctx.querySelectorAll(q));
+
+  const els = {
+    bd: $('#tourBackdrop'), hi: $('#tourHighlight'), pop: $('#tourPop'),
+    step: $('#tourStep'), title: $('#tourTitle'), text: $('#tourText'),
+    next: $('#tourNext'), prev: $('#tourPrev'), skip: $('#tourSkip'), do: $('#tourDo')
+  };
+
+  function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+  function placePop(r, place){
+    const pad = 12;
+    let x=r.left, y=r.bottom+pad, transform='';
+    if(place==='top'){ y=r.top-pad; transform='translateY(-100%)'; }
+    else if(place==='left'){ x=r.left-pad; y=r.top; transform='translateX(-100%)'; }
+    else if(place==='right'){ x=r.right+pad; y=r.top; transform=''; }
+    // Clamp within viewport
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const pop = els.pop; pop.style.transform = transform; pop.style.display='block'; // temp show to measure
+    const pw = pop.offsetWidth || 340, ph = pop.offsetHeight || 120;
+    // Auto-flip if out of bounds
+    if(place==='top' && (y - ph) < 8){ place='bottom'; y = r.bottom + pad; transform=''; }
+    if(place==='left' && (x - pw) < 8){ place='right'; x = r.right + pad; transform=''; }
+    if(place==='right' && (x + pw) > vw - 8){ place='left'; x = r.left - pad; transform='translateX(-100%)'; }
+    // Re-clamp
+    x = clamp(x, 8, vw - pw - 8);
+    y = clamp(y, 8, vh - ph - 8);
+    Object.assign(pop.style, {left:x+'px', top:y+'px', transform});
+  }
+
+  function highlight(el){
+    const r = el.getBoundingClientRect();
+    Object.assign(els.hi.style, {display:'block', left:(r.left-6)+'px', top:(r.top-6)+'px', width:(r.width+12)+'px', height:(r.height+12)+'px'});
+    els.bd.style.display='block';
+  }
+
+  function waitFor(selectorOrFn, timeout=5000){
+    return new Promise((resolve)=>{
+      const t0=performance.now();
+      const id=setInterval(()=>{
+        const el = typeof selectorOrFn==='function' ? selectorOrFn() : document.querySelector(selectorOrFn);
+        if(el || performance.now()-t0>timeout){ clearInterval(id); resolve(el||null); }
+      }, 80);
+    });
+  }
+
+  async function openPanel(panelId){
+    if(!panelId) return;
+    const btn = document.querySelector('[data-target="'+panelId+'"]');
+    if(btn) btn.click();
+    await new Promise(r=>setTimeout(r,120));
+  }
+
+  const tours = {
+    quick: [
+      {target:'[data-target="inventoryPanel"]', title:'Inventory', text:'Click to open your Inventory.', panel:null, place:'right', wait:true},
+      {target:'#invTable', title:'Inventory Table', text:'All items with stock, min/max and ROP.', panel:'inventoryPanel', place:'top'},
+      {target:'[data-target="storagePanel"]', title:'Storage Map', text:'Open the Storage Map.', panel:null, place:'right', wait:true},
+      {target:'#roomGrid', title:'Rooms & Storages', text:'Each card is a room. Add storages, drawers, and slots.', panel:'storagePanel', place:'top'},
+      {target:'[data-target="registerPanel"]', title:'Register', text:'Open the Register form.', panel:null, place:'right', wait:true},
+      {target:'#registerPanel .row', title:'Register form', text:'Supplier, name, system, size, min/max/ROP, usage, SKU.', panel:'registerPanel', place:'bottom'}
+    ],
+    storage: [
+      {target:'[data-target="storagePanel"]', title:'Open Storage Map', text:'Click to open.', panel:null, place:'right', wait:true},
+      {target:'#roomGrid', title:'Rooms', text:'These cards are rooms/locations. Click a room to focus.', panel:'storagePanel', place:'top'},
+      {target:() => document.querySelector('#storagePanel .room .actions .mini.add') || document.querySelector('#storagePanel .add-storage .btn'), title:'+ Storage', text:'Add a storage to the selected room.', panel:'storagePanel', place:'bottom'},
+      {target:'#addDrawerBtn', title:'Add Drawer', text:'Use + / – to add or remove drawers.', panel:'storagePanel', place:'bottom'},
+      {target:'#drawerTable', title:'Drawers & Slots', text:'Each drawer is a row. Click a drawer to add slots.', panel:'storagePanel', place:'top'},
+      {target:() => document.querySelector('.slots [draggable="true"]'), title:'Drag item tile', text:'Click & hold an item tile, then drag and drop it onto a drawer or slot below.', panel:'storagePanel', place:'bottom'},
+      {target:'#invTable', title:'Live update', text:'After dropping, open Inventory to see the new location & updated counts.', panel:'inventoryPanel', place:'top'}
+    ],
+    inventory: [
+      {target:'[data-target="inventoryPanel"]', title:'Open Inventory', text:'Click to open.', panel:null, place:'right', wait:true},
+      {target:'#invSearch', title:'Search', text:'Type to filter by name, SKU, supplier or system.', panel:'inventoryPanel', place:'bottom'},
+      {target:'#filters', title:'Filters', text:'Use Supplier/System/Type/Usage filters to narrow.', panel:'inventoryPanel', place:'bottom'},
+      {target:()=>document.querySelector('#invTable tbody tr td:nth-child(2)'), title:'Inline edit', text:'Double‑click a cell to edit. Enter to save, Esc to cancel.', panel:'inventoryPanel', place:'top'},
+      {target:()=>document.querySelector('#invTable tbody tr a.note-link'), title:'Notes & Flags', text:'Click “Add Note”/“View Note”. Flags appear here based on item status.', panel:'inventoryPanel', place:'top'},
+      {target:'#invContextMenu', title:'Row actions', text:'Right‑click a row for Move / Edit / Delete.', panel:'inventoryPanel', place:'left'}
+    ],
+    register: [
+      {target:'[data-target="registerPanel"]', title:'Open Register', text:'Click to open.', panel:null, place:'right', wait:true},
+      {target:'#r_supplier', title:'Supplier', text:'Select or type a supplier. Lists learn from saved entries.', panel:'registerPanel', place:'bottom'},
+      {target:'#r_name', title:'Product Name', text:'e.g. “3.5mm Cortical Screw”.', panel:'registerPanel', place:'bottom'},
+      {target:'#r_system', title:'System', text:'Pick the surgical system/kit.', panel:'registerPanel', place:'bottom'},
+      {target:'#r_type', title:'Type', text:'Consumable, implant, tray, etc.', panel:'registerPanel', place:'bottom'},
+      {target:'#r_size', title:'Size', text:'Add size/spec.', panel:'registerPanel', place:'bottom'},
+      {target:'#r_min', title:'Min/Max/ROP', text:'Set stock rules for alerts & planning.', panel:'registerPanel', place:'top'},
+      {target:'#r_usage_seg', title:'Usage level', text:'Choose usage level to track variance.', panel:'registerPanel', place:'top'},
+      {target:'#r_image', title:'Image / Link', text:'Paste an image URL or upload; saved items include a clickable link.', panel:'registerPanel', place:'top'},
+      {target:'#r_save', title:'Save product', text:'Save to add to Inventory. In Inventory, names/images become hyperlinks.', panel:'registerPanel', place:'top'}
+    ]
+  };
+
+  let active=null, idx=0, clickForward=null;
+
+  function clearClickForward(){
+    if(clickForward){ document.removeEventListener('click', clickForward, true); clickForward=null; }
+    els.do.classList.add('tour-hidden');
+  }
+
+  async function show(i){
+    clearClickForward();
+    idx = i;
+    const steps = tours[active]; if(!steps || i<0 || i>=steps.length){ return end(); }
+    const s = steps[i];
+
+    if(s.panel){ await openPanel(s.panel); }
+
+    // Resolve target
+    let target = typeof s.target==='function' ? s.target() : document.querySelector(s.target);
+    if(!target){ target = await waitFor(typeof s.target==='function' ? s.target : ()=>document.querySelector(s.target), 5000); }
+    if(!target){ return next(); }
+
+    target.scrollIntoView({behavior:'smooth', block:'center'});
+    highlight(target);
+    els.step.textContent = `Step ${i+1} of ${steps.length}`;
+    els.title.textContent = s.title;
+    els.text.textContent = s.text;
+    placePop(target.getBoundingClientRect(), s.place||'bottom');
+
+    els.prev.disabled = i===0;
+    els.next.textContent = i===steps.length-1 ? 'Finish' : 'Next';
+
+    if(s.wait){
+      els.do.classList.remove('tour-hidden');
+      clickForward = (e)=>{
+        if(target.contains(e.target) || e.target===target){ setTimeout(next, 120); clearClickForward(); }
+      };
+      document.addEventListener('click', clickForward, true);
+      els.do.onclick = ()=>{ target.click && target.click(); setTimeout(next, 120); clearClickForward(); };
+    }
+  }
+
+  function next(){ const steps=tours[active]; if(!steps) return end(); if(idx<steps.length-1) show(idx+1); else end(); }
+  function prev(){ if(idx>0) show(idx-1); }
+  function end(){ clearClickForward(); els.bd.style.display='none'; els.hi.style.display='none'; els.pop.style.display='none'; }
+
+  // Wire tutorial panel buttons
+  $$('.tour-btn').forEach(btn=>btn.addEventListener('click', async ()=>{
+    active = btn.dataset.tour;
+    // open default panel to stabilize starting selectors
+    if(active==='quick'||active==='inventory'){ await openPanel('inventoryPanel'); }
+    if(active==='storage'){ await openPanel('storagePanel'); }
+    if(active==='register'){ await openPanel('registerPanel'); }
+    show(0);
+  }));
+
+  // Controls
+  els.next.addEventListener('click', next);
+  els.prev.addEventListener('click', prev);
+  els.skip.addEventListener('click', end);
+  window.addEventListener('keydown', (e)=>{ if(e.shiftKey && e.key==='?'){ active='quick'; show(0);} });
+
+  // Reposition popover on resize/scroll to stay in view
+  window.addEventListener('resize', ()=>{ if(els.hi.style.display==='block'){ const r = document.querySelector('.drop-over')?.getBoundingClientRect(); } });
+})();
+</script>

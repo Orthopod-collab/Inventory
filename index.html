@@ -632,6 +632,133 @@
 }
 /* === End storage tile === */
 </style>
+
+<!-- === Dark Modern Theme (preserves functional color coding) === -->
+<style id="theme-dark-modern">
+  :root{
+    --bg:#0f1220;
+    --panel:#141a2a;
+    --text:#e6ebf5;
+    --muted:#9aa6bf;
+    --border:rgba(255,255,255,.08);
+    --accent:#7c3aed;         /* purple accent */
+    --accent-200:#2b2f52;     /* deep navy block */
+    --chip:rgba(255,255,255,.06);
+    --shadow:0 12px 28px rgba(0,0,0,.45);
+  }
+  body{ background:radial-gradient(1200px 600px at 20% -10%, #1d1438 0%, rgba(15,18,32,0) 55%), radial-gradient(900px 500px at 90% -10%, #3a1f2e 0%, rgba(15,18,32,0) 50%), var(--bg); color:var(--text); }
+  .app{ background:transparent; }
+  .side{ background:linear-gradient(180deg,#0e1020,#0c0f1b); border-right:1px solid var(--border); }
+  .logo{ background:#1b2140; color:#cfd6ff; border:1px solid rgba(255,255,255,.06); }
+  header.top{ background:linear-gradient(180deg,#12162a,#0f1326); border-bottom:1px solid var(--border); }
+  .top-title{ color:#e8ecff; }
+  .badge{ background:rgba(255,255,255,.06); border-color:var(--border); color:#c9d3ea; }
+
+  .card{ background:linear-gradient(180deg,#171b31,#141a2a); border:1px solid var(--border); border-radius:18px; box-shadow:var(--shadow); }
+  .card header{ background:linear-gradient(180deg,#171b31,#12162a); border-bottom:1px solid var(--border); color:#dde6ff; }
+  .card .body{ background:transparent; }
+
+  .field label{ color:#aeb7cc; }
+  .field input,.field select,.field textarea,
+  .search{ background:#101426; color:#e6ebf5; border:1.5px solid var(--border); border-radius:12px; }
+  .search svg{ color:#a9b3cc; }
+  .field input::placeholder,.field textarea::placeholder{ color:#7b86a3; }
+  .field input:focus,.field select:focus,.field textarea:focus,
+  .search:focus-within{ border-color:#6b5be7; box-shadow:0 0 0 4px rgba(124,58,237,.18); outline:none; }
+
+  .btn{ background:#11162a; color:#e6ebf5; border:1.5px solid var(--border); border-radius:12px; }
+  .btn:hover{ box-shadow:0 10px 28px rgba(0,0,0,.45); transform:translateY(-1px); }
+  .btn:active{ transform:translateY(0); }
+  .btn.primary{ background:linear-gradient(180deg,#7c3aed,#5b21b6); border-color:#6d28d9; color:#fff; }
+  .btn.danger{ background:rgba(239,68,68,.12); border-color:rgba(239,68,68,.45); color:#fecaca; }
+
+  .chip{ background:rgba(255,255,255,.06); border:1px solid var(--border); color:#cbd5e1; }
+  .chip.stat{ background:rgba(124,58,237,.14); border-color:rgba(124,58,237,.35); color:#ede9fe; }
+
+  .seg{ border:1.5px solid var(--border); background:#0f1426; }
+  .seg button{ color:#cbd5e1; }
+  .seg button.active{ background:#7c3aed; color:#fff; }
+
+  /* Inventory table */
+  #invTable thead th{ background:#0f152c; color:#c7d2fe; border-bottom:1px solid var(--border); }
+  #invTable tbody tr:nth-child(odd) td{ background:#121733; }
+  #invTable tbody tr:nth-child(even) td{ background:#0f152c; }
+  #invTable tbody tr:hover td{ background:#151c3a; }
+
+  /* Maintain functional type color coding with dark-friendly tints */
+  :root{
+    --type-consumable:#60a5fa;     /* lighter for dark bg */
+    --type-implant:#a78bfa;
+    --type-table_attach:#fbbf24;
+    --type-medical_device:#34d399;
+    --type-instrument_tray:#818cf8;
+    --type-single_pack:#fb7185;
+  }
+  #invTable tr[data-type]::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:4px 0 0 4px; }
+  #invTable tr[data-type="consumable"]::before{ background:var(--type-consumable); }
+  #invTable tr[data-type="implant"]::before{ background:var(--type-implant); }
+  #invTable tr[data-type="table_attach"]::before{ background:var(--type-table_attach); }
+  #invTable tr[data-type="medical_device"]::before{ background:var(--type-medical_device); }
+  #invTable tr[data-type="instrument_tray"]::before{ background:var(--type-instrument_tray); }
+  #invTable tr[data-type="single_pack"]::before{ background:var(--type-single_pack); }
+
+  #invTable tr[data-type="consumable"] td{ background-color:rgba(96,165,250,0.10); }
+  #invTable tr[data-type="implant"] td{ background-color:rgba(167,139,250,0.10); }
+  #invTable tr[data-type="table_attach"] td{ background-color:rgba(251,191,36,0.10); }
+  #invTable tr[data-type="medical_device"] td{ background-color:rgba(52,211,153,0.10); }
+  #invTable tr[data-type="instrument_tray"] td{ background-color:rgba(129,140,248,0.10); }
+  #invTable tr[data-type="single_pack"] td{ background-color:rgba(251,113,133,0.10); }
+
+  /* Mobile tiles */
+  .m-item{ border:1px solid var(--border); background:#11162a; }
+  .m-item[data-type="consumable"]{ background-color:rgba(96,165,250,.12); }
+  .m-item[data-type="implant"]{ background-color:rgba(167,139,250,.12); }
+  .m-item[data-type="table_attach"]{ background-color:rgba(251,191,36,.12); }
+  .m-item[data-type="medical_device"]{ background-color:rgba(52,211,153,.12); }
+  .m-item[data-type="instrument_tray"]{ background-color:rgba(129,140,248,.12); }
+  .m-item[data-type="single_pack"]{ background-color:rgba(251,113,133,.12); }
+
+  /* Storage Map */
+  .room{ background:#141a2a; border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); }
+  .room header{ background:#151b33; border-bottom:1px solid var(--border); }
+  .room .title{ background:#2b2f52; color:#e6ebf5; border-radius:10px; padding:8px 10px; font-weight:900; }
+  .storage-tile{ background:#151b33; border:1px solid var(--border); }
+  .storage-tile small{ color:#a9b3cc; }
+
+  /* Inline arrow buttons next to Edit/Remove: hide them forcefully if any exist */
+  .room header .actions .move-up,
+  .room header .actions .move-down{ display:none !important; }
+
+  /* Side arrows */
+  @media (min-width: 901px){
+    #roomGrid .room{ position:relative; }
+    .reorder-sides{ position:absolute; inset:0; pointer-events:none; }
+    .reorder-btn{
+      position:absolute; top:50%; transform:translateY(-50%);
+      pointer-events:auto; display:grid; place-items:center;
+      width:30px; height:30px; border-radius:999px;
+      background:#0f1426; border:1px solid var(--border);
+      box-shadow:0 10px 28px rgba(0,0,0,.45);
+      color:#e6ebf5; font-size:16px; font-weight:900;
+      opacity:0; transition:opacity .15s ease, transform .08s ease;
+      cursor:pointer; user-select:none;
+    }
+    #roomGrid .room:hover .reorder-btn{ opacity:1; }
+    .reorder-btn.left{ left:-12px; }
+    .reorder-btn.right{ right:-12px; }
+    .reorder-btn.top{ top:10px; left:50%; transform:translate(-50%,0); }
+    .reorder-btn.bottom{ bottom:10px; top:auto; left:50%; transform:translate(-50%,0); }
+    .reorder-btn.disabled{ opacity:.25; cursor:not-allowed; }
+  }
+</style>
+
+
+<style id="tab-click-fixes">
+  /* Keep nav and segmented controls above any overlays */
+  header.top, aside.side { position: sticky; z-index: 50; }
+  .seg, .icon-btn, [data-target] { pointer-events: auto !important; }
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -2251,6 +2378,262 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 .drawer-row .item .drawer-actions a{ text-decoration: underline; }
 </style>
+
+
+<!-- === Up/Down Arrow Reorder (FINAL: robust targeting + floating fallback) === -->
+<style>
+  .room{ position:relative; }
+  .room .mini.move-up, .room .mini.move-down{
+    background:#f3f4f6;
+    border:1px solid #d1d5db;
+    font-size:14px;
+    padding:6px 10px;
+    border-radius:10px;
+    cursor:pointer;
+  }
+  .room .reorder-float{
+    position:absolute; top:10px; right:10px;
+    display:flex; gap:6px; z-index:3;
+    background:rgba(255,255,255,.9);
+    border:1px solid #e5e7eb; border-radius:10px; padding:4px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+  }
+  .room.moved{ animation: pulseMove 400ms ease; }
+  @keyframes pulseMove{ 0%{box-shadow:0 0 0 rgba(37,99,235,0);} 30%{box-shadow:0 0 0 6px rgba(37,99,235,.18);} 100%{box-shadow:0 0 0 rgba(37,99,235,0);}}
+</style>
+<script>
+(function(){
+  const STORAGE_KEY = "roomOrder_arrows_final_v1";
+
+  const saveOrder = ids => { try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(ids)); }catch(e){} };
+  const loadOrder = () => { try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }catch(e){ return []; } };
+
+  function getPanelId(panel){
+    // 1) explicit data-room on inner .bar (most likely in your build)
+    const barData = panel.querySelector('.bar[data-room]');
+    if(barData) return barData.getAttribute('data-room');
+    // 2) data-room on panel
+    if(panel.hasAttribute('data-room')) return panel.getAttribute('data-room');
+    // 3) text inside title
+    const titleEl = panel.querySelector('.title');
+    if(titleEl && titleEl.textContent) return titleEl.textContent.trim();
+    // 4) last resort: index
+    return 'room-' + Array.from(panel.parentElement?.children || []).indexOf(panel);
+  }
+
+  function currentOrder(){
+    return Array.from(document.querySelectorAll('#roomGrid .room'))
+      .map(getPanelId)
+      .filter(Boolean)
+      .filter(id => id !== '__Unplaced__');
+  }
+
+  function applySavedOrder(){
+    const grid = document.getElementById('roomGrid');
+    if(!grid) return;
+    const order = loadOrder();
+    if(!order.length) return;
+    const map = {};
+    grid.querySelectorAll('.room').forEach(p => { const id = getPanelId(p); if(id) map[id] = p; });
+    order.forEach(id => { const p = map[id]; if(p && p.parentElement === grid) grid.appendChild(p); });
+  }
+
+  function movePanel(panel, dir){
+    const grid = document.getElementById('roomGrid');
+    if(!grid || !panel) return;
+    if(dir === 'up'){
+      const prev = panel.previousElementSibling;
+      if(prev && prev.classList.contains('room')) grid.insertBefore(panel, prev);
+    } else if(dir === 'down'){
+      const next = panel.nextElementSibling;
+      if(next && next.classList.contains('room')) grid.insertBefore(next, panel);
+    }
+    panel.classList.add('moved');
+    setTimeout(()=>panel.classList.remove('moved'), 450);
+    saveOrder(currentOrder());
+  }
+
+  function makeBtn(cls, title, click){
+    const b = document.createElement('button');
+    b.className = 'mini ' + cls; b.type = 'button'; b.title = title; b.textContent = cls.includes('up') ? '⬆️' : '⬇️';
+    b.addEventListener('click', click); return b;
+  }
+
+  function ensureButtons(panel){
+    if(!panel) return;
+    // Try the row that contains "Edit"
+    let row = null;
+    const candidates = panel.querySelectorAll('button, .btn');
+    for(const el of candidates){
+      const t = (el.textContent || '').trim().toLowerCase();
+      if(t === 'edit'){ row = el.parentElement; break; }
+    }
+    // Secondary: header .actions
+    if(!row) row = panel.querySelector('header .actions');
+    const up = makeBtn('move-up','Move up',()=>movePanel(panel,'up'));
+    const down = makeBtn('move-down','Move down',()=>movePanel(panel,'down'));
+
+    if(row){
+      if(row.querySelector('.move-up') || row.querySelector('.move-down')) return;
+      row.appendChild(up); row.appendChild(down);
+    }else{
+      // Fallback floating
+      if(panel.querySelector('.reorder-float')) return;
+      const float = document.createElement('div'); float.className = 'reorder-float';
+      float.appendChild(up); float.appendChild(down); panel.appendChild(float);
+    }
+  }
+
+  const mo = new MutationObserver(() => {
+    const grid = document.getElementById('roomGrid'); if(!grid) return;
+    grid.querySelectorAll('.room').forEach(ensureButtons);
+    if(!mo._applied && grid.querySelector('.room')){ mo._applied = true; setTimeout(applySavedOrder, 0); }
+  });
+
+  function start(){
+    const grid = document.getElementById('roomGrid');
+    if(grid){ grid.querySelectorAll('.room').forEach(ensureButtons); applySavedOrder(); }
+    mo.observe(document.body, { childList:true, subtree:true });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', start); } else { start(); }
+})();
+</script>
+<!-- === End Final Reorder === -->
+
+
+<script>
+(function(){
+  const STORAGE_KEY = "roomOrder_sides_dark_v1";
+
+  function saveOrder(ids){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(ids)); }catch(e){} }
+  function loadOrder(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }catch(e){ return []; } }
+
+  function getPanelId(panel){
+    const bar = panel.querySelector('.bar[data-room]');
+    if(bar) return bar.getAttribute('data-room');
+    if(panel.hasAttribute('data-room')) return panel.getAttribute('data-room');
+    const title = panel.querySelector('.title'); if(title && title.textContent) return title.textContent.trim();
+    return null;
+  }
+  const grid = () => document.getElementById('roomGrid');
+  const panels = () => Array.from(grid()?.querySelectorAll('.room') || []);
+
+  function currentOrder(){
+    return panels().map(getPanelId).filter(Boolean).filter(id => id !== '__Unplaced__');
+  }
+  function applySavedOrder(){
+    const g = grid(); if(!g) return;
+    const order = loadOrder(); if(!order.length) return;
+    const map = {}; panels().forEach(p => { const id = getPanelId(p); if(id) map[id] = p; });
+    order.forEach(id => { const p = map[id]; if(p && p.parentElement === g) g.appendChild(p); });
+  }
+
+  function gridColumns(){
+    const g = grid(); if(!g) return 1;
+    const cs = getComputedStyle(g);
+    const cols = (cs.gridTemplateColumns || '').split(' ').filter(Boolean).length;
+    return Math.max(cols || 1, 1);
+  }
+  function moveBy(panel, delta){
+    const g = grid(); if(!g) return;
+    const list = panels();
+    const idx = list.indexOf(panel); if(idx < 0) return;
+    let t = Math.max(0, Math.min(idx + delta, list.length - 1));
+    const target = list[t]; if(!target || target === panel) return;
+    if(delta > 0){ g.insertBefore(panel, target.nextSibling); } else { g.insertBefore(panel, target); }
+    saveOrder(currentOrder()); refreshDisabledStates();
+  }
+
+  function ensureSideControls(panel){
+    if(!panel || panel.querySelector('.reorder-sides')) return;
+    const wrap = document.createElement('div'); wrap.className = 'reorder-sides';
+    const btn = (cls, title, sym, cb) => {
+      const b = document.createElement('button'); b.className = 'reorder-btn ' + cls; b.title = title; b.textContent = sym;
+      b.addEventListener('click', e => { e.stopPropagation(); cb(); }); return b;
+    };
+    const cols = () => gridColumns();
+    const left = btn('left','Move left','◀', () => moveBy(panel,-1));
+    const right = btn('right','Move right','▶', () => moveBy(panel,+1));
+    const top = btn('top','Move up','▲', () => moveBy(panel,-cols()));
+    const bottom = btn('bottom','Move down','▼', () => moveBy(panel,+cols()));
+    wrap.append(left,right,top,bottom);
+    panel.appendChild(wrap);
+  }
+
+  function refreshDisabledStates(){
+    const list = panels(); const cols = gridColumns();
+    list.forEach((p,i) => {
+      const L=p.querySelector('.reorder-btn.left'), R=p.querySelector('.reorder-btn.right'),
+            T=p.querySelector('.reorder-btn.top'), B=p.querySelector('.reorder-btn.bottom');
+      if(!L||!R||!T||!B) return;
+      (i===0?L.classList.add('disabled'):L.classList.remove('disabled'));
+      (i===list.length-1?R.classList.add('disabled'):R.classList.remove('disabled'));
+      (i<cols?T.classList.add('disabled'):T.classList.remove('disabled'));
+      (i+cols>=list.length?B.classList.add('disabled'):B.classList.remove('disabled'));
+    });
+  }
+
+  // Cleanup any previous inline up/down controls
+  function cleanupInlineArrows(){
+    document.querySelectorAll('.room header .actions .move-up, .room header .actions .move-down')
+      .forEach(el => el.remove());
+  }
+
+  const mo = new MutationObserver(() => {
+    if(!grid()) return;
+    panels().forEach(ensureSideControls);
+    cleanupInlineArrows();
+    refreshDisabledStates();
+    if(!mo._applied && panels().length){ mo._applied = true; setTimeout(applySavedOrder, 0); }
+  });
+
+  function start(){
+    if(grid()){
+      panels().forEach(ensureSideControls);
+      cleanupInlineArrows();
+      applySavedOrder();
+      refreshDisabledStates();
+    }
+    mo.observe(document.body, { childList:true, subtree:true });
+    window.addEventListener('resize', refreshDisabledStates);
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', start); } else { start(); }
+})();
+</script>
+
+
+<script>
+// Make tab/segmented controls robust to nested clicks and ensure nav works.
+(function(){
+  function enable(){
+    // Sidebar panel switching resilience
+    document.querySelectorAll('.side .icon-btn').forEach(btn => {
+      if(btn._patched) return; btn._patched = true;
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.side .icon-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.target;
+        if(target){
+          document.querySelectorAll('section.panel').forEach(p=>p.classList.remove('active'));
+          const panel = document.getElementById(target);
+          if(panel) panel.classList.add('active');
+        }
+      });
+    });
+    // Segmented controls: accept clicks on inner spans/emojis
+    document.querySelectorAll('.seg').forEach(seg => {
+      if(seg._patched) return; seg._patched = true;
+      seg.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if(!btn || !seg.contains(btn)) return;
+        seg.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', enable); } else { enable(); }
+})();
+</script>
 
 </body>
 </html>

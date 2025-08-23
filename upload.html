@@ -508,12 +508,7 @@
 
 
   /* Size line under main label */
-  .m-size, .item .size{
-    text-align:center;
-    font-weight:700;
-    font-size:0.9em;
-    margin-top:2px;
-  }
+  .m-size, .item .size{ text-align:center; font-weight:700; font-size:0.9em; margin:0 auto 6px auto; }
 
   /* Color hints for type filter pills at the top (drawers) */
   .chip.type-consumable{ background:rgba(37,99,235,.18); color:#1e3a8a; }
@@ -526,8 +521,8 @@
 
   /* Storage item: prevent overlap with top-right controls */
   .item{ position:relative; padding-top:10px; }
-  .item .name{ text-align:center; margin:0 60px 2px 8px; }
-  .item .size{ text-align:center; font-weight:700; font-size:0.9em; margin:0 60px 6px 8px; }
+  .item .name{ text-align:center; margin:0 auto 2px auto; }
+  .item .size{ text-align:center; font-weight:700; font-size:0.9em; margin:0 auto 6px auto; }
 
   /* Turn "Remove" mini button into a minus icon and avoid text overflow */
   .mini.danger[data-action="remove"]{ font-size:0; padding:6px 10px; }
@@ -713,6 +708,10 @@
                   <button data-v="low">🔴 Low</button>
                 </div>
               </div>
+            </div>
+            <div class="row-2">
+              <div class="field"><label>Image link upload</label><input id="r_image" placeholder="https://... (Drive, SharePoint, etc.)"></div>
+              <div class="field" id="trayListField" style="display:none"><label>Instrument list link (login required)</label><input id="r_trayList" placeholder="e.g. https://synergy.trak/... (requires login)"></div>
             </div>
             <div class="row">
               <div class="field" style="grid-column:1/-1"><label>Notes</label><textarea id="r_notes" rows="4" placeholder="Optional notes (size, lot, expiry, packaging, pairing, etc.)"></textarea></div>
@@ -1092,9 +1091,9 @@ function renderInventoryMobile(list){
         <span class="m-var">${varianceLabel(it.usage, it.qty, it.max)}</span>
         <span class="m-dot" aria-hidden="true"></span>
         <div class="m-txt">
-          <div class="m-name">${escapeHtml(it.name||'')}</div><div class="m-size">${escapeHtml(it.size||'')}</div>
+          <div class="m-name">${escapeHtml(it.name||"")}</div>${it.image?`<div class="m-actions"><a href="${escapeHtml(it.image)}" target="_blank" rel="noopener noreferrer">View Image</a>${it.type==="instrument_tray" && it.trayList?` • <a href="${escapeHtml(it.trayList)}" target="_blank" rel="noopener noreferrer">Instrument list (login)</a>`:""}</div>`:""}<div class="m-size">${escapeHtml(it.size||'')}</div>
           <div class="m-sub">${escapeHtml(it.system||'')}</div>
-          <div class="m-loc">${(roomName===UNPLACED_ROOM || sObj?.id===UNPLACED_STORAGE_ID) ? '<span class="unplaced-label">Unplaced</span>' : escapeHtml(loc)}</div>
+          <div class="m-loc">${(roomName===UNPLACED_ROOM || sObj?.id===UNPLACED_STORAGE_ID) ? '<span class="unplaced-label">Unplaced</span>' : escapeHtml(loc)}</div>${it.image?`<div class="m-actions"><a href="${escapeHtml(it.image)}" target="_blank" rel="noopener noreferrer">View Image</a>${it.type==="instrument_tray" && it.trayList?` • <a href="${escapeHtml(it.trayList)}" target="_blank" rel="noopener noreferrer">Instrument list (login)</a>`:""}</div>`:""}
         </div>
         <div class="m-badge">${it.qty||0}</div>
         <span class="m-type">${escapeHtml((it.type||"").replace(/_/g," ").replace(/^\w/,c=>c.toUpperCase()))}</span>
@@ -1177,8 +1176,8 @@ function renderInventoryMobile(list){
 
   $('#r_clear').addEventListener('click', ()=>{
     $('#r_supplier').value=''; $('#r_name').value=''; $('#r_system').value=''; $('#r_type').value='consumable';
-    $('#r_size').value=''; $('#r_qty').value=0; $('#r_rop').value=0; $('#r_min').value=0; $('#r_max').value=0; $('#r_sku').value=''; $('#r_notes').value='';
-    usage='medium'; $$('#r_usage_seg button').forEach(b=>b.classList.toggle('active', b.dataset.v==='medium'));
+    $('#r_size').value=''; $('#r_qty').value=0; $('#r_rop').value=0; $('#r_min').value=0; $('#r_max').value=0; $('#r_sku').value=''; $('#r_notes').value=''; $('#r_image').value=''; $('#r_trayList').value='';
+            usage='medium'; if(window.__toggleTrayField) window.__toggleTrayField();; $$('#r_usage_seg button').forEach(b=>b.classList.toggle('active', b.dataset.v==='medium'));
   });
 
   $('#r_save').addEventListener('click', async ()=>{
@@ -1192,7 +1191,9 @@ function renderInventoryMobile(list){
     const min=Number($('#r_min').value||0);
     const max=Number($('#r_max').value||0);
     const sku=$('#r_sku').value.trim();
-    const notes=$('#r_notes').value.trim();
+            const image=($('#r_image')?.value||'').trim();
+            const trayList=($('#r_trayList')?.value||'').trim();
+            const notes=$('#r_notes').value.trim();
     const storageId=$('#r_storage').value;
     const drawer=$('#r_drawer').value || null;
     const slot=$('#r_slot').value ? Number($('#r_slot').value) : null;
@@ -1310,7 +1311,7 @@ function renderInventory(){
       return `<tr data-id=\"${it.id}\" data-type=\"${escapeHtml(it.type||'')}\">
         <td class="sel-cell"><input class="invSel" type="checkbox"></td>
         <td class="mono">${escapeHtml(it.sku||'')}</td>
-        <td><strong>${escapeHtml(it.name||'')}</strong></td>
+        <td>${it.image?`<a href="${escapeHtml(it.image)}" target="_blank" rel="noopener noreferrer"><strong>${escapeHtml(it.name||"")}</strong></a>`:`<strong>${escapeHtml(it.name||"")}</strong>`}${(it.type==="instrument_tray" && it.trayList)?`<div><a href="${escapeHtml(it.trayList)}" target="_blank" rel="noopener noreferrer" class="mini">Instrument list (login)</a></div>`:""}</td>
         <td>${escapeHtml(it.supplier||'')}<div style="color:var(--muted);font-size:12px">${escapeHtml(it.system||'')}</div></td>
         <td>${escapeHtml(it.type||'')}<div style="color:var(--muted);font-size:12px">${escapeHtml(it.size||'')}</div></td>
         <td>${(sObj?.id===UNPLACED_STORAGE_ID || roomName===UNPLACED_ROOM) ? '<span class="unplaced-label">Unplaced</span>' : (escapeHtml(roomName) + '<div style="color:var(--muted);font-size:12px">' + escapeHtml(storageName)   + (it?.location?.drawer?(' • '+escapeHtml(it.location.drawer)) : '')   + (it?.location?.slot?(' • '+escapeHtml(it.location.slot)) : '') + '</div>')}</td>
@@ -1509,7 +1510,7 @@ listEl.appendChild(controls);
 
   function renderItemBox(it){
     const box=document.createElement('div'); box.className='item'; box.setAttribute('data-type',(it.type||'')); box.draggable=true;
-    box.innerHTML=`<div class="name">${escapeHtml(it.name)}</div><div class="size">${escapeHtml(it.size||"")}</div><div class="meta">${escapeHtml(it.sku)} • ${escapeHtml(it.supplier)}  •  Qty ${it.qty}</div><span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>`;
+    box.innerHTML=`<div class="name">${escapeHtml(it.name)}</div><div class="size">${escapeHtml(it.size||"")}</div><div class="meta sm-center"><div class="sm-ref mono">${escapeHtml(it.sku||"")}</div><div class="sm-sys">${escapeHtml(it.system||"")}</div><div class="sm-qty">Qty ${it.qty||0}</div></div><span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>`;
     box.addEventListener('dragstart',(e)=>{ state.draggingItemId=it.id; e.dataTransfer.setData('text/plain',it.id); e.dataTransfer.effectAllowed='move'; });
     box.addEventListener('dragend',()=>{ state.draggingItemId=null; document.querySelectorAll('.drop-over').forEach(el=>el.classList.remove('drop-over')); });
     box.addEventListener('dblclick',()=>editItemPrompt(it));
@@ -1517,7 +1518,14 @@ listEl.appendChild(controls);
   }
   function renderItemCard(it){
     const card=document.createElement('div'); card.className='item'; card.setAttribute('data-type',(it.type||'')); card.style.minHeight='unset'; card.draggable=true; card.style.position='relative';
-    card.innerHTML=`<button type="button" class="mini remove-item" style="position:absolute; right:28px; top:6px;">&minus;</button><div class="name">${escapeHtml(it.name)}</div><div class="size">${escapeHtml(it.size||"")}</div><div class="meta">${escapeHtml(it.sku)} • ${escapeHtml(it.supplier)}  •  Qty ${it.qty}</div><span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>`;
+    card.innerHTML=`<button type="button" class="mini remove-item" style="position:absolute; right:28px; top:6px;">&minus;</button><div class="name">${escapeHtml(it.name)}</div><div class="size">${escapeHtml(it.size||"")}</div><div class="meta sm-center"><div class="sm-ref mono">${escapeHtml(it.sku||"")}</div><div class="sm-sys">${escapeHtml(it.system||"")}</div><div class="sm-qty">Qty ${it.qty||0}</div></div><span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>
+    ${ (it.image || (it.type==='instrument_tray' && it.trayList)) ?
+        `<div class="card-actions">
+           ${it.image ? `<a href="${escapeHtml(it.image)}" target="_blank" rel="noopener noreferrer">View Image</a>` : ``}
+           ${ (it.type==='instrument_tray' && it.trayList) ? ` • <a href="${escapeHtml(it.trayList)}" target="_blank" rel="noopener noreferrer">Instrument list (login)</a>` : ``}
+         </div>`
+      : `` }
+`;
     card.addEventListener('dragstart',(e)=>{ state.draggingItemId=it.id; e.dataTransfer.setData('text/plain',it.id); e.dataTransfer.effectAllowed='move'; });
     card.addEventListener('dragend',()=>{ state.draggingItemId=null; document.querySelectorAll('.drop-over').forEach(el=>el.classList.remove('drop-over')); });
     card.addEventListener('dblclick',()=>editItemPrompt(it));
@@ -2139,6 +2147,90 @@ document.addEventListener('DOMContentLoaded', () => {
 /* Also catch generic "+ Storage" spinner buttons if present */
 .storage-spinner .spin-btn{
   border-radius: 999px !important;
+}
+</style>
+
+
+<script>
+(function(){
+  function toggleTrayField(){
+    const typeSel=document.getElementById('r_type');
+    const trayField=document.getElementById('trayListField');
+    const trayInput=document.getElementById('r_trayList');
+    if(!typeSel||!trayField||!trayInput) return;
+    const v=(typeSel.value||'').toLowerCase();
+    const isTray=(v==='instrument_tray'||v==='instrument tray');
+    trayField.style.display=isTray?'block':'none';
+    if(!isTray){ trayInput.value=''; }
+  }
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const typeSel=document.getElementById('r_type');
+    if(typeSel){
+      typeSel.addEventListener('change', toggleTrayField);
+      toggleTrayField();
+    }
+  });
+  window.__toggleTrayField=toggleTrayField;
+})();
+</script>
+
+
+<style>
+.m-actions{margin-top:6px;font-size:12px}
+.m-actions a{display:inline-block;text-decoration:underline}
+.mini-links{margin-top:4px;font-size:12px}
+.mini-links a{text-decoration:underline}
+</style>
+
+
+<style>
+.m-actions{margin-top:6px;font-size:12px}
+.m-actions a{display:inline-block;text-decoration:underline}
+.mini-links{margin-top:6px;font-size:12px}
+.mini-links a{text-decoration:underline}
+</style>
+
+
+<style>
+.card-actions{
+  margin-top:6px;
+  font-size:12px;
+  user-select:auto;
+}
+.card-actions a{
+  text-decoration:underline;
+}
+</style>
+
+
+<style>
+/* Storage Map tile: center ref/system, qty bottom-right */
+.drawer-row .item{ position: relative; }
+.drawer-row .item .meta.sm-center{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; gap:2px; min-height:48px;
+}
+.drawer-row .item .sm-ref.mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+  font-size: 12px;
+}
+.drawer-row .item .sm-sys{ font-size:12px; color: var(--muted,#6b7280); }
+.drawer-row .item .sm-qty{
+  position:absolute; right:8px; bottom:6px; font-weight:700; font-size:12px;
+}
+</style>
+
+
+<style>
+/* Adjust positions so product name is not covered */
+.drawer-row .item .level-dot{
+  left: 6px !important;
+  right: auto !important;
+  top: 6px !important;
+}
+.drawer-row .item .remove-item{
+  right: 6px !important;
+  top: 6px !important;
 }
 </style>
 

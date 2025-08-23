@@ -299,6 +299,338 @@
   }
 }
 
+
+  /* === Type color mapping (both desktop & mobile) === */
+  :root{
+    --type-consumable:#2563eb;
+    --type-implant:#7c3aed;
+    --type-table_attach:#d97706;
+    --type-medical_device:#0f766e;
+    --type-instrument_tray:#4338ca;
+    --type-single_pack:#db2777;
+  }
+  /* Desktop: color stripe on left of each inventory row by type */
+  #invTable tr[data-type] td:first-child{ position: relative; }
+  #invTable tr[data-type]::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:4px 0 0 4px;
+  }
+  #invTable tr[data-type="consumable"]::before{ background:var(--type-consumable); }
+  #invTable tr[data-type="implant"]::before{ background:var(--type-implant); }
+  #invTable tr[data-type="table_attach"]::before{ background:var(--type-table_attach); }
+  #invTable tr[data-type="medical_device"]::before{ background:var(--type-medical_device); }
+  #invTable tr[data-type="instrument_tray"]::before{ background:var(--type-instrument_tray); }
+  #invTable tr[data-type="single_pack"]::before{ background:var(--type-single_pack); }
+
+  /* Mobile: subtle border + badge background per type */
+  @media (max-width:768px){
+    .m-item[data-type="consumable"]{ border-color: rgba(37,99,235,.35); box-shadow:0 1px 6px rgba(37,99,235,.15); }
+    .m-item[data-type="implant"]{ border-color: rgba(124,58,237,.35); box-shadow:0 1px 6px rgba(124,58,237,.15); }
+    .m-item[data-type="table_attach"]{ border-color: rgba(217,119,6,.35); box-shadow:0 1px 6px rgba(217,119,6,.15); }
+    .m-item[data-type="medical_device"]{ border-color: rgba(15,118,110,.35); box-shadow:0 1px 6px rgba(15,118,110,.15); }
+    .m-item[data-type="instrument_tray"]{ border-color: rgba(67,56,202,.35); box-shadow:0 1px 6px rgba(67,56,202,.15); }
+    .m-item[data-type="single_pack"]{ border-color: rgba(219,39,119,.35); box-shadow:0 1px 6px rgba(219,39,119,.15); }
+
+    /* Lower-left type label on mobile tile */
+    .m-item .m-type{
+      position:absolute; left:8px; bottom:6px;
+      font-size:10px; font-weight:800; letter-spacing:.2px;
+      padding:3px 6px; border-radius:6px; border:1px solid rgba(0,0,0,.08);
+      background:#f8fafc; color:#111827;
+    }
+    .m-item[data-type="consumable"] .m-type{ background:rgba(37,99,235,.12); border-color:rgba(37,99,235,.25); }
+    .m-item[data-type="implant"] .m-type{ background:rgba(124,58,237,.12); border-color:rgba(124,58,237,.25); }
+    .m-item[data-type="table_attach"] .m-type{ background:rgba(217,119,6,.12); border-color:rgba(217,119,6,.25); }
+    .m-item[data-type="medical_device"] .m-type{ background:rgba(15,118,110,.12); border-color:rgba(15,118,110,.25); }
+    .m-item[data-type="instrument_tray"] .m-type{ background:rgba(67,56,202,.12); border-color:rgba(67,56,202,.25); }
+    .m-item[data-type="single_pack"] .m-type{ background:rgba(219,39,119,.12); border-color:rgba(219,39,119,.25); }
+  }
+
+
+  /* --- Mobile tile layout safety + stronger color coding --- */
+  .m-item{ position:relative; padding-bottom:34px; } /* room for bottom-left type badge */
+  .m-item::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:6px; border-radius:12px 0 0 12px;
+  }
+  .m-item[data-type="consumable"]::before{ background:var(--type-consumable); }
+  .m-item[data-type="implant"]::before{ background:var(--type-implant); }
+  .m-item[data-type="table_attach"]::before{ background:var(--type-table_attach); }
+  .m-item[data-type="medical_device"]::before{ background:var(--type-medical_device); }
+  .m-item[data-type="instrument_tray"]::before{ background:var(--type-instrument_tray); }
+  .m-item[data-type="single_pack"]::before{ background:var(--type-single_pack); }
+
+  .m-item .m-type{ z-index:2; }
+  .m-item .m-title,
+  .m-item .m-subtitle,
+  .m-item .m-location{
+    text-align:center;
+    white-space:normal;
+    word-break:break-word;
+    overflow-wrap:anywhere;
+  }
+  .m-item .m-title{ line-height:1.15; }
+  .m-item .m-subtitle{ line-height:1.2; }
+  .m-item .m-details{ padding-bottom:4px; } /* breathing space above badge */
+
+
+  /* === Light background tint for entire tile === */
+  .m-item[data-type="consumable"]{ background-color:rgba(37,99,235,0.08); }
+  .m-item[data-type="implant"]{ background-color:rgba(124,58,237,0.08); }
+  .m-item[data-type="table_attach"]{ background-color:rgba(217,119,6,0.08); }
+  .m-item[data-type="medical_device"]{ background-color:rgba(15,118,110,0.08); }
+  .m-item[data-type="instrument_tray"]{ background-color:rgba(67,56,202,0.08); }
+  .m-item[data-type="single_pack"]{ background-color:rgba(219,39,119,0.08); }
+
+  #invTable tr[data-type="consumable"] td{ background-color:rgba(37,99,235,0.06); }
+  #invTable tr[data-type="implant"] td{ background-color:rgba(124,58,237,0.06); }
+  #invTable tr[data-type="table_attach"] td{ background-color:rgba(217,119,6,0.06); }
+  #invTable tr[data-type="medical_device"] td{ background-color:rgba(15,118,110,0.06); }
+  #invTable tr[data-type="instrument_tray"] td{ background-color:rgba(67,56,202,0.06); }
+  #invTable tr[data-type="single_pack"] td{ background-color:rgba(219,39,119,0.06); }
+
+
+  /* === Desktop Type/Size pill badges === */
+  .type-pill{
+    display:inline-block; padding:2px 8px; border-radius:9999px;
+    font-size:12px; font-weight:600; color:#111827;
+  }
+  .type-pill.consumable{ background-color:rgba(37,99,235,0.18); color:#1e3a8a; }
+  .type-pill.implant{ background-color:rgba(124,58,237,0.18); color:#4c1d95; }
+  .type-pill.table_attach{ background-color:rgba(217,119,6,0.18); color:#78350f; }
+  .type-pill.medical_device{ background-color:rgba(15,118,110,0.18); color:#064e3b; }
+  .type-pill.instrument_tray{ background-color:rgba(67,56,202,0.18); color:#1e1b4b; }
+  .type-pill.single_pack{ background-color:rgba(219,39,119,0.18); color:#831843; }
+
+
+  /* === Storage tab tile color coding === */
+  .s-item[data-type="consumable"]{ background-color:rgba(37,99,235,0.08); }
+  .s-item[data-type="implant"]{ background-color:rgba(124,58,237,0.08); }
+  .s-item[data-type="table_attach"]{ background-color:rgba(217,119,6,0.08); }
+  .s-item[data-type="medical_device"]{ background-color:rgba(15,118,110,0.08); }
+  .s-item[data-type="instrument_tray"]{ background-color:rgba(67,56,202,0.08); }
+  .s-item[data-type="single_pack"]{ background-color:rgba(219,39,119,0.08); }
+
+  .s-item{ position:relative; padding-bottom:34px; }
+  .s-item .s-type{
+    position:absolute; left:8px; bottom:6px;
+    font-size:10px; font-weight:800; letter-spacing:.2px;
+    padding:3px 6px; border-radius:6px; border:1px solid rgba(0,0,0,.08);
+    background:#f8fafc; color:#111827;
+  }
+  .s-item[data-type="consumable"] .s-type{ background:rgba(37,99,235,.12); border-color:rgba(37,99,235,.25); }
+  .s-item[data-type="implant"] .s-type{ background:rgba(124,58,237,.12); border-color:rgba(124,58,237,.25); }
+  .s-item[data-type="table_attach"] .s-type{ background:rgba(217,119,6,.12); border-color:rgba(217,119,6,.25); }
+  .s-item[data-type="medical_device"] .s-type{ background:rgba(15,118,110,.12); border-color:rgba(15,118,110,.25); }
+  .s-item[data-type="instrument_tray"] .s-type{ background:rgba(67,56,202,.12); border-color:rgba(67,56,202,.25); }
+  .s-item[data-type="single_pack"] .s-type{ background:rgba(219,39,119,.12); border-color:rgba(219,39,119,.25); }
+
+
+  /* === Storage tab tile color coding === */
+  .s-item[data-type="consumable"]{ background-color:rgba(37,99,235,0.08); }
+  .s-item[data-type="implant"]{ background-color:rgba(124,58,237,0.08); }
+  .s-item[data-type="table_attach"]{ background-color:rgba(217,119,6,0.08); }
+  .s-item[data-type="medical_device"]{ background-color:rgba(15,118,110,0.08); }
+  .s-item[data-type="instrument_tray"]{ background-color:rgba(67,56,202,0.08); }
+  .s-item[data-type="single_pack"]{ background-color:rgba(219,39,119,0.08); }
+
+  .s-item{ position:relative; padding-bottom:34px; }
+  .s-item .s-type{
+    position:absolute; left:8px; bottom:6px;
+    font-size:10px; font-weight:800; letter-spacing:.2px;
+    padding:3px 6px; border-radius:6px; border:1px solid rgba(0,0,0,.08);
+    background:#f8fafc; color:#111827;
+  }
+  .s-item[data-type="consumable"] .s-type{ background:rgba(37,99,235,.12); border-color:rgba(37,99,235,.25); }
+  .s-item[data-type="implant"] .s-type{ background:rgba(124,58,237,.12); border-color:rgba(124,58,237,.25); }
+  .s-item[data-type="table_attach"] .s-type{ background:rgba(217,119,6,.12); border-color:rgba(217,119,6,.25); }
+  .s-item[data-type="medical_device"] .s-type{ background:rgba(15,118,110,.12); border-color:rgba(15,118,110,.25); }
+  .s-item[data-type="instrument_tray"] .s-type{ background:rgba(67,56,202,.12); border-color:rgba(67,56,202,.25); }
+  .s-item[data-type="single_pack"] .s-type{ background:rgba(219,39,119,.12); border-color:rgba(219,39,119,.25); }
+
+
+  /* === Storage tiles color coding via data-type === */
+  .item{ position:relative; padding-bottom:34px; }
+  .item::after{
+    content: attr(data-type);
+    position:absolute; left:8px; bottom:6px;
+    font-size:10px; font-weight:800; letter-spacing:.2px;
+    padding:3px 6px; border-radius:6px; border:1px solid rgba(0,0,0,.08);
+    background:#f8fafc; color:#111827;
+    text-transform:none;
+  }
+  .item[data-type="Consumable"]{ background-color:rgba(37,99,235,0.08); }
+  .item[data-type="Implant"]{ background-color:rgba(124,58,237,0.08); }
+  .item[data-type="Table & Attachments"]{ background-color:rgba(217,119,6,0.08); }
+  .item[data-type="Medical Device"]{ background-color:rgba(15,118,110,0.08); }
+  .item[data-type="Instrument Tray"]{ background-color:rgba(67,56,202,0.08); }
+  .item[data-type="Single Pack"]{ background-color:rgba(219,39,119,0.08); }
+
+
+/* === Storage tiles: color tint + bottom-left badge via ::after === */
+.item{ position:relative; padding-bottom:34px; }
+.item::after{
+  content: attr(data-type);
+  position:absolute; left:8px; bottom:6px;
+  font-size:10px; font-weight:800; letter-spacing:.2px;
+  padding:3px 6px; border-radius:6px; border:1px solid rgba(0,0,0,.08);
+  background:#f8fafc; color:#111827;
+}
+.item[data-type="Consumable"], .item[data-type="consumable"], .item[data-type="consumable" i]{ background-color:rgba(37,99,235,0.08); }
+.item[data-type="Implant"], .item[data-type="implant"], .item[data-type="implant" i]{ background-color:rgba(124,58,237,0.08); }
+.item[data-type="Table & Attachments"], .item[data-type="table_attach"], .item[data-type="table attachments" i]{ background-color:rgba(217,119,6,0.08); }
+.item[data-type="Medical Device"], .item[data-type="medical_device"], .item[data-type="medical device" i]{ background-color:rgba(15,118,110,0.08); }
+.item[data-type="Instrument Tray"], .item[data-type="instrument_tray"], .item[data-type="instrument tray" i]{ background-color:rgba(67,56,202,0.08); }
+.item[data-type="Single Pack"], .item[data-type="single_pack"], .item[data-type="single pack" i]{ background-color:rgba(219,39,119,0.08); }
+
+.item[data-type="Consumable"]::after, .item[data-type="consumable"]::after{ background:rgba(37,99,235,.12); border-color:rgba(37,99,235,.25); }
+.item[data-type="Implant"]::after, .item[data-type="implant"]::after{ background:rgba(124,58,237,.12); border-color:rgba(124,58,237,.25); }
+.item[data-type="Table & Attachments"]::after, .item[data-type="table_attach"]::after{ background:rgba(217,119,6,.12); border-color:rgba(217,119,6,.25); }
+.item[data-type="Medical Device"]::after, .item[data-type="medical_device"]::after{ background:rgba(15,118,110,.12); border-color:rgba(15,118,110,.25); }
+.item[data-type="Instrument Tray"]::after, .item[data-type="instrument_tray"]::after{ background:rgba(67,56,202,.12); border-color:rgba(67,56,202,.25); }
+.item[data-type="Single Pack"]::after, .item[data-type="single_pack"]::after{ background:rgba(219,39,119,.12); border-color:rgba(219,39,119,.25); }
+
+
+  /* === Storage tiles: full tint + auto badge === */
+  .item{ position:relative; padding-bottom:34px; }
+  .item::after{
+    content: attr(data-type);
+    position:absolute; left:8px; bottom:6px;
+    font-size:10px; font-weight:800; letter-spacing:.2px;
+    padding:3px 6px; border-radius:6px; border:1px solid rgba(0,0,0,.08);
+    background:#f8fafc; color:#111827; text-transform:capitalize;
+  }
+  .item[data-type="consumable"], .item[data-type="Consumable"]{ background-color:rgba(37,99,235,0.08); }
+  .item[data-type="implant"], .item[data-type="Implant"]{ background-color:rgba(124,58,237,0.08); }
+  .item[data-type="table_attach"], .item[data-type="Table & Attachments"], .item[data-type="Table Attachments"]{ background-color:rgba(217,119,6,0.08); }
+  .item[data-type="medical_device"], .item[data-type="Medical Device"]{ background-color:rgba(15,118,110,0.08); }
+  .item[data-type="instrument_tray"], .item[data-type="Instrument Tray"]{ background-color:rgba(67,56,202,0.08); }
+  .item[data-type="single_pack"], .item[data-type="Single Pack"]{ background-color:rgba(219,39,119,0.08); }
+
+
+  /* Size line under main label */
+  .m-size, .item .size{ text-align:center; font-weight:700; font-size:0.9em; margin:0 auto 6px auto; }
+
+  /* Color hints for type filter pills at the top (drawers) */
+  .chip.type-consumable{ background:rgba(37,99,235,.18); color:#1e3a8a; }
+  .chip.type-implant{ background:rgba(124,58,237,.18); color:#4c1d95; }
+  .chip.type-table_attach{ background:rgba(217,119,6,.18); color:#78350f; }
+  .chip.type-medical_device{ background:rgba(15,118,110,.18); color:#064e3b; }
+  .chip.type-instrument_tray{ background:rgba(67,56,202,.18); color:#1e1b4b; }
+  .chip.type-single_pack{ background:rgba(219,39,119,.18); color:#831843; }
+
+
+  /* Storage item: prevent overlap with top-right controls */
+  .item{ position:relative; padding-top:10px; }
+  .item .name{ text-align:center; margin:0 auto 2px auto; }
+  .item .size{ text-align:center; font-weight:700; font-size:0.9em; margin:0 auto 6px auto; }
+
+  /* Turn "Remove" mini button into a minus icon and avoid text overflow */
+  .mini.danger[data-action="remove"]{ font-size:0; padding:6px 10px; }
+  .mini.danger[data-action="remove"]::before{ content:"\2212"; font-size:16px; font-weight:900; line-height:1; }
+
+  /* Extra: ensure level-dot doesn't sit over text */
+  .item .level-dot{ z-index:2; }
+
+
+  /* --- Storage Map: location row improvements --- */
+  .room header{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    justify-content:flex-start;
+  }
+  .room .bar{ align-items:flex-start; }
+  .room .title{
+    white-space:normal;
+    overflow:visible;
+    overflow-wrap:anywhere;
+    text-overflow:initial;
+    background:#00e5ff; /* neon blue */
+    color:#000;
+    font-weight:800;
+    padding:8px 10px;
+    border-radius:10px;
+    display:inline-block;
+    max-width:100%;
+  }
+  .room .kind{ margin-left:8px; }
+  .room header .actions{
+    margin-top:10px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+
+  /* --- Light grey action pills/buttons --- */
+  .room header .actions{ display:flex; flex-direction:column; align-items:flex-start; gap:8px; }
+  .room header .actions .count,
+  .room header .actions .mini{
+    background:#f3f4f6;
+    border:1px solid #e5e7eb;
+    color:#111827;
+  }
+  .room header .actions .mini.danger{ background:#f3f4f6; border-color:#e5e7eb; color:#111827; }
+
+  /* Spinner-style control for + / - storage */
+  .storage-controls{ display:flex; justify-content:flex-start; }
+  .storage-spinner{
+    display:inline-flex; align-items:center; gap:10px;
+    background:#f3f4f6; border:1px dashed #d1d5db; padding:10px 14px; border-radius:12px;
+  }
+  .storage-spinner .spin-btn{
+    width:28px; height:28px; border-radius:9999px; border:1px solid #d1d5db; background:#fff;
+    font-weight:900; line-height:1; font-size:18px; cursor:pointer;
+  }
+  .storage-spinner .spin-label{ font-weight:700; }
+
+
+  /* Horizontal action row + button styling */
+  .room header .actions{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .room header .actions .mini{appearance:none; border:0; background:#e5e7eb; color:#111827; padding:6px 10px; border-radius:10px; font-weight:600; cursor:pointer}
+  .room header .actions .mini.edit{background:#3b82f6; color:#fff}
+  .room header .actions .mini.danger{background:transparent; color:#ef4444; border:1.5px solid #ef4444}
+
+</style>
+  <link rel="manifest" href="manifest.webmanifest">
+<style>
+/* === Light Yellow Storage Tile === */
+.storage-tile{
+  background: #FFF9DB;          /* light yellow */
+  border: 1px solid #FFE8A3;    /* yellow border */
+  border-radius: 20px;
+  padding: 16px 18px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  transition: box-shadow .2s ease, transform .06s ease;
+}
+.storage-tile:hover{
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  transform: translateY(-1px);
+}
+.storage-tile h3{
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.15;
+  font-weight: 800;
+}
+.storage-tile small{
+  display: block;
+  color: #6b7280;
+  margin-top: 2px;
+  font-weight: 600;
+}
+.tile-dot{
+  width: 36px; height: 36px;
+  border-radius: 999px;
+  background: white;
+  border: 2px solid #FFE8A3;
+  display: grid; place-items: center;
+  font-weight: 800;
+}
+/* === End storage tile === */
 </style>
 </head>
 <body>
@@ -376,6 +708,10 @@
                   <button data-v="low">🔴 Low</button>
                 </div>
               </div>
+            </div>
+            <div class="row-2">
+              <div class="field"><label>Image link upload</label><input id="r_image" placeholder="https://... (Drive, SharePoint, etc.)"></div>
+              <div class="field" id="trayListField" style="display:none"><label>Instrument list link (login required)</label><input id="r_trayList" placeholder="e.g. https://synergy.trak/... (requires login)"></div>
             </div>
             <div class="row">
               <div class="field" style="grid-column:1/-1"><label>Notes</label><textarea id="r_notes" rows="4" placeholder="Optional notes (size, lot, expiry, packaging, pairing, etc.)"></textarea></div>
@@ -509,7 +845,7 @@
           </div>
         </header>
         <div class="body">
-          <div class="app-storage">
+          <div class"app-storage storage-tile">
             <div><div id="roomGrid" class="room-grid"></div></div>
             <div class="detail">
               <header>
@@ -751,15 +1087,16 @@ function renderInventoryMobile(list){
       const storageName = sObj?.name || ''; const roomName = sObj?.location || '';
       const loc = roomName ? `${roomName}${storageName?(' • '+storageName):''}${it?.location?.drawer?(' • '+it.location.drawer):''}${it?.location?.slot?(' • '+it.location.slot):''}` : 'Unplaced';
       const cls = __statusClass(it);
-      return `<button class="m-item ${cls}" type="button" data-id="${it.id}">
+      return `<button class=\"m-item ${cls}\" type=\"button\" data-id=\"${it.id}\" data-type=\"${escapeHtml(it.type||'')}\">
         <span class="m-var">${varianceLabel(it.usage, it.qty, it.max)}</span>
         <span class="m-dot" aria-hidden="true"></span>
         <div class="m-txt">
-          <div class="m-name">${escapeHtml(it.name||'')}</div>
+          <div class="m-name">${escapeHtml(it.name||"")}</div><div class="m-size">${escapeHtml(it.size||'')}</div>
           <div class="m-sub">${escapeHtml(it.system||'')}</div>
-          <div class="m-loc">${(roomName===UNPLACED_ROOM || sObj?.id===UNPLACED_STORAGE_ID) ? '<span class="unplaced-label">Unplaced</span>' : escapeHtml(loc)}</div>
+          <div class="m-loc">${(roomName===UNPLACED_ROOM || sObj?.id===UNPLACED_STORAGE_ID) ? '<span class="unplaced-label">Unplaced</span>' : escapeHtml(loc)}</div>${it.image?`<div class="m-actions"><a href="${escapeHtml(it.image)}" target="_blank" rel="noopener noreferrer">View Image</a>${it.type==="instrument_tray" && it.trayList?` • <a href="${escapeHtml(it.trayList)}" target="_blank" rel="noopener noreferrer">Instrument list (login)</a>`:""}</div>`:""}
         </div>
         <div class="m-badge">${it.qty||0}</div>
+        <span class="m-type">${escapeHtml((it.type||"").replace(/_/g," ").replace(/^\w/,c=>c.toUpperCase()))}</span>
         <div class="m-details">
           <div class="m-chips">
             <span class="m-chip">SKU: ${escapeHtml(it.sku||'')}</span>
@@ -839,8 +1176,8 @@ function renderInventoryMobile(list){
 
   $('#r_clear').addEventListener('click', ()=>{
     $('#r_supplier').value=''; $('#r_name').value=''; $('#r_system').value=''; $('#r_type').value='consumable';
-    $('#r_size').value=''; $('#r_qty').value=0; $('#r_rop').value=0; $('#r_min').value=0; $('#r_max').value=0; $('#r_sku').value=''; $('#r_notes').value='';
-    usage='medium'; $$('#r_usage_seg button').forEach(b=>b.classList.toggle('active', b.dataset.v==='medium'));
+    $('#r_size').value=''; $('#r_qty').value=0; $('#r_rop').value=0; $('#r_min').value=0; $('#r_max').value=0; $('#r_sku').value=''; $('#r_notes').value=''; $('#r_image').value=''; $('#r_trayList').value='';
+            usage='medium'; if(window.__toggleTrayField) window.__toggleTrayField();; $$('#r_usage_seg button').forEach(b=>b.classList.toggle('active', b.dataset.v==='medium'));
   });
 
   $('#r_save').addEventListener('click', async ()=>{
@@ -854,7 +1191,9 @@ function renderInventoryMobile(list){
     const min=Number($('#r_min').value||0);
     const max=Number($('#r_max').value||0);
     const sku=$('#r_sku').value.trim();
-    const notes=$('#r_notes').value.trim();
+            const image=($('#r_image')?.value||'').trim();
+            const trayList=($('#r_trayList')?.value||'').trim();
+            const notes=$('#r_notes').value.trim();
     const storageId=$('#r_storage').value;
     const drawer=$('#r_drawer').value || null;
     const slot=$('#r_slot').value ? Number($('#r_slot').value) : null;
@@ -969,10 +1308,10 @@ function renderInventory(){
       const roomName = sObj?.location || '';
       const lev = level(it);
       const updated = tsToStr(it.updatedAt);
-      return `<tr data-id="${it.id}">
+      return `<tr data-id=\"${it.id}\" data-type=\"${escapeHtml(it.type||'')}\">
         <td class="sel-cell"><input class="invSel" type="checkbox"></td>
         <td class="mono">${escapeHtml(it.sku||'')}</td>
-        <td><strong>${escapeHtml(it.name||'')}</strong></td>
+        <td>${it.image?`<a href="${escapeHtml(it.image)}" target="_blank" rel="noopener noreferrer"><strong>${escapeHtml(it.name||"")}</strong></a>`:`<strong>${escapeHtml(it.name||"")}</strong>`}${(it.type==="instrument_tray" && it.trayList)?`<div><a href="${escapeHtml(it.trayList)}" target="_blank" rel="noopener noreferrer" class="mini">Instrument list (login)</a></div>`:""}</td>
         <td>${escapeHtml(it.supplier||'')}<div style="color:var(--muted);font-size:12px">${escapeHtml(it.system||'')}</div></td>
         <td>${escapeHtml(it.type||'')}<div style="color:var(--muted);font-size:12px">${escapeHtml(it.size||'')}</div></td>
         <td>${(sObj?.id===UNPLACED_STORAGE_ID || roomName===UNPLACED_ROOM) ? '<span class="unplaced-label">Unplaced</span>' : (escapeHtml(roomName) + '<div style="color:var(--muted);font-size:12px">' + escapeHtml(storageName)   + (it?.location?.drawer?(' • '+escapeHtml(it.location.drawer)) : '')   + (it?.location?.slot?(' • '+escapeHtml(it.location.slot)) : '') + '</div>')}</td>
@@ -1083,8 +1422,8 @@ function renderInventory(){
             <div class="title">${roomName===UNPLACED_ROOM?'Unplaced':escapeHtml(roomName)}${roomName===UNPLACED_ROOM?'':(kind?`<span class="kind">• ${escapeHtml(kind)}</span>`:'')}${roomName===UNPLACED_ROOM?'':(floor?`<span class="kind">• ${escapeHtml(floor)}</span>`:'')}</div>
           </div>
           <div class="actions">
-            <span class="count">${(storages.filter(s=>s.location===roomName).length)} storage</span>
-            ${roomName===UNPLACED_ROOM?'':`<button class="mini" data-action="edit">Edit</button><button class="mini danger" data-action="remove">Remove</button>`}
+            <span class="count">${(()=>{const n=storages.filter(s=>s.location===roomName).length; return n+" "+(n===1?"Storage":"Storages");})()}</span>
+            ${roomName===UNPLACED_ROOM?'':`<button class="mini edit" data-action="edit">Edit</button><button class="mini danger" data-action="remove">Remove</button>`}
           </div>
         </header>
         <div class="list"></div>`;
@@ -1112,13 +1451,15 @@ function renderInventory(){
       });
 
       if(roomName!==UNPLACED_ROOM){
-        const controls=document.createElement('div'); controls.style.display='flex'; controls.style.gap='8px';
-        const add=document.createElement('button'); add.className='add-storage'; add.textContent='+ New storage';
-        add.onclick=()=>openCreateStorage(roomName);
-        const rem=document.createElement('button'); rem.className='add-storage'; rem.textContent='− Remove';
-        rem.onclick=()=>removeSelectedStorage(roomName);
-        controls.appendChild(add); controls.appendChild(rem);
-        listEl.appendChild(controls);
+        const controls=document.createElement('div'); controls.className='storage-controls';
+controls.innerHTML=`<div class"storage-spinner storage-tile">
+  <button class="spin-btn plus" aria-label="Add storage">+</button>
+  <span class="spin-label">Storage</span>
+  <button class="spin-btn minus" aria-label="Remove storage">−</button>
+</div>`;
+controls.querySelector('.plus').onclick=()=>openCreateStorage(roomName);
+controls.querySelector('.minus').onclick=()=>removeSelectedStorage(roomName);
+listEl.appendChild(controls);
       }
     });
   }
@@ -1168,16 +1509,28 @@ function renderInventory(){
   }
 
   function renderItemBox(it){
-    const box=document.createElement('div'); box.className='item'; box.draggable=true;
-    box.innerHTML=`<div class="name">${escapeHtml(it.name)}</div><div class="meta">${escapeHtml(it.sku)} • ${escapeHtml(it.supplier)} • ${escapeHtml(it.type)} • Qty ${it.qty}</div><span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>`;
+    const box=document.createElement('div'); box.className='item'; box.setAttribute('data-type',(it.type||'')); box.draggable=true;
+    box.innerHTML=`<div class="name">${escapeHtml(it.name)}</div><div class="size">${escapeHtml(it.size||"")}</div><div class="meta sm-center"><div class="sm-ref mono">${escapeHtml(it.sku||"")}</div><div class="sm-sys">${escapeHtml(it.system||"")}</div><div class="sm-qty">Qty ${it.qty||0}</div></div>
+      ${ it.image ? `<div class="drawer-actions" aria-label="links">
+        <a draggable="false" href="${escapeHtml(it.image)}" target="_blank" rel="noopener noreferrer">View Image</a>
+        ${ (it.type==='instrument_tray' && it.trayList) ? ` • <a draggable="false" href="${escapeHtml(it.trayList)}" target="_blank" rel="noopener noreferrer">Instrument list (login)</a>` : ``}
+      </div>` : `` }
+    <span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>`;
     box.addEventListener('dragstart',(e)=>{ state.draggingItemId=it.id; e.dataTransfer.setData('text/plain',it.id); e.dataTransfer.effectAllowed='move'; });
     box.addEventListener('dragend',()=>{ state.draggingItemId=null; document.querySelectorAll('.drop-over').forEach(el=>el.classList.remove('drop-over')); });
     box.addEventListener('dblclick',()=>editItemPrompt(it));
     return box;
   }
   function renderItemCard(it){
-    const card=document.createElement('div'); card.className='item'; card.style.minHeight='unset'; card.draggable=true; card.style.position='relative';
-    card.innerHTML=`<button type="button" class="mini remove-item" style="position:absolute; right:6px; top:6px;">Remove</button><div class="name">${escapeHtml(it.name)}</div><div class="meta">${escapeHtml(it.sku)} • ${escapeHtml(it.supplier)} • ${escapeHtml(it.type)} • Qty ${it.qty}</div><span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>`;
+    const card=document.createElement('div'); card.className='item'; card.setAttribute('data-type',(it.type||'')); card.style.minHeight='unset'; card.draggable=true; card.style.position='relative';
+    card.innerHTML=`<button type="button" class="mini remove-item" style="position:absolute; right:28px; top:6px;">&minus;</button><div class="name">${escapeHtml(it.name)}</div><div class="size">${escapeHtml(it.size||"")}</div><div class="meta sm-center"><div class="sm-ref mono">${escapeHtml(it.sku||"")}</div><div class="sm-sys">${escapeHtml(it.system||"")}</div><div class="sm-qty">Qty ${it.qty||0}</div></div><span class="level-dot ${level(it)}" style="position:absolute;right:6px;top:6px"></span>
+    ${ (it.image || (it.type==='instrument_tray' && it.trayList)) ?
+        `<div class="card-actions">
+           ${it.image ? `<a href="${escapeHtml(it.image)}" target="_blank" rel="noopener noreferrer">View Image</a>` : ``}
+           ${ (it.type==='instrument_tray' && it.trayList) ? ` • <a href="${escapeHtml(it.trayList)}" target="_blank" rel="noopener noreferrer">Instrument list (login)</a>` : ``}
+         </div>`
+      : `` }
+`;
     card.addEventListener('dragstart',(e)=>{ state.draggingItemId=it.id; e.dataTransfer.setData('text/plain',it.id); e.dataTransfer.effectAllowed='move'; });
     card.addEventListener('dragend',()=>{ state.draggingItemId=null; document.querySelectorAll('.drop-over').forEach(el=>el.classList.remove('drop-over')); });
     card.addEventListener('dblclick',()=>editItemPrompt(it));
@@ -1580,6 +1933,445 @@ document.addEventListener('click', async function(e){
   }
 });
 </script>
+
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const typeMap = {
+    "consumable":"consumable",
+    "instrument tray":"instrument_tray",
+    "single pack":"single_pack",
+    "implant":"implant",
+    "medical device":"medical_device",
+    "table & attachments":"table_attach",
+    "table attachments":"table_attach"
+  };
+  const candidates = document.querySelectorAll('.chip, .pill, .filter-chip, .type-chip, .tag');
+  candidates.forEach(el => {
+    const txt = (el.textContent||"").trim().toLowerCase();
+    if (typeMap[txt]) {
+      el.classList.add('type-' + typeMap[txt]);
+    }
+  });
+});
+</script>
+
+
+<style>
+/* === Overrides: horizontal action buttons + visible 'Remove' text === */
+.room header .actions { display:flex !important; flex-direction:row !important; align-items:center; gap:8px; flex-wrap:wrap; }
+.room header .actions .mini { font-size:14px !important; }
+.mini.danger[data-action="remove"] { font-size:inherit !important; padding:6px 10px; }
+.mini.danger[data-action="remove"]::before { content:none !important; }
+.mini.danger[data-action="remove"] { background:transparent; color:#ef4444; border:1.5px solid #ef4444; }
+</style>
+
+
+<style>
+/* === Tile size + layout overrides === */
+.storage-tile {
+  padding: 6px 8px !important;
+  min-height: 46px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+}
+.storage-tile .name { font-weight:700; font-size:13px !important; }
+.storage-tile .type,
+.storage-tile .size,
+.storage-tile .meta { font-size:11px !important; line-height:1.3; }
+
+/* Green status dot fix */
+.level-dot {
+  position:absolute !important;
+  top:6px !important;
+  right:6px !important;
+  width:10px !important;
+  height:10px !important;
+}
+
+/* Remove button inside tile */
+.mini.remove-item {
+  position:absolute !important;
+  top:6px !important;
+  right:22px !important; /* shift left so it doesn’t overlap green dot */
+  font-size:12px !important;
+  padding:4px 6px !important;
+  border-radius:6px !important;
+}
+</style>
+
+
+<style>
+/* === Compact storage tile + icon alignment fixes === */
+.storage-tile{ padding:6px 8px !important; min-height:46px !important; border-radius:8px !important; }
+.storage-tile .name{ font-size:13px !important; font-weight:700 !important; }
+.storage-tile .meta, .storage-tile .size, .storage-tile .type{ font-size:11px !important; line-height:1.3 !important; }
+.storage-tile .badge, .type-pill{ font-size:11px !important; padding:2px 8px !important; border-radius:8px !important; }
+.level-dot{ position:absolute !important; top:6px !important; right:6px !important; width:10px !important; height:10px !important; }
+.mini.remove-item{ position:absolute !important; top:6px !important; right:28px !important; font-size:12px !important; padding:4px 6px !important; border-radius:6px !important; z-index:2; }
+</style>
+
+
+<style>
+/* === (1) Storage count: inline chip layout (no overlap) === */
+.storage-tile{
+  display:grid !important;
+  grid-template-columns: 1fr auto !important;
+  grid-template-rows:auto auto !important;
+  grid-template-areas:
+    "name count"
+    "type count" !important;
+  align-items:start !important;
+  gap:2px 10px !important;
+}
+.storage-tile .name{ grid-area:name !important; }
+.storage-tile .type{ grid-area:type !important; }
+.storage-tile .count{
+  grid-area:count !important;
+  position:static !important;
+  display:inline-block !important;
+  align-self:start !important;
+  margin:0 !important;
+  font-size:12px !important;
+  padding:2px 8px !important;
+  border:1px solid var(--accent-200) !important;
+  border-radius:999px !important;
+  background:#fff !important;
+}
+@media (max-width:768px){
+  .storage-tile{ gap:2px 8px !important; }
+  .storage-tile .count{ font-size:11px !important; padding:2px 6px !important; }
+}
+
+/* === (2) Storage: steel label (rooms keep neon) === */
+.detail .title{
+  background:#eef2f7 !important;
+  border:1px solid #d8e1f2 !important;
+  color:#0f172a !important;
+  padding:8px 10px !important;
+  border-radius:10px !important;
+  display:inline-block !important;
+}
+.storage-tile .name{
+  display:inline-block !important;
+  background:#eef2f7 !important;
+  border:1px solid #d8e1f2 !important;
+  padding:4px 8px !important;
+  border-radius:8px !important;
+}
+.detail header + .body .legend,
+.detail .body .legend{ margin-top:4px !important; }
+
+/* === (3) Type chips: match existing palette === */
+.chip.type-consumable, .chip[data-type="consumable"]{
+  background:rgba(37,99,235,.18) !important; color:#1e3a8a !important; border:1px solid rgba(37,99,235,.25) !important;
+}
+.chip.type-implant, .chip[data-type="implant"]{
+  background:rgba(124,58,237,.18) !important; color:#4c1d95 !important; border:1px solid rgba(124,58,237,.25) !important;
+}
+.chip.type-instrument_tray, .chip[data-type="instrument_tray"]{
+  background:rgba(67,56,202,.18) !important; color:#1e1b4b !important; border:1px solid rgba(67,56,202,.25) !important;
+}
+.chip.type-single_pack, .chip[data-type="single_pack"]{
+  background:rgba(219,39,119,.18) !important; color:#831843 !important; border:1px solid rgba(219,39,119,.25) !important;
+}
+.chip.type-medical_device, .chip[data-type="medical_device"]{
+  background:rgba(15,118,110,.18) !important; color:#064e3b !important; border:1px solid rgba(15,118,110,.25) !important;
+}
+.chip.type-table_attach, .chip[data-type="table_attach"]{
+  background:rgba(217,119,6,.18) !important; color:#78350f !important; border:1px solid rgba(217,119,6,.25) !important;
+}
+.legend .chip{ white-space:nowrap !important; }
+</style>
+
+<script>
+// === (4) Auto-upgrade chips: add data-type/class from text ===
+(function(){
+  const map = new Map([
+    ['consumable','consumable'],
+    ['implant','implant'],
+    ['instrument tray','instrument_tray'],
+    ['instrument_tray','instrument_tray'],
+    ['single pack','single_pack'],
+    ['single_pack','single_pack'],
+    ['medical device','medical_device'],
+    ['medical_device','medical_device'],
+    ['table & attachments','table_attach'],
+    ['table attachments','table_attach'],
+    ['table & attach','table_attach'],
+    ['table attach','table_attach']
+  ]);
+  function normalize(t){ return (t||'').toString().trim().toLowerCase(); }
+  function retag(node){
+    const chips = node.querySelectorAll('.chip');
+    chips.forEach(ch => {
+      const key = map.get(normalize(ch.textContent)) || ch.getAttribute('data-type');
+      if(!key) return;
+      ch.setAttribute('data-type', key);
+      ch.classList.add('type-' + key);
+    });
+  }
+  // run once now
+  document.addEventListener('DOMContentLoaded', () => retag(document));
+  // watch for future legend chips
+  const mo = new MutationObserver(muts => muts.forEach(m => m.addedNodes.forEach(n => {
+    if(!(n instanceof HTMLElement)) return;
+    if(n.matches('.chip')) retag(n.parentElement || n);
+    if(n.querySelectorAll) retag(n);
+  })) );
+  mo.observe(document.documentElement, {childList:true, subtree:true});
+})();
+</script>
+
+
+<style>
+/* === Keep storage tile fully light yellow: remove grey label === */
+.storage-tile .name{
+  background: transparent !important;
+  border: none !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+}
+
+/* === Round the + / - storage buttons === */
+#addDrawerBtn.btn,
+#removeDrawerBtn.btn{
+  border-radius: 12px !important;
+  padding: 8px 12px !important;
+}
+
+/* Also catch generic "+ Storage" spinner buttons if present */
+.storage-spinner .spin-btn{
+  border-radius: 999px !important;
+}
+</style>
+
+
+<script>
+(function(){
+  function toggleTrayField(){
+    const typeSel=document.getElementById('r_type');
+    const trayField=document.getElementById('trayListField');
+    const trayInput=document.getElementById('r_trayList');
+    if(!typeSel||!trayField||!trayInput) return;
+    const v=(typeSel.value||'').toLowerCase();
+    const isTray=(v==='instrument_tray'||v==='instrument tray');
+    trayField.style.display=isTray?'block':'none';
+    if(!isTray){ trayInput.value=''; }
+  }
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const typeSel=document.getElementById('r_type');
+    if(typeSel){
+      typeSel.addEventListener('change', toggleTrayField);
+      toggleTrayField();
+    }
+  });
+  window.__toggleTrayField=toggleTrayField;
+})();
+</script>
+
+
+<style>
+.m-actions{margin-top:6px;font-size:12px}
+.m-actions a{display:inline-block;text-decoration:underline}
+.mini-links{margin-top:4px;font-size:12px}
+.mini-links a{text-decoration:underline}
+</style>
+
+
+<style>
+.m-actions{margin-top:6px;font-size:12px}
+.m-actions a{display:inline-block;text-decoration:underline}
+.mini-links{margin-top:6px;font-size:12px}
+.mini-links a{text-decoration:underline}
+</style>
+
+
+<style>
+.card-actions{
+  margin-top:6px;
+  font-size:12px;
+  user-select:auto;
+}
+.card-actions a{
+  text-decoration:underline;
+}
+</style>
+
+
+<style>
+/* Storage Map tile: center ref/system, qty bottom-right */
+.drawer-row .item{ position: relative; }
+.drawer-row .item .meta.sm-center{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; gap:2px; min-height:48px;
+}
+.drawer-row .item .sm-ref.mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+  font-size: 12px;
+}
+.drawer-row .item .sm-sys{ font-size:12px; color: var(--muted,#6b7280); }
+.drawer-row .item .sm-qty{
+  position:absolute; right:8px; bottom:6px; font-weight:700; font-size:12px;
+}
+</style>
+
+
+<style>
+/* Adjust positions so product name is not covered */
+.drawer-row .item .level-dot{
+  left: 6px !important;
+  right: auto !important;
+  top: 6px !important;
+}
+.drawer-row .item .remove-item{
+  right: 6px !important;
+  top: 6px !important;
+}
+</style>
+
+
+<style>
+/* Links only on drawer tiles; keep footprint small to preserve DnD */
+.drawer-row .item .drawer-actions{
+  font-size: 12px;
+  margin: 6px 8px 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.drawer-row .item .drawer-actions a{ text-decoration: underline; }
+</style>
+
+
+<!-- === Up/Down Arrow Reorder (FINAL: robust targeting + floating fallback) === -->
+<style>
+  .room{ position:relative; }
+  .room .mini.move-up, .room .mini.move-down{
+    background:#f3f4f6;
+    border:1px solid #d1d5db;
+    font-size:14px;
+    padding:6px 10px;
+    border-radius:10px;
+    cursor:pointer;
+  }
+  .room .reorder-float{
+    position:absolute; top:10px; right:10px;
+    display:flex; gap:6px; z-index:3;
+    background:rgba(255,255,255,.9);
+    border:1px solid #e5e7eb; border-radius:10px; padding:4px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+  }
+  .room.moved{ animation: pulseMove 400ms ease; }
+  @keyframes pulseMove{ 0%{box-shadow:0 0 0 rgba(37,99,235,0);} 30%{box-shadow:0 0 0 6px rgba(37,99,235,.18);} 100%{box-shadow:0 0 0 rgba(37,99,235,0);}}
+</style>
+<script>
+(function(){
+  const STORAGE_KEY = "roomOrder_arrows_final_v1";
+
+  const saveOrder = ids => { try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(ids)); }catch(e){} };
+  const loadOrder = () => { try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }catch(e){ return []; } };
+
+  function getPanelId(panel){
+    // 1) explicit data-room on inner .bar (most likely in your build)
+    const barData = panel.querySelector('.bar[data-room]');
+    if(barData) return barData.getAttribute('data-room');
+    // 2) data-room on panel
+    if(panel.hasAttribute('data-room')) return panel.getAttribute('data-room');
+    // 3) text inside title
+    const titleEl = panel.querySelector('.title');
+    if(titleEl && titleEl.textContent) return titleEl.textContent.trim();
+    // 4) last resort: index
+    return 'room-' + Array.from(panel.parentElement?.children || []).indexOf(panel);
+  }
+
+  function currentOrder(){
+    return Array.from(document.querySelectorAll('#roomGrid .room'))
+      .map(getPanelId)
+      .filter(Boolean)
+      .filter(id => id !== '__Unplaced__');
+  }
+
+  function applySavedOrder(){
+    const grid = document.getElementById('roomGrid');
+    if(!grid) return;
+    const order = loadOrder();
+    if(!order.length) return;
+    const map = {};
+    grid.querySelectorAll('.room').forEach(p => { const id = getPanelId(p); if(id) map[id] = p; });
+    order.forEach(id => { const p = map[id]; if(p && p.parentElement === grid) grid.appendChild(p); });
+  }
+
+  function movePanel(panel, dir){
+    const grid = document.getElementById('roomGrid');
+    if(!grid || !panel) return;
+    if(dir === 'up'){
+      const prev = panel.previousElementSibling;
+      if(prev && prev.classList.contains('room')) grid.insertBefore(panel, prev);
+    } else if(dir === 'down'){
+      const next = panel.nextElementSibling;
+      if(next && next.classList.contains('room')) grid.insertBefore(next, panel);
+    }
+    panel.classList.add('moved');
+    setTimeout(()=>panel.classList.remove('moved'), 450);
+    saveOrder(currentOrder());
+  }
+
+  function makeBtn(cls, title, click){
+    const b = document.createElement('button');
+    b.className = 'mini ' + cls; b.type = 'button'; b.title = title; b.textContent = cls.includes('up') ? '⬆️' : '⬇️';
+    b.addEventListener('click', click); return b;
+  }
+
+  function ensureButtons(panel){
+    if(!panel) return;
+    // Try the row that contains "Edit"
+    let row = null;
+    const candidates = panel.querySelectorAll('button, .btn');
+    for(const el of candidates){
+      const t = (el.textContent || '').trim().toLowerCase();
+      if(t === 'edit'){ row = el.parentElement; break; }
+    }
+    // Secondary: header .actions
+    if(!row) row = panel.querySelector('header .actions');
+    const up = makeBtn('move-up','Move up',()=>movePanel(panel,'up'));
+    const down = makeBtn('move-down','Move down',()=>movePanel(panel,'down'));
+
+    if(row){
+      if(row.querySelector('.move-up') || row.querySelector('.move-down')) return;
+      row.appendChild(up); row.appendChild(down);
+    }else{
+      // Fallback floating
+      if(panel.querySelector('.reorder-float')) return;
+      const float = document.createElement('div'); float.className = 'reorder-float';
+      float.appendChild(up); float.appendChild(down); panel.appendChild(float);
+    }
+  }
+
+  const mo = new MutationObserver(() => {
+    const grid = document.getElementById('roomGrid'); if(!grid) return;
+    grid.querySelectorAll('.room').forEach(ensureButtons);
+    if(!mo._applied && grid.querySelector('.room')){ mo._applied = true; setTimeout(applySavedOrder, 0); }
+  });
+
+  function start(){
+    const grid = document.getElementById('roomGrid');
+    if(grid){ grid.querySelectorAll('.room').forEach(ensureButtons); applySavedOrder(); }
+    mo.observe(document.body, { childList:true, subtree:true });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', start); } else { start(); }
+})();
+</script>
+<!-- === End Final Reorder === -->
 
 </body>
 </html>

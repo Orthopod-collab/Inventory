@@ -202,7 +202,7 @@ section.panel.active{ display:block }
   display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:8px; align-content:start
 }
 
-/* ===== Unplaced drop (single grid, no partitions) ===== */
+/* ===== Unplaced drop ===== */
 .unplaced-drop{
   border:1px dashed #d8e1f2; border-radius:12px; background:#fff; padding:8px; min-height:120px;
   display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:8px; align-content:start; margin-top:8px;
@@ -229,14 +229,14 @@ section.panel.active{ display:block }
 .item-card.type-medical_device{  background:#DDF1EB; border-color:#B7E4D7 }
 .item-card.type-table_attach{    background:#FFE7CC; border-color:#FFD3A3 }
 
-/* ===== Tri-panel layout =================================================== */
+/* === Tri-panel layout =================================================== */
 .tri-wrap{
-  --leftW: 300px;   /* controlled inline */
-  --midW: 520px;    /* controlled inline */
+  --leftW: 300px;
+  --midW: 520px;
   display:grid;
   grid-template-columns: var(--leftW) 6px var(--midW) 6px 1fr;
   gap:0;
-  height: calc(100vh - 84px); /* leave room for your app header */
+  height: calc(100vh - 84px);
 }
 .tri-col{ overflow:auto; padding:8px 10px 14px 10px }
 .tri-left, .tri-mid, .tri-right{ background:transparent }
@@ -279,60 +279,89 @@ section.panel.active{ display:block }
 .part-controls .mini.icon{ padding:0 8px; height:22px; line-height:22px; border-radius:8px }
 .part-count{ font-size:12px; color:#64748b; font-weight:800 }
 
-/* ===== Desktop (unchanged behavior) ===== */
-.tri-wrap.desktop { display: grid; grid-template-columns: var(--leftW) 6px var(--midW) 6px 1fr; gap: 0; height: 100%; min-height: 0; }
-.tri-col { min-width: 0; }
+/* ===== Desktop (unchanged) ===== */
+.tri-wrap.desktop { display:grid; grid-template-columns: var(--leftW) 6px var(--midW) 6px 1fr; gap:0; height:100%; min-height:0; }
+.tri-col { min-width:0; }
 
-/* ===== Mobile: stack columns, hide sizers, sticky toolbars ===== */
+/* ===== Mobile: stack columns, sticky helpers ===== */
 @media (max-width: 900px) {
-  .tri-wrap.mobile { display: block; }
+  .tri-wrap.mobile { display:block; }
+  .v-sizer { display:none !important; }
 
-  .v-sizer { display: none !important; }
-
-  .tri-col { padding: 8px 10px; }
-  .tri-left, .tri-mid, .tri-right { margin-bottom: 8px; }
+  .tri-col { padding:8px 10px; }
+  .tri-left, .tri-mid, .tri-right { margin-bottom:8px; }
 
   .loc-banner, .storage-bar, .sm-toolbar {
-    position: sticky; top: 0; z-index: 10; background: #fff;
+    position:sticky; top:0; z-index:10; background:#fff;
   }
-  .loc-banner { top: 0; padding: 8px 10px; }
-  .storage-bar { top: 44px; padding: 8px 10px; }
-  .sm-toolbar  { top: 0;  padding: 6px 8px; }
+  .loc-banner { top:0; padding:8px 10px; }
+  .storage-bar { top:44px; padding:8px 10px; }
+  .sm-toolbar  { top:0; padding:6px 8px; }
 
-  .storage-tile, .item-card { padding: 12px 14px; border-radius: 14px; }
-
-  .sm-toolbar .search input { width: 100%; font-size: 16px; padding: 10px 12px; }
+  .storage-tile, .item-card { padding:12px 14px; border-radius:14px; }
+  .sm-toolbar .search input { width:100%; font-size:16px; padding:10px 12px; }
 
   .drawer-row .partitions {
-    display: grid !important;
+    display:grid !important;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 8px;
+    gap:8px;
   }
-  .drawer-row .part-col { min-width: 0; }
-  .drawer-row .part-cap { font-size: 12px; color: #64748b; margin-bottom: 6px; }
+  .drawer-row .part-col { min-width:0; }
+  .drawer-row .part-cap { font-size:12px; color:#64748b; margin-bottom:6px; }
   .part-drop {
-    min-height: 80px; padding: 8px; border-radius: 12px;
-    border: 1px dashed #cbd5e1; background: #f8fafc;
+    min-height:80px; padding:8px; border-radius:12px;
+    border:1px dashed #cbd5e1; background:#f8fafc;
   }
 
   .drawer-label {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 10px; padding: 8px 10px; border-radius: 10px; background: #f1f5f9; margin-bottom: 6px;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; padding:8px 10px; border-radius:10px; background:#f1f5f9; margin-bottom:6px;
   }
-  .drawer-label .part-controls { display: inline-flex; align-items: center; gap: 8px; }
-  .drawer-label .part-count { min-width: 28px; text-align: center; font-weight: 700; }
-  .drawer-label button.mini.icon { padding: 6px 10px; line-height: 1; border: 1px solid #e2e8f0; border-radius: 8px; }
+  .drawer-label .part-controls { display:inline-flex; align-items:center; gap:8px; }
+  .drawer-label .part-count { min-width:28px; text-align:center; font-weight:700; }
+  .drawer-label button.mini.icon { padding:6px 10px; line-height:1; border:1px solid #e2e8f0; border-radius:8px; }
 
-  .storage-bar { display: flex; gap: 8px; flex-wrap: wrap; }
-  .storage-bar .name { font-size: 16px; }
-  .storage-bar .meta { font-size: 12px; }
-  .storage-bar button.mini { padding: 8px 10px; }
+  .storage-bar { display:flex; gap:8px; flex-wrap:wrap; }
+  .storage-bar .name { font-size:16px; }
+  .storage-bar .meta { font-size:12px; }
+  .storage-bar button.mini { padding:8px 10px; }
 
-  .tri-right .detail-body { max-height: none !important; }
-
-  .unplaced-drop { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  .tri-right .detail-body { max-height:none !important; }
+  .unplaced-drop { display:grid; grid-template-columns:1fr; gap:8px; }
 }
 
 @media (max-width: 480px) {
   .drawer-row .partitions { grid-template-columns: 1fr 1fr; }
 }
+
+/* ======== NEW: Mobile tabs (Locations / Unplaced / Storages) ======== */
+.mobile-tabs{
+  position:sticky; top:0; z-index:11;
+  display:grid; grid-template-columns:repeat(3,1fr); gap:6px;
+  padding:8px 10px; background:#fff; border-bottom:1px solid var(--border);
+}
+.mobile-tabs button{
+  appearance:none; border:1px solid #e6e8f0; background:#f4f6fb; color:#0f172a;
+  border-radius:9999px; padding:10px 12px; font-weight:700; font-size:14px; cursor:pointer;
+}
+.mobile-tabs button.on{
+  background:linear-gradient(90deg,#662D91,#F15A29); color:#fff; border-color:transparent;
+  box-shadow:0 4px 12px rgba(101,45,145,.25);
+}
+
+/* ======== NEW: Tap-to-assign bottom sheet ======== */
+.sheet-backdrop{
+  position:fixed; inset:0; background:rgba(2,6,23,.35); z-index:50;
+  display:flex; align-items:flex-end;
+}
+.sheet{
+  width:100%; background:#fff; border-radius:16px 16px 0 0;
+  box-shadow:0 -12px 40px rgba(0,0,0,.25);
+  padding:14px 16px 16px; max-height:85vh; overflow:auto;
+  animation:sheetRise .18s ease-out;
+}
+@keyframes sheetRise { from{ transform:translateY(12px); opacity:.9 } to{ transform:translateY(0); opacity:1 } }
+.sheet-head{ margin-bottom:10px }
+.sheet-title{ font-weight:900; font-size:18px }
+.sheet-sub{ color:#475569; font-size:12px }
+.sheet-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:12px }

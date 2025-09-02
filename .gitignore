@@ -1,0 +1,8 @@
+﻿# Dependencies
+node_modules
+# Build output
+dist
+# Secrets
+*.env
+*.env.*
+*firebase-adminsdk-*.json

@@ -2,13 +2,13 @@ import React, {
   useEffect, useMemo, useRef, useState, useLayoutEffect
 } from 'react';
 import {
-  addDoc, collection, deleteDoc, doc, serverTimestamp, setDoc, updateDoc, writeBatch
+  addDoc, collection, doc, serverTimestamp, setDoc, updateDoc, writeBatch
 } from 'firebase/firestore';
 import { db } from '../firebase';
 
 /* ---------- Shared helpers ---------- */
 const clean = v => String(v ?? '').trim();
-const titleCase = s => String(s || '').replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+const titleCase = s => String(s||'').replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
 const UNPLACED = '__unplaced__';
 const safeId = () =>
   (typeof crypto !== 'undefined' && crypto.randomUUID)
@@ -35,14 +35,35 @@ const nextDrawerLabelFrom = (labels=[])=>{
   return incAlpha(alphas[alphas.length-1]);
 };
 
+/* normalize drawers utility (used by storages panel + move sheet) */
+const normalizeDrawers = (raw) => {
+  const arr = Array.isArray(raw) ? raw : [];
+  return arr.map(d => {
+    if (typeof d === 'string' || typeof d === 'number') {
+      const label = String(d).toUpperCase();
+      return { label, defaultPartitions: undefined };
+    }
+    if (d && typeof d === 'object') {
+      const lbl = (d.label ?? d.name ?? '').toString().toUpperCase();
+      const parts = Number(d.partitions);
+      return {
+        label: lbl,
+        defaultPartitions: Number.isFinite(parts) && parts > 0 ? parts : undefined
+      };
+    }
+    return { label: String(d).toUpperCase(), defaultPartitions: undefined };
+  }).filter(x => x.label);
+};
+
 /* ---------- Item card ---------- */
-function ItemCard({ it }) {
+function ItemCard({ it, onTapAssign, isMobile }) {
   const cls = `item-card ${it?.type ? ('type-'+String(it.type).replace(/\s+/g,'_')) : ''}`;
   return (
     <div
       className={cls}
-      draggable
-      onDragStart={(e)=>e.dataTransfer.setData('text/plain', JSON.stringify({ id: it.id, name: it.name }))}
+      draggable={!isMobile}
+      onDragStart={(e)=>!isMobile && e.dataTransfer.setData('text/plain', JSON.stringify({ id: it.id, name: it.name }))}
+      onClick={()=> isMobile && onTapAssign?.(it)}
       title={`${it.sku||''}${it.supplier?(' • '+it.supplier):''}`}
     >
       <div className="ic-name">{it.name}</div>
@@ -55,7 +76,7 @@ function ItemCard({ it }) {
 }
 
 /* ---------- Unplaced column ---------- */
-function UnplacedColumn({ items, query, setQuery, onDropHere }) {
+function UnplacedColumn({ items, query, setQuery, onDropHere, isMobile, onTapAssign }) {
   const list = useMemo(()=>{
     const q = clean(query).toLowerCase();
     const src = items.filter(x => {
@@ -84,17 +105,19 @@ function UnplacedColumn({ items, query, setQuery, onDropHere }) {
 
       <div
         className="unplaced-drop"
-        onDragOver={(e)=>e.preventDefault()}
-        onDrop={onDropHere}
+        onDragOver={(e)=>!isMobile && e.preventDefault()}
+        onDrop={e=>!isMobile && onDropHere(e)}
       >
-        {list.map(it => <ItemCard key={it.id} it={it} />)}
+        {list.map(it => (
+          <ItemCard key={it.id} it={it} isMobile={isMobile} onTapAssign={onTapAssign} />
+        ))}
       </div>
     </div>
   );
 }
 
-/* ---------- Drawer row (letters for drawer, numbers for partitions) ---------- */
-function DrawerRow({ storage, label, list, partCount, setPartCount }) {
+/* ---------- Drawer row ---------- */
+function DrawerRow({ storage, label, list, partCount, setPartCount, isMobile, onTapAssign }) {
   const sId = storage.id;
 
   const handleDropTo = (drawer, partIndex) => async (e) => {
@@ -116,7 +139,6 @@ function DrawerRow({ storage, label, list, partCount, setPartCount }) {
   return (
     <div className="drawer-section">
       <div className="drawer-row">
-        {/* Drawer letter */}
         <div className="drawer-label clickable">
           <span>{label}</span>
           <div className="part-controls">
@@ -126,19 +148,25 @@ function DrawerRow({ storage, label, list, partCount, setPartCount }) {
           </div>
         </div>
 
-        {/* partitions = numeric chips */}
         <div className="partitions" style={{ ['--cols']: partCount }}>
           {Array.from({length:partCount}).map((_,i)=>(
             <div key={i} className="part-col">
               <div className="part-cap">{i+1}</div>
               <div
                 className="part-drop"
-                onDragOver={(e)=>e.preventDefault()}
-                onDrop={handleDropTo(label, i)}
+                onDragOver={(e)=>!isMobile && e.preventDefault()}
+                onDrop={e=>!isMobile && handleDropTo(label, i)(e)}
               >
                 {list
                   .filter(x => String(x?.location?.slot||'') === String(i+1))
-                  .map(it => <ItemCard key={it.id} it={it}/>)
+                  .map(it => (
+                    <ItemCard
+                      key={it.id}
+                      it={it}
+                      isMobile={isMobile}
+                      onTapAssign={onTapAssign}
+                    />
+                  ))
                 }
               </div>
             </div>
@@ -149,11 +177,12 @@ function DrawerRow({ storage, label, list, partCount, setPartCount }) {
   );
 }
 
-/* ---------- Right panel: banner + up to 2 storage rows (top/bottom) ---------- */
+/* ---------- Right panel ---------- */
 function StoragesPanel({
   storages, items,
   activeStorages, setActiveStorages,
-  partCfg, setPartCfg
+  partCfg, setPartCfg,
+  isMobile, onTapAssign
 }) {
   const active = activeStorages
     .map(id => storages.find(s => s && s.id === id))
@@ -165,57 +194,10 @@ function StoragesPanel({
     return locs.join(' • ');
   }, [active]);
 
-  const bannerHelper = 'Drag between columns, drawers & partitions';
+  const bannerHelper = 'Drag (desktop) or tap to assign (mobile)';
   const itemsByStorage = (sid) => items.filter(x => x?.location?.storage === sid);
 
-  const normalizeDrawers = (raw) => {
-    const arr = Array.isArray(raw) ? raw : [];
-    return arr.map(d => {
-      if (typeof d === 'string' || typeof d === 'number') {
-        const label = String(d).toUpperCase();
-        return { label, defaultPartitions: undefined };
-      }
-      if (d && typeof d === 'object') {
-        const lbl = (d.label ?? d.name ?? '').toString().toUpperCase();
-        const parts = Number(d.partitions);
-        return {
-          label: lbl,
-          defaultPartitions: Number.isFinite(parts) && parts > 0 ? parts : undefined
-        };
-      }
-      return { label: String(d).toUpperCase(), defaultPartitions: undefined };
-    }).filter(x => x.label);
-  };
-
-  /* per-storage drawer actions */
-  async function addDrawerFor(s){
-    const curLabels = normalizeDrawers(s.drawers).map(d=>d.label);
-    const next = nextDrawerLabelFrom(curLabels);
-    const nextArr = [...curLabels, next];
-    await updateDoc(doc(db,'storages', s.id), { drawers: nextArr });
-    await addDoc(collection(db,'activities'), { type:'Add Drawer', details:`${s.name}: +${next}`, createdAt: serverTimestamp() });
-  }
-  async function removeDrawerFor(s){
-    const curLabels = normalizeDrawers(s.drawers).map(d=>d.label);
-    if (!curLabels.length){ alert('No drawers to remove'); return; }
-    const last = curLabels[curLabels.length-1];
-    if (!confirm(`Remove drawer "${last}" from ${s.name}? Items in ${last} will be moved to Unplaced.`)) return;
-
-    const batch = writeBatch(db);
-    items
-      .filter(it => it?.location?.storage===s.id && String(it?.location?.drawer||'').toUpperCase()===last)
-      .forEach(it=>{
-        batch.update(doc(db,'items', it.id), {
-          location: { storage:UNPLACED, drawer:null, slot:null },
-          updatedAt: serverTimestamp()
-        });
-      });
-    batch.update(doc(db,'storages', s.id), { drawers: curLabels.slice(0,-1) });
-    await batch.commit();
-    await addDoc(collection(db,'activities'), { type:'Remove Drawer', details:`${s.name}: -${last}`, createdAt: serverTimestamp() });
-  }
-
-  // height for inner scroll (no CSS change)
+  // inner scroll height for desktop
   const innerScrollH = active.length===2 ? 'calc(50vh - 160px)' : 'calc(78vh - 160px)';
 
   return (
@@ -236,21 +218,41 @@ function StoragesPanel({
 
           return (
             <div key={s.id || s.name} className="storage-col" style={{minHeight:0}}>
-              {/* storage header */}
               <div className="storage-bar" style={{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>
                 <div style={{minWidth:0}}>
                   <div className="name" style={{fontWeight:900, fontSize:16, overflow:'hidden', textOverflow:'ellipsis'}}>{s.name}</div>
                   <div className="meta" style={{color:'#64748b', fontSize:12}}>{s.type||'Storage'} • {s.location||'—'}</div>
                 </div>
                 <div style={{marginLeft:'auto',display:'flex',gap:6}}>
-                  <button className="mini" onClick={()=>addDrawerFor(s)}>+ Drawer</button>
-                  <button className="mini danger" onClick={()=>removeDrawerFor(s)}>− Drawer</button>
+                  <button className="mini" onClick={async ()=>{
+                    const cur = normalizeDrawers(s.drawers).map(d=>d.label);
+                    const next = nextDrawerLabelFrom(cur);
+                    await updateDoc(doc(db,'storages', s.id), { drawers: [...cur, next] });
+                    await addDoc(collection(db,'activities'), { type:'Add Drawer', details:`${s.name}: +${next}`, createdAt: serverTimestamp() });
+                  }}>+ Drawer</button>
+                  <button className="mini danger" onClick={async ()=>{
+                    const cur = normalizeDrawers(s.drawers).map(d=>d.label);
+                    if (!cur.length){ alert('No drawers to remove'); return; }
+                    const last = cur[cur.length-1];
+                    if (!confirm(`Remove drawer "${last}" from ${s.name}? Items in ${last} will be moved to Unplaced.`)) return;
+                    const batch = writeBatch(db);
+                    items
+                      .filter(it => it?.location?.storage===s.id && String(it?.location?.drawer||'').toUpperCase()===last)
+                      .forEach(it=>{
+                        batch.update(doc(db,'items', it.id), {
+                          location: { storage:UNPLACED, drawer:null, slot:null },
+                          updatedAt: serverTimestamp()
+                        });
+                      });
+                    batch.update(doc(db,'storages', s.id), { drawers: cur.slice(0,-1) });
+                    await batch.commit();
+                    await addDoc(collection(db,'activities'), { type:'Remove Drawer', details:`${s.name}: -${last}`, createdAt: serverTimestamp() });
+                  }}>− Drawer</button>
                   <button className="mini" onClick={()=>setActiveStorages(prev => prev.filter(x => x!==s.id))}>Hide</button>
                 </div>
               </div>
 
-              {/* drawers stacked vertically; scrolls up/down when there are many */}
-              <div className="detail-body" style={{overflowY:'auto', overflowX:'hidden', maxHeight: innerScrollH}}>
+              <div className="detail-body" style={{overflowY:'auto', overflowX:'hidden', maxHeight: isMobile ? 'none' : innerScrollH}}>
                 {drawers.length ? (
                   <div style={{display:'flex', flexDirection:'column', gap:12}}>
                     {drawers.map(d=>{
@@ -267,10 +269,12 @@ function StoragesPanel({
                         <DrawerRow
                           key={d.label}
                           storage={s}
-                          label={d.label}     // A, B, C…
+                          label={d.label}
                           list={subset}
-                          partCount={count}   // numbers
+                          partCount={count}
                           setPartCount={setCount}
+                          isMobile={isMobile}
+                          onTapAssign={onTapAssign}
                         />
                       );
                     })}
@@ -279,21 +283,10 @@ function StoragesPanel({
                   <div className="drawer-section">
                     <div className="drawer-row">
                       <div className="drawer-label clickable"><span>Items</span></div>
-                      <div className="unplaced-drop"
-                           onDragOver={(e)=>e.preventDefault()}
-                           onDrop={async (e)=>{
-                             const payload = e.dataTransfer.getData('text/plain');
-                             if (!payload) return;
-                             const data = JSON.parse(payload);
-                             await updateDoc(doc(db,'items', data.id), {
-                               location: { storage:s.id, drawer:null, slot:null },
-                               updatedAt: serverTimestamp()
-                             });
-                             await addDoc(collection(db,'activities'), {
-                               type:'Move Item', details:`${data.name} → ${s.name}`, createdAt: serverTimestamp()
-                             });
-                           }}>
-                        {list.map(it => <ItemCard key={it.id} it={it}/>)}
+                      <div className="unplaced-drop">
+                        {list.map(it => (
+                          <ItemCard key={it.id} it={it} isMobile={isMobile} onTapAssign={onTapAssign}/>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -309,7 +302,7 @@ function StoragesPanel({
   );
 }
 
-/* ---------- Left panel: locations ---------- */
+/* ---------- Left panel ---------- */
 function LocationsPanel({
   rooms, storages, items,
   expandedRooms, setExpandedRooms,
@@ -409,6 +402,89 @@ function LocationsPanel({
   );
 }
 
+/* ---------- Mobile-only tabs ---------- */
+function MobileTabs({ view, setView }) {
+  return (
+    <div className="mobile-tabs">
+      <button className={view==='left' ? 'on' : ''} onClick={()=>setView('left')}>Locations</button>
+      <button className={view==='mid'  ? 'on' : ''} onClick={()=>setView('mid')}>Unplaced</button>
+      <button className={view==='right'? 'on' : ''} onClick={()=>setView('right')}>Storages</button>
+    </div>
+  );
+}
+
+/* ---------- Tap-to-Assign sheet (mobile) ---------- */
+function MoveSheet({ open, onClose, item, storages, partCfg, onAssign }) {
+  const [storageId, setStorageId] = useState('');
+  const [drawer, setDrawer] = useState('');
+  const [slot, setSlot] = useState('1');
+
+  useEffect(()=>{ if(open){ setStorageId(''); setDrawer(''); setSlot('1'); }},[open]);
+
+  const currentStorage = storages.find(s => s.id === storageId);
+  const drawers = currentStorage ? normalizeDrawers(currentStorage.drawers) : [];
+  const slotsCount = (() => {
+    if (!currentStorage || !drawer) return 1;
+    const key = `${currentStorage.id}__${drawer}`;
+    const persisted = Number(partCfg.get(key));
+    const def = drawers.find(d=>d.label===drawer)?.defaultPartitions;
+    return Math.max(1, persisted || def || 3);
+  })();
+
+  if (!open) return null;
+
+  return (
+    <div className="sheet-backdrop" onClick={onClose}>
+      <div className="sheet" onClick={e=>e.stopPropagation()}>
+        <div className="sheet-head">
+          <div className="sheet-title">Move item</div>
+          <div className="sheet-sub">{item?.name}</div>
+        </div>
+
+        <div className="field">
+          <label>Storage</label>
+          <select value={storageId} onChange={e=>{ setStorageId(e.target.value); setDrawer(''); setSlot('1'); }}>
+            <option value="">— Select storage —</option>
+            {storages
+              .slice()
+              .sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')))
+              .map(s=>(
+                <option key={s.id} value={s.id}>{s.name} • {s.location||'—'}</option>
+              ))}
+          </select>
+        </div>
+
+        <div className="row">
+          <div className="field">
+            <label>Drawer</label>
+            <select value={drawer} onChange={e=>{ setDrawer(e.target.value); setSlot('1'); }} disabled={!storageId}>
+              <option value="">—</option>
+              {drawers.map(d=> <option key={d.label} value={d.label}>{d.label}</option>)}
+            </select>
+          </div>
+          <div className="field">
+            <label>Slot</label>
+            <select value={slot} onChange={e=>setSlot(e.target.value)} disabled={!drawer}>
+              {Array.from({length: slotsCount}).map((_,i)=>(
+                <option key={i+1} value={String(i+1)}>{i+1}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="sheet-actions">
+          <button className="btn" onClick={onClose}>Cancel</button>
+          <button
+            className="btn primary"
+            disabled={!storageId}
+            onClick={()=> onAssign({ storageId, drawer: drawer || null, slot: drawer ? slot : null })}
+          >Assign</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ====================== MAIN ====================== */
 export default function StorageMap({ items=[], rooms=[], storages=[] }) {
   const [leftW, setLeftW] = useState(()=> Number(localStorage.getItem('sm.leftW')||300));
@@ -496,7 +572,7 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
     });
   };
 
-  /* Mobile detection (<=900px) for responsive rendering */
+  /* Mobile detection (<=900px) */
   const [isMobile, setIsMobile] = useState(
     typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches
   );
@@ -505,55 +581,99 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
     const mq = window.matchMedia('(max-width: 900px)');
     const onChange = () => setIsMobile(mq.matches);
     mq.addEventListener?.('change', onChange);
-    mq.addListener?.(onChange); // Safari fallback
+    mq.addListener?.(onChange);
     return () => {
       mq.removeEventListener?.('change', onChange);
       mq.removeListener?.(onChange);
     };
   }, []);
 
+  /* Mobile tabs: which panel is visible */
+  const [mobileView, setMobileView] = useState('mid'); // 'left' | 'mid' | 'right'
+
+  /* Tap-to-assign sheet */
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetItem, setSheetItem] = useState(null);
+  const openAssign = (it)=>{ setSheetItem(it); setSheetOpen(true); };
+  const doAssign = async ({ storageId, drawer, slot }) => {
+    await updateDoc(doc(db,'items', sheetItem.id), {
+      location: { storage: storageId, drawer, slot },
+      updatedAt: serverTimestamp()
+    });
+    await addDoc(collection(db,'activities'),{
+      type:'Move Item',
+      details:`${sheetItem.name} → ${storages.find(s=>s.id===storageId)?.name || 'Storage'}${drawer?` / ${drawer}`:''}${slot?` / ${slot}`:''}`,
+      createdAt: serverTimestamp()
+    });
+    setSheetOpen(false);
+    setSheetItem(null);
+  };
+
   return (
     <div
       className={`tri-wrap ${isMobile ? 'mobile' : 'desktop'}`}
       style={{ '--leftW': `${leftW}px`, '--midW': `${midW}px` }}
     >
-      <LocationsPanel
-        rooms={rooms}
-        storages={storages}
-        items={items}
-        expandedRooms={expandedRooms}
-        setExpandedRooms={setExpandedRooms}
-        activeStorages={activeStorages}
-        setActiveStorages={setActiveStorages}
-        onCreateRoom={onCreateRoom}
-        onCreateStorage={onCreateStorage}
-        onRemoveStorage={onRemoveStorage}
-      />
+      {isMobile && <MobileTabs view={mobileView} setView={setMobileView} />}
 
-      {/* hide resizers on mobile */}
-      {!isMobile && (
-        <div
-          className="v-sizer"
-          onMouseDown={e=>{ dragRef.current={dragging:'left', startX:e.clientX, orig:leftW}; }}
+      {( !isMobile || mobileView==='left') && (
+        <>
+          <LocationsPanel
+            rooms={rooms}
+            storages={storages}
+            items={items}
+            expandedRooms={expandedRooms}
+            setExpandedRooms={setExpandedRooms}
+            activeStorages={activeStorages}
+            setActiveStorages={setActiveStorages}
+            onCreateRoom={onCreateRoom}
+            onCreateStorage={onCreateStorage}
+            onRemoveStorage={onRemoveStorage}
+          />
+          {!isMobile && (
+            <div className="v-sizer"
+                 onMouseDown={e=>{ dragRef.current={dragging:'left', startX:e.clientX, orig:leftW}; }} />
+          )}
+        </>
+      )}
+
+      {( !isMobile || mobileView==='mid') && (
+        <UnplacedColumn
+          items={items}
+          query={unplacedQ}
+          setQuery={setUnplacedQ}
+          onDropHere={dropUnplaced}
+          isMobile={isMobile}
+          onTapAssign={openAssign}
         />
       )}
 
-      <UnplacedColumn items={items} query={unplacedQ} setQuery={setUnplacedQ} onDropHere={dropUnplaced} />
-
-      {!isMobile && (
-        <div
-          className="v-sizer"
-          onMouseDown={e=>{ dragRef.current={dragging:'mid', startX:e.clientX, orig:midW}; }}
-        />
+      {( !isMobile || mobileView==='right') && (
+        <>
+          {!isMobile && (
+            <div className="v-sizer"
+                 onMouseDown={e=>{ dragRef.current={dragging:'mid', startX:e.clientX, orig:midW}; }} />
+          )}
+          <StoragesPanel
+            storages={storages}
+            items={items}
+            activeStorages={activeStorages}
+            setActiveStorages={setActiveStorages}
+            partCfg={partCfg}
+            setPartCfg={setPartCfg}
+            isMobile={isMobile}
+            onTapAssign={openAssign}
+          />
+        </>
       )}
 
-      <StoragesPanel
+      <MoveSheet
+        open={sheetOpen}
+        onClose={()=>setSheetOpen(false)}
+        item={sheetItem}
         storages={storages}
-        items={items}
-        activeStorages={activeStorages}
-        setActiveStorages={setActiveStorages}
         partCfg={partCfg}
-        setPartCfg={setPartCfg}
+        onAssign={doAssign}
       />
     </div>
   );

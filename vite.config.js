@@ -1,16 +1,8 @@
 // vite.config.js
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react' // remove if not using React
+import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  server: {
-    https: false,          // ⟵ force HTTP
-    host: 'localhost',
-    port: 5173,
-    strictPort: true
-  },
-  preview: {
-    https: false           // also keep preview on HTTP
-  },
-  plugins: [react()]       // remove this line if not using React
+  base: '/Inventory/',        // MUST match your repo name + trailing slash
+  plugins: [react()],
 })

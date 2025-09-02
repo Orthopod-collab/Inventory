@@ -101,7 +101,7 @@ main{ padding:18px; display:flex; flex-direction:column; gap:18px; width:100%; m
 }
 .chips .chip.stat{ background:#f5f1ff; border-color:#e7e2ff }
 
-/* ===== Generic table base (safe defaults) ===== */
+/* ===== Generic table base ===== */
 table{ width:100%; border-collapse:separate; border-spacing:0 }
 th,td{ padding:12px 10px; border-bottom:1px solid var(--border); text-align:left }
 th{ font-size:12px; color:var(--muted); font-weight:800; letter-spacing:.2px }
@@ -157,7 +157,7 @@ section.panel.active{ display:block }
 }
 .sm-toolbar .toolbar .search input{ border:none; outline:none; width:100%; background:transparent; font-size:14px }
 
-/* ===== Right Detail / Bands (shared) ===== */
+/* ===== Right Detail / Bands ===== */
 .detail{
   position:sticky; top:0; height:100%;
   border:1px solid var(--border); background:linear-gradient(180deg,#fcfdff,#f6f8ff);
@@ -208,7 +208,7 @@ section.panel.active{ display:block }
   display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:8px; align-content:start; margin-top:8px;
 }
 
-/* ===== Item tiles (tinted by type, compact, no overlap) ===== */
+/* ===== Item tiles ===== */
 .item-card{
   position:relative; border:1px solid var(--border); border-radius:12px; background:#fff;
   padding:10px; cursor:grab; width:100%; display:flex; flex-direction:column; gap:8px; min-height:78px
@@ -221,7 +221,7 @@ section.panel.active{ display:block }
 .item-card .ic-meta{ display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#1f2937; gap:10px }
 .item-card.is-selected{ outline:3px solid rgba(37,99,235,.28) }
 
-/* tile tint by type (no inner pills) */
+/* tile tint by type */
 .item-card.type-consumable{      background:#E1ECFF; border-color:#BBD2FF }
 .item-card.type-instrument_tray{ background:#E8E6FF; border-color:#D3CEFF }
 .item-card.type-single_pack{     background:#FFE0E7; border-color:#FFC2CE }
@@ -229,76 +229,7 @@ section.panel.active{ display:block }
 .item-card.type-medical_device{  background:#DDF1EB; border-color:#B7E4D7 }
 .item-card.type-table_attach{    background:#FFE7CC; border-color:#FFD3A3 }
 
-/* ===== Tags / Pills (used elsewhere) ===== */
-.pill{ display:inline-block; padding:.25rem .5rem; border-radius:999px; font-size:12px; font-weight:700; border:1px solid rgba(0,0,0,.06) }
-.type-consumable{      background:#E1ECFF; border-color:#BBD2FF; color:#1E40AF }
-.type-instrument_tray{ background:#E8E6FF; border-color:#D3CEFF; color:#4338CA }
-.type-single_pack{     background:#FFE0E7; border-color:#FFC2CE; color:#9D174D }
-.type-implant{         background:#EEE6FF; border-color:#D7C8FF; color:#5B21B6 }
-.type-medical_device{  background:#DDF1EB; border-color:#B7E4D7; color:#0F766E }
-.type-table_attach{    background:#FFE7CC; border-color:#FFD3A3; color:#92400E }
-
-/* === CATEGORY badges === */
-.cat-badge{ display:inline-block; padding:.25rem .5rem; border-radius:999px; font-size:12px; font-weight:800; border:1px solid transparent }
-.cat-trauma{    background:#E5E7EB; border-color:#D1D5DB; color:#111827 }
-.cat-emergency{ background:#FFE4E6; border-color:#FF6B6B; color:#B91C1C }
-.cat-elective{  background:#EEFFDB; border-color:#39FF14; color:#14532d }
-
-/* ===== Inventory toolbar ===== */
-.body .toolbar{ display:flex; gap:12px; align-items:center; flex-wrap:wrap }
-.body .search{ display:flex; align-items:center; gap:8px; padding:10px 14px; border:1px solid #e6e8f0; border-radius:9999px; background:#fff }
-.body .search input{ border:none; outline:none; width:100%; background:transparent; font-size:14px }
-
-/* ===== Inventory table (tight) ===== */
-#invTable.sheet-style{ border-collapse:collapse; width:100%; font-size:13px }
-#invTable.sheet-style th,#invTable.sheet-style td{ border:1px dashed #cfd4dc; padding:4px 6px; text-align:left; vertical-align:middle }
-#invTable.sheet-style th{ background:#f5f7fb; font-weight:600 }
-#invTable.sheet-style th:nth-child(n+7),#invTable.sheet-style td:nth-child(n+7){ text-align:center; white-space:nowrap; width:1% }
-#invTable.sheet-style tbody tr{ position:relative; transition:background-color .15s }
-#invTable.sheet-style tbody tr:hover{ background:#faf8ff; box-shadow:inset 3px 0 0 #7c3aed }
-#invTable.sheet-style tbody tr.row-selected{ background:#f4ecff; box-shadow:inset 3px 0 0 #7c3aed }
-.actions-inline{ display:inline-flex; align-items:center; justify-content:center; gap:6px }
-a.link{ color:#1a73e8; text-decoration:underline; font-size:12px }
-.no-wrap{ white-space:nowrap }
-.flags-cell{ text-align:center; white-space:nowrap }
-.flag-btn{ border:0; background:transparent; cursor:pointer; padding:0 4px; line-height:1; opacity:.8; font-size:14px }
-.flag-btn:hover{ opacity:1 }
-.flag-btn.pin.on{ color:#f59e0b }
-.flag-btn.urgent.on{ color:#ef4444 }
-.flag-btn.watch.on{ color:#1d4ed8 }
-.flags-cell .dot{ display:inline-block; width:6px; height:6px; border-radius:50%; background:#1a73e8; margin-left:6px; vertical-align:middle }
-.tag{ display:inline-block; padding:2px 4px; border-radius:6px; border:1px solid; font-size:10px; line-height:1; margin-left:6px }
-.tag.warn{ border-color:#f59e0b; color:#a16207; background:#fff7e6 }
-.tag.danger{ border-color:#ef4444; color:#991b1b; background:#fff1f1 }
-.tag.info{ border-color:#3b82f6; color:#1d4ed8; background:#eef5ff }
-
-/* ===== Context menu ===== */
-.ctx-backdrop{ position:fixed; inset:0; z-index:49; background:transparent }
-.ctx-menu{
-  position:fixed; z-index:50; left:0; top:0; min-width:190px; background:#fff; border:1px solid var(--border);
-  border-radius:10px; box-shadow:var(--shadow); padding:6px
-}
-.ctx-menu button{
-  display:block; width:100%; text-align:left; background:none; border:0;
-  padding:8px 10px; font:inherit; cursor:pointer; border-radius:8px
-}
-.ctx-menu button:hover{ background:#f5f7fb }
-.ctx-menu button.on{ color:var(--accent) }
-.ctx-sep{ height:1px; background:var(--border); margin:6px 0 }
-
-/* ===== Tag input ===== */
-.tag-input{
-  display:flex; flex-wrap:wrap; gap:6px; padding:6px; background:#fff;
-  border:1px solid #e6e8f0; border-radius:8px
-}
-.tag-input input{ border:0; outline:0; min-width:140px; flex:1; font:inherit; padding:4px }
-.tag.token{
-  display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px;
-  font-size:12px; line-height:1; background:#eef5ff; border:1px solid #cfe0ff; color:#0b3aa5
-}
-.tag.token button{ border:0; background:transparent; cursor:pointer; padding:0 2px; line-height:1; font-size:14px }
-
-/* === Tri-panel layout =================================================== */
+/* ===== Tri-panel layout =================================================== */
 .tri-wrap{
   --leftW: 300px;   /* controlled inline */
   --midW: 520px;    /* controlled inline */
@@ -314,67 +245,17 @@ a.link{ color:#1a73e8; text-decoration:underline; font-size:12px }
 .v-sizer{
   cursor: col-resize;
   background: linear-gradient(180deg,#ffffff,#f4f6fb);
-  border-left:1px solid #e6e9f2; border-right:1px solid #e6e9f2;
+  border-left:1px solid var(--border); border-right:1px solid var(--border);
 }
 .v-sizer:hover{ background:#eaf1ff }
 
-/* ===== Left panel (locations) ===== */
-.room{
-  background:#fff; border:1px solid var(--border); border-radius:14px;
-  box-shadow:var(--shadow); display:flex; flex-direction:column; overflow:hidden; margin-bottom:10px;
-}
-.room header{
-  display:flex; justify-content:space-between; align-items:center; gap:8px;
-  padding:10px 12px; background:linear-gradient(#fff,#f7f9ff); border-bottom:1px solid var(--border); cursor:pointer
-}
-.room.active header{ background:linear-gradient(#fff,#f1f5ff); box-shadow:inset 0 0 0 2px rgba(37,99,235,.15) }
-.room .bar{ display:flex; align-items:center; gap:10px; flex:1; min-width:0 }
-.room .title{ font-weight:800; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
-.room .list{
-  padding:10px; display:grid; gap:8px;
-  grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); align-content:start; max-height:56vh; overflow:auto
-}
-.storage-tile{
-  position:relative; display:flex; flex-direction:column; gap:2px; align-items:flex-start;
-  padding:10px 12px; background:#fff; border:1px solid #ecf0f8; border-radius:12px; min-height:56px; cursor:pointer
-}
-.storage-tile .name{ font-weight:800 }
-.storage-tile .type{ font-size:11px; color:var(--muted) }
-.storage-tile .count{ position:absolute; right:8px; top:6px; font-size:11px; padding:2px 6px; border:1px solid var(--accent-200); border-radius:999px }
-.storage-tile.active{ outline:2px solid rgba(37,99,235,.25) }
-.add-storage{ padding:10px 12px; border:1px dashed #cfd4dc; border-radius:12px; background:#fff; cursor:pointer }
-.add-storage:hover{ background:#fbfdff }
-
-/* ===== Middle panel: Unplaced ===== */
-.band{
-  border:1px solid var(--border); border-radius:12px; padding:10px 12px; font-weight:900;
-  display:grid; grid-template-columns:72px 1fr auto; align-items:center
-}
-.band.unplaced{
-  grid-template-columns:1fr; justify-items:center;
-  background:#ff8a1f; color:#fff; border-color:#ff8a1f; letter-spacing:.5px
-}
-.sm-toolbar .toolbar .search{ display:flex; align-items:center; gap:8px; padding:10px 14px; border:1px solid #e6e8f0; border-radius:9999px; background:#fff }
-.sm-toolbar .toolbar .search input{ border:none; outline:none; width:100%; background:transparent; font-size:14px }
-
-.unplaced-drop{
-  border:1px dashed #d8e1f2; border-radius:12px; background:#fff;
-  padding:8px; min-height:120px;
-  display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap:8px; align-content:start; margin-top:6px;
-}
-
-/* ===== Right panel: Location banner + storage columns ===== */
+/* ===== Right panel bits ===== */
 .loc-banner{
   background:#d9f99d; border:1px solid #bbf7d0; border-radius:12px;
   padding:10px 12px; margin-bottom:10px; color:#0f172a;
 }
-.loc-title{
-  font-weight:900; font-size:18px; line-height:1.25; word-break:break-word; white-space:normal;
-}
-.loc-help{
-  margin-top:4px; font-size:12px; color:#334155; font-weight:700; line-height:1.2;
-}
+.loc-title{ font-weight:900; font-size:18px; line-height:1.25; word-break:break-word; white-space:normal; }
+.loc-help{ margin-top:4px; font-size:12px; color:#334155; font-weight:700; line-height:1.2; }
 
 .storage-col{ min-width:0 }
 .storage-bar{
@@ -386,7 +267,7 @@ a.link{ color:#1a73e8; text-decoration:underline; font-size:12px }
 
 .detail-body{ padding:10px 2px 2px 2px; display:flex; flex-direction:column; gap:12px }
 
-/* ===== Drawer + partitions ===== */
+/* drawer section */
 .drawer-section{ display:flex; flex-direction:column; gap:8px }
 .drawer-row{ display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:start }
 .drawer-label{
@@ -398,31 +279,60 @@ a.link{ color:#1a73e8; text-decoration:underline; font-size:12px }
 .part-controls .mini.icon{ padding:0 8px; height:22px; line-height:22px; border-radius:8px }
 .part-count{ font-size:12px; color:#64748b; font-weight:800 }
 
-.partitions{ display:grid; grid-template-columns: repeat(var(--cols, 1), minmax(180px, 1fr)); gap:10px; align-items:start }
-.part-col{ display:flex; flex-direction:column; gap:6px; min-width:0 }
-.part-cap{ font-size:12px; color:#64748b; font-weight:800; letter-spacing:.2px; padding:4px 8px; border:1px solid var(--border); border-radius:999px; width:max-content }
-.part-drop{
-  border:1px dashed #d8e1f2; border-radius:12px; background:#fff;
-  padding:8px; min-height:120px;
-  display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap:8px; align-content:start
+/* ===== Desktop (unchanged behavior) ===== */
+.tri-wrap.desktop { display: grid; grid-template-columns: var(--leftW) 6px var(--midW) 6px 1fr; gap: 0; height: 100%; min-height: 0; }
+.tri-col { min-width: 0; }
+
+/* ===== Mobile: stack columns, hide sizers, sticky toolbars ===== */
+@media (max-width: 900px) {
+  .tri-wrap.mobile { display: block; }
+
+  .v-sizer { display: none !important; }
+
+  .tri-col { padding: 8px 10px; }
+  .tri-left, .tri-mid, .tri-right { margin-bottom: 8px; }
+
+  .loc-banner, .storage-bar, .sm-toolbar {
+    position: sticky; top: 0; z-index: 10; background: #fff;
+  }
+  .loc-banner { top: 0; padding: 8px 10px; }
+  .storage-bar { top: 44px; padding: 8px 10px; }
+  .sm-toolbar  { top: 0;  padding: 6px 8px; }
+
+  .storage-tile, .item-card { padding: 12px 14px; border-radius: 14px; }
+
+  .sm-toolbar .search input { width: 100%; font-size: 16px; padding: 10px 12px; }
+
+  .drawer-row .partitions {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+  }
+  .drawer-row .part-col { min-width: 0; }
+  .drawer-row .part-cap { font-size: 12px; color: #64748b; margin-bottom: 6px; }
+  .part-drop {
+    min-height: 80px; padding: 8px; border-radius: 12px;
+    border: 1px dashed #cbd5e1; background: #f8fafc;
+  }
+
+  .drawer-label {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding: 8px 10px; border-radius: 10px; background: #f1f5f9; margin-bottom: 6px;
+  }
+  .drawer-label .part-controls { display: inline-flex; align-items: center; gap: 8px; }
+  .drawer-label .part-count { min-width: 28px; text-align: center; font-weight: 700; }
+  .drawer-label button.mini.icon { padding: 6px 10px; line-height: 1; border: 1px solid #e2e8f0; border-radius: 8px; }
+
+  .storage-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+  .storage-bar .name { font-size: 16px; }
+  .storage-bar .meta { font-size: 12px; }
+  .storage-bar button.mini { padding: 8px 10px; }
+
+  .tri-right .detail-body { max-height: none !important; }
+
+  .unplaced-drop { display: grid; grid-template-columns: 1fr; gap: 8px; }
 }
 
-/* ===== Item tiles ===== */
-.item-card{
-  position:relative; border:1px solid var(--border); border-radius:12px; background:#fff;
-  padding:10px; cursor:grab; width:100%; display:flex; flex-direction:column; gap:8px; min-height:78px
+@media (max-width: 480px) {
+  .drawer-row .partitions { grid-template-columns: 1fr 1fr; }
 }
-.item-card .ic-name{
-  font-weight:800; font-size:13px; line-height:1.25;
-  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
-  overflow:hidden; white-space:normal;
-}
-.item-card .ic-meta{ display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#1f2937; gap:10px }
-.item-card.type-consumable{      background:#E1ECFF; border-color:#BBD2FF }
-.item-card.type-instrument_tray{ background:#E8E6FF; border-color:#D3CEFF }
-.item-card.type-single_pack{     background:#FFE0E7; border-color:#FFC2CE }
-.item-card.type-implant{         background:#EEE6FF; border-color:#D7C8FF }
-.item-card.type-medical_device{  background:#DDF1EB; border-color:#B7E4D7 }
-.item-card.type-table_attach{    background:#FFE7CC; border-color:#FFD3A3 }
-

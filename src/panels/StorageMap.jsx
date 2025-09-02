@@ -1,42 +1,43 @@
-// StorageMap.jsx
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, {
+  useEffect, useMemo, useRef, useState, useLayoutEffect
+} from 'react';
 import {
   addDoc, collection, deleteDoc, doc, serverTimestamp, setDoc, updateDoc, writeBatch
-} from 'firebase/firestore'
-import { db } from '../firebase'
+} from 'firebase/firestore';
+import { db } from '../firebase';
 
 /* ---------- Shared helpers ---------- */
-const clean = v => String(v ?? '').trim()
-const titleCase = s => String(s||'').replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())
-const UNPLACED = '__unplaced__'
+const clean = v => String(v ?? '').trim();
+const titleCase = s => String(s || '').replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+const UNPLACED = '__unplaced__';
 const safeId = () =>
   (typeof crypto !== 'undefined' && crypto.randomUUID)
     ? crypto.randomUUID()
-    : `id_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`
+    : `id_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
 
 /* drawers = letters helper */
-const isAlpha = s => /^[A-Z]+$/.test(s)
+const isAlpha = s => /^[A-Z]+$/.test(s);
 const incAlpha = (s='')=>{
-  if (!s) return 'A'
-  let carry = 1, out = ''
+  if (!s) return 'A';
+  let carry = 1, out = '';
   for (let i=s.length-1;i>=0;i--){
-    const code = s.charCodeAt(i) - 65 + carry
-    if (code >= 26){ out = 'A' + out; carry = 1 }
-    else { out = String.fromCharCode(65+code) + out; carry = 0 }
+    const code = s.charCodeAt(i) - 65 + carry;
+    if (code >= 26){ out = 'A' + out; carry = 1; }
+    else { out = String.fromCharCode(65+code) + out; carry = 0; }
   }
-  if (carry) out = 'A' + out
-  return out
-}
+  if (carry) out = 'A' + out;
+  return out;
+};
 const nextDrawerLabelFrom = (labels=[])=>{
-  const alphas = labels.map(String).map(s=>s.toUpperCase()).filter(isAlpha)
-  if (!alphas.length) return 'A'
-  alphas.sort((a,b)=> a.length - b.length || a.localeCompare(b))
-  return incAlpha(alphas[alphas.length-1])
-}
+  const alphas = labels.map(String).map(s=>s.toUpperCase()).filter(isAlpha);
+  if (!alphas.length) return 'A';
+  alphas.sort((a,b)=> a.length - b.length || a.localeCompare(b));
+  return incAlpha(alphas[alphas.length-1]);
+};
 
 /* ---------- Item card ---------- */
 function ItemCard({ it }) {
-  const cls = `item-card ${it?.type ? ('type-'+String(it.type).replace(/\s+/g,'_')) : ''}`
+  const cls = `item-card ${it?.type ? ('type-'+String(it.type).replace(/\s+/g,'_')) : ''}`;
   return (
     <div
       className={cls}
@@ -50,23 +51,23 @@ function ItemCard({ it }) {
         <span>{Math.max(0, +it.qty || 0)} in stock</span>
       </div>
     </div>
-  )
+  );
 }
 
 /* ---------- Unplaced column ---------- */
 function UnplacedColumn({ items, query, setQuery, onDropHere }) {
   const list = useMemo(()=>{
-    const q = clean(query).toLowerCase()
+    const q = clean(query).toLowerCase();
     const src = items.filter(x => {
-      const sid = x?.location?.storage
-      return !sid || sid === UNPLACED
-    })
-    if (!q) return src
+      const sid = x?.location?.storage;
+      return !sid || sid === UNPLACED;
+    });
+    if (!q) return src;
     return src.filter(x => {
-      const hay = `${x.name} ${x.sku} ${x.supplier} ${x.type}`.toLowerCase()
-      return hay.includes(q)
-    })
-  }, [items, query])
+      const hay = `${x.name} ${x.sku} ${x.supplier} ${x.type}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }, [items, query]);
 
   return (
     <div className="tri-col tri-mid">
@@ -89,28 +90,28 @@ function UnplacedColumn({ items, query, setQuery, onDropHere }) {
         {list.map(it => <ItemCard key={it.id} it={it} />)}
       </div>
     </div>
-  )
+  );
 }
 
 /* ---------- Drawer row (letters for drawer, numbers for partitions) ---------- */
 function DrawerRow({ storage, label, list, partCount, setPartCount }) {
-  const sId = storage.id
+  const sId = storage.id;
 
   const handleDropTo = (drawer, partIndex) => async (e) => {
-    e.preventDefault()
-    const payload = e.dataTransfer.getData('text/plain')
-    if (!payload) return
-    const data = JSON.parse(payload)
+    e.preventDefault();
+    const payload = e.dataTransfer.getData('text/plain');
+    if (!payload) return;
+    const data = JSON.parse(payload);
     await updateDoc(doc(db, 'items', data.id), {
       location: { storage: sId, drawer, slot: String(partIndex+1) },
       updatedAt: serverTimestamp()
-    })
+    });
     await addDoc(collection(db,'activities'),{
       type:'Move Item',
       details:`${data.name} → ${storage.name} / ${drawer} / ${partIndex+1}`,
       createdAt: serverTimestamp()
-    })
-  }
+    });
+  };
 
   return (
     <div className="drawer-section">
@@ -145,7 +146,7 @@ function DrawerRow({ storage, label, list, partCount, setPartCount }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 /* ---------- Right panel: banner + up to 2 storage rows (top/bottom) ---------- */
@@ -156,66 +157,66 @@ function StoragesPanel({
 }) {
   const active = activeStorages
     .map(id => storages.find(s => s && s.id === id))
-    .filter(Boolean)
+    .filter(Boolean);
 
   const bannerText = useMemo(() => {
-    const locs = Array.from(new Set(active.map(s => s.location).filter(Boolean)))
-    if (!locs.length) return 'Select a storage'
-    return locs.join(' • ')
-  }, [active])
+    const locs = Array.from(new Set(active.map(s => s.location).filter(Boolean)));
+    if (!locs.length) return 'Select a storage';
+    return locs.join(' • ');
+  }, [active]);
 
-  const bannerHelper = 'Drag between columns, drawers & partitions'
-  const itemsByStorage = (sid) => items.filter(x => x?.location?.storage === sid)
+  const bannerHelper = 'Drag between columns, drawers & partitions';
+  const itemsByStorage = (sid) => items.filter(x => x?.location?.storage === sid);
 
   const normalizeDrawers = (raw) => {
-    const arr = Array.isArray(raw) ? raw : []
+    const arr = Array.isArray(raw) ? raw : [];
     return arr.map(d => {
       if (typeof d === 'string' || typeof d === 'number') {
-        const label = String(d).toUpperCase()
-        return { label, defaultPartitions: undefined }
+        const label = String(d).toUpperCase();
+        return { label, defaultPartitions: undefined };
       }
       if (d && typeof d === 'object') {
-        const lbl = (d.label ?? d.name ?? '').toString().toUpperCase()
-        const parts = Number(d.partitions)
+        const lbl = (d.label ?? d.name ?? '').toString().toUpperCase();
+        const parts = Number(d.partitions);
         return {
           label: lbl,
           defaultPartitions: Number.isFinite(parts) && parts > 0 ? parts : undefined
-        }
+        };
       }
-      return { label: String(d).toUpperCase(), defaultPartitions: undefined }
-    }).filter(x => x.label)
-  }
+      return { label: String(d).toUpperCase(), defaultPartitions: undefined };
+    }).filter(x => x.label);
+  };
 
   /* per-storage drawer actions */
   async function addDrawerFor(s){
-    const curLabels = normalizeDrawers(s.drawers).map(d=>d.label)
-    const next = nextDrawerLabelFrom(curLabels)
-    const nextArr = [...curLabels, next]
-    await updateDoc(doc(db,'storages', s.id), { drawers: nextArr })
-    await addDoc(collection(db,'activities'), { type:'Add Drawer', details:`${s.name}: +${next}`, createdAt: serverTimestamp() })
+    const curLabels = normalizeDrawers(s.drawers).map(d=>d.label);
+    const next = nextDrawerLabelFrom(curLabels);
+    const nextArr = [...curLabels, next];
+    await updateDoc(doc(db,'storages', s.id), { drawers: nextArr });
+    await addDoc(collection(db,'activities'), { type:'Add Drawer', details:`${s.name}: +${next}`, createdAt: serverTimestamp() });
   }
   async function removeDrawerFor(s){
-    const curLabels = normalizeDrawers(s.drawers).map(d=>d.label)
-    if (!curLabels.length){ alert('No drawers to remove'); return }
-    const last = curLabels[curLabels.length-1]
-    if (!confirm(`Remove drawer "${last}" from ${s.name}? Items in ${last} will be moved to Unplaced.`)) return
+    const curLabels = normalizeDrawers(s.drawers).map(d=>d.label);
+    if (!curLabels.length){ alert('No drawers to remove'); return; }
+    const last = curLabels[curLabels.length-1];
+    if (!confirm(`Remove drawer "${last}" from ${s.name}? Items in ${last} will be moved to Unplaced.`)) return;
 
-    const batch = writeBatch(db)
+    const batch = writeBatch(db);
     items
       .filter(it => it?.location?.storage===s.id && String(it?.location?.drawer||'').toUpperCase()===last)
       .forEach(it=>{
         batch.update(doc(db,'items', it.id), {
           location: { storage:UNPLACED, drawer:null, slot:null },
           updatedAt: serverTimestamp()
-        })
-      })
-    batch.update(doc(db,'storages', s.id), { drawers: curLabels.slice(0,-1) })
-    await batch.commit()
-    await addDoc(collection(db,'activities'), { type:'Remove Drawer', details:`${s.name}: -${last}`, createdAt: serverTimestamp() })
+        });
+      });
+    batch.update(doc(db,'storages', s.id), { drawers: curLabels.slice(0,-1) });
+    await batch.commit();
+    await addDoc(collection(db,'activities'), { type:'Remove Drawer', details:`${s.name}: -${last}`, createdAt: serverTimestamp() });
   }
 
   // height for inner scroll (no CSS change)
-  const innerScrollH = active.length===2 ? 'calc(50vh - 160px)' : 'calc(78vh - 160px)'
+  const innerScrollH = active.length===2 ? 'calc(50vh - 160px)' : 'calc(78vh - 160px)';
 
   return (
     <div className="tri-col tri-right">
@@ -230,8 +231,8 @@ function StoragesPanel({
 
       <div style={{display:'grid', gridTemplateRows: active.length===2 ? '1fr 12px 1fr' : '1fr', gap:'0'}}>
         {active.map((s, idx) => {
-          const drawers = normalizeDrawers(s.drawers)
-          const list = itemsByStorage(s.id)
+          const drawers = normalizeDrawers(s.drawers);
+          const list = itemsByStorage(s.id);
 
           return (
             <div key={s.id || s.name} className="storage-col" style={{minHeight:0}}>
@@ -253,14 +254,14 @@ function StoragesPanel({
                 {drawers.length ? (
                   <div style={{display:'flex', flexDirection:'column', gap:12}}>
                     {drawers.map(d=>{
-                      const key = `${s.id}__${d.label}`
-                      const persisted = +partCfg.get(key)
-                      const count = Math.max(1, persisted || d.defaultPartitions || 3)
+                      const key = `${s.id}__${d.label}`;
+                      const persisted = +partCfg.get(key);
+                      const count = Math.max(1, persisted || d.defaultPartitions || 3);
                       const setCount = (n)=>{
-                        const next = new Map(partCfg); next.set(key, n); setPartCfg(next)
-                        try{ localStorage.setItem('sm.partitionCounts', JSON.stringify([...next])) }catch{}
-                      }
-                      const subset = list.filter(x => String(x?.location?.drawer||'').toUpperCase() === d.label)
+                        const next = new Map(partCfg); next.set(key, n); setPartCfg(next);
+                        try{ localStorage.setItem('sm.partitionCounts', JSON.stringify([...next])); }catch{}
+                      };
+                      const subset = list.filter(x => String(x?.location?.drawer||'').toUpperCase() === d.label);
 
                       return (
                         <DrawerRow
@@ -271,7 +272,7 @@ function StoragesPanel({
                           partCount={count}   // numbers
                           setPartCount={setCount}
                         />
-                      )
+                      );
                     })}
                   </div>
                 ) : (
@@ -281,16 +282,16 @@ function StoragesPanel({
                       <div className="unplaced-drop"
                            onDragOver={(e)=>e.preventDefault()}
                            onDrop={async (e)=>{
-                             const payload = e.dataTransfer.getData('text/plain')
-                             if (!payload) return
-                             const data = JSON.parse(payload)
+                             const payload = e.dataTransfer.getData('text/plain');
+                             if (!payload) return;
+                             const data = JSON.parse(payload);
                              await updateDoc(doc(db,'items', data.id), {
                                location: { storage:s.id, drawer:null, slot:null },
                                updatedAt: serverTimestamp()
-                             })
+                             });
                              await addDoc(collection(db,'activities'), {
                                type:'Move Item', details:`${data.name} → ${s.name}`, createdAt: serverTimestamp()
-                             })
+                             });
                            }}>
                         {list.map(it => <ItemCard key={it.id} it={it}/>)}
                       </div>
@@ -301,14 +302,14 @@ function StoragesPanel({
 
               {idx===0 && active.length===2 && <div style={{height:12}}/>}
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }
 
-/* ---------- Left panel: Locations, collapse, select active storages ---------- */
+/* ---------- Left panel: locations ---------- */
 function LocationsPanel({
   rooms, storages, items,
   expandedRooms, setExpandedRooms,
@@ -316,40 +317,40 @@ function LocationsPanel({
   onCreateRoom, onCreateStorage, onRemoveStorage
 }) {
   const counts = useMemo(()=>{
-    const m = new Map()
+    const m = new Map();
     items.forEach(it=>{
-      const sid = it?.location?.storage
-      if (sid) m.set(sid, (m.get(sid)||0) + (+it.qty||0))
-    })
-    return m
-  },[items])
+      const sid = it?.location?.storage;
+      if (sid) m.set(sid, (m.get(sid)||0) + (+it.qty||0));
+    });
+    return m;
+  },[items]);
 
-  const persistExp = (arr)=>{ try{ localStorage.setItem('sm.expandedRooms', JSON.stringify(arr)) }catch{} }
-  const persistAct = (arr)=>{ try{ localStorage.setItem('sm.activeStorages', JSON.stringify(arr)) }catch{} }
+  const persistExp = (arr)=>{ try{ localStorage.setItem('sm.expandedRooms', JSON.stringify(arr)); }catch{} };
+  const persistAct = (arr)=>{ try{ localStorage.setItem('sm.activeStorages', JSON.stringify(arr)); }catch{} };
 
   const toggleExpand = (roomName) => {
     setExpandedRooms(prev=>{
-      const arr = [...prev]
-      const ix = arr.indexOf(roomName)
-      if (ix>=0){ arr.splice(ix,1); persistExp(arr); return arr }
-      arr.push(roomName)
-      while(arr.length>2) arr.shift()
-      persistExp(arr)
-      return arr
-    })
-  }
+      const arr = [...prev];
+      const ix = arr.indexOf(roomName);
+      if (ix>=0){ arr.splice(ix,1); persistExp(arr); return arr; }
+      arr.push(roomName);
+      while(arr.length>2) arr.shift();
+      persistExp(arr);
+      return arr;
+    });
+  };
 
   const toggleActiveStorage = (id) => {
     setActiveStorages(prev=>{
-      const arr = [...prev]
-      const ix = arr.indexOf(id)
-      if (ix>=0){ arr.splice(ix,1); persistAct(arr); return arr }
-      arr.push(id)
-      while(arr.length>2) arr.shift()
-      persistAct(arr)
-      return arr
-    })
-  }
+      const arr = [...prev];
+      const ix = arr.indexOf(id);
+      if (ix>=0){ arr.splice(ix,1); persistAct(arr); return arr; }
+      arr.push(id);
+      while(arr.length>2) arr.shift();
+      persistAct(arr);
+      return arr;
+    });
+  };
 
   return (
     <div className="tri-col tri-left">
@@ -359,9 +360,9 @@ function LocationsPanel({
       </div>
 
       {rooms.map(r=>{
-        if (!r || !r.name) return null
-        const isOpen = expandedRooms.includes(r.name)
-        const inRoom = storages.filter(s => s.location === r.name)
+        if (!r || !r.name) return null;
+        const isOpen = expandedRooms.includes(r.name);
+        const inRoom = storages.filter(s => s.location === r.name);
         return (
           <div key={r.name} className={`room ${isOpen?'active':''}`}>
             <header onClick={()=>toggleExpand(r.name)}>
@@ -378,8 +379,8 @@ function LocationsPanel({
                 {inRoom
                   .sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')))
                   .map(s=>{
-                    if (!s) return null
-                    const active = activeStorages.includes(s.id)
+                    if (!s) return null;
+                    const active = activeStorages.includes(s.id);
                     return (
                       <div key={s.id || s.name}
                            className={`storage-tile ${active?'active':''}`}
@@ -392,111 +393,130 @@ function LocationsPanel({
                         <button
                           className="mini danger"
                           style={{position:'absolute',right:8,bottom:8}}
-                          onClick={(e)=>{ e.stopPropagation(); onRemoveStorage(s) }}
+                          onClick={(e)=>{ e.stopPropagation(); onRemoveStorage(s); }}
                         >Remove</button>
                       </div>
-                    )
+                    );
                   })}
 
                 <button className="add-storage" onClick={()=>onCreateStorage(r.name)}>+ New storage</button>
               </div>
             )}
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }
 
 /* ====================== MAIN ====================== */
 export default function StorageMap({ items=[], rooms=[], storages=[] }) {
-  const [leftW, setLeftW] = useState(()=> Number(localStorage.getItem('sm.leftW')||300))
-  const [midW,  setMidW]  = useState(()=> Number(localStorage.getItem('sm.midW') ||520))
+  const [leftW, setLeftW] = useState(()=> Number(localStorage.getItem('sm.leftW')||300));
+  const [midW,  setMidW]  = useState(()=> Number(localStorage.getItem('sm.midW') ||520));
 
   const [expandedRooms, setExpandedRooms] = useState(()=>{
-    try{ return JSON.parse(localStorage.getItem('sm.expandedRooms')||'[]') }catch{return []}
-  })
+    try{ return JSON.parse(localStorage.getItem('sm.expandedRooms')||'[]'); }catch{return [];}
+  });
   const [activeStorages, setActiveStorages] = useState(()=>{
-    try{ return JSON.parse(localStorage.getItem('sm.activeStorages')||'[]') }catch{return []}
-  })
+    try{ return JSON.parse(localStorage.getItem('sm.activeStorages')||'[]'); }catch{return [];}
+  });
 
   const [partCfg, setPartCfg] = useState(()=>{
     try{
-      const raw = JSON.parse(localStorage.getItem('sm.partitionCounts')||'[]')
-      return new Map(Array.isArray(raw) ? raw : [])
-    }catch{ return new Map() }
-  })
+      const raw = JSON.parse(localStorage.getItem('sm.partitionCounts')||'[]');
+      return new Map(Array.isArray(raw) ? raw : []);
+    }catch{ return new Map(); }
+  });
 
-  const [unplacedQ, setUnplacedQ] = useState('')
+  const [unplacedQ, setUnplacedQ] = useState('');
 
-  const dragRef = useRef({ dragging:null, startX:0, orig:0 })
+  const dragRef = useRef({ dragging:null, startX:0, orig:0 });
   useEffect(()=>{
     const onMove = (e)=>{
-      const d = dragRef.current
-      if (!d.dragging) return
-      const dx = e.clientX - d.startX
+      const d = dragRef.current;
+      if (!d.dragging) return;
+      const dx = e.clientX - d.startX;
       if (d.dragging==='left'){
-        const w = Math.max(240, Math.min(520, d.orig + dx)); setLeftW(w); localStorage.setItem('sm.leftW', w)
+        const w = Math.max(240, Math.min(520, d.orig + dx)); setLeftW(w); localStorage.setItem('sm.leftW', w);
       }
       if (d.dragging==='mid'){
-        const w = Math.max(380, Math.min(780, d.orig + dx)); setMidW(w);  localStorage.setItem('sm.midW',  w)
+        const w = Math.max(380, Math.min(780, d.orig + dx)); setMidW(w);  localStorage.setItem('sm.midW',  w);
       }
-    }
-    const onUp = ()=>{ dragRef.current.dragging=null }
-    window.addEventListener('mousemove', onMove)
-    window.addEventListener('mouseup', onUp)
-    return ()=>{ window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
-  },[])
+    };
+    const onUp = ()=>{ dragRef.current.dragging=null; };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return ()=>{ window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+  },[]);
 
   async function onCreateRoom(){
-    const name = prompt('New location name?'); if(!name) return
-    const n = clean(name)
-    await addDoc(collection(db,'rooms'), { name:n, createdAt: serverTimestamp() })
-    await addDoc(collection(db,'activities'), { type:'Add Room', details:n, createdAt: serverTimestamp() })
+    const name = prompt('New location name?'); if(!name) return;
+    const n = clean(name);
+    await addDoc(collection(db,'rooms'), { name:n, createdAt: serverTimestamp() });
+    await addDoc(collection(db,'activities'), { type:'Add Room', details:n, createdAt: serverTimestamp() });
   }
 
   async function onCreateStorage(roomName){
-    const name = prompt('Storage name?'); if(!name) return
-    const type = prompt('Type? (e.g., Gratnell, Cupboard, Shelf)','Gratnell') || 'Storage'
-    const drawersStr = prompt('Drawers/Layers (letters, comma-separated: A,B,C)', 'A,B,C')
-    const drawers = clean(drawersStr).split(',').map(s=>clean(s).toUpperCase()).filter(Boolean)
-    const id = safeId()
-    await setDoc(doc(db,'storages', id), { id, name: clean(name), type: clean(type), location: roomName, drawers })
-    await addDoc(collection(db,'activities'), { type:'Add Storage', details:`${name} in ${roomName}`, createdAt: serverTimestamp() })
+    const name = prompt('Storage name?'); if(!name) return;
+    const type = prompt('Type? (e.g., Gratnell, Cupboard, Shelf)','Gratnell') || 'Storage';
+    const drawersStr = prompt('Drawers/Layers (letters, comma-separated: A,B,C)', 'A,B,C');
+    const drawers = clean(drawersStr).split(',').map(s=>clean(s).toUpperCase()).filter(Boolean);
+    const id = safeId();
+    await setDoc(doc(db,'storages', id), { id, name: clean(name), type: clean(type), location: roomName, drawers });
+    await addDoc(collection(db,'activities'), { type:'Add Storage', details:`${name} in ${roomName}`, createdAt: serverTimestamp() });
   }
 
   async function onRemoveStorage(s){
-    if(!confirm(`Remove storage "${s.name}"?\nItems will be moved to Unplaced.`)) return
-    const batch = writeBatch(db)
+    if(!confirm(`Remove storage "${s.name}"?\nItems will be moved to Unplaced.`)) return;
+    const batch = writeBatch(db);
     items.forEach(it=>{
       if (it?.location?.storage === s.id){
         batch.update(doc(db,'items',it.id), {
           location:{ storage:UNPLACED, drawer:null, slot:null },
           updatedAt: serverTimestamp()
-        })
+        });
       }
-    })
-    batch.delete(doc(db,'storages', s.id))
-    await batch.commit()
-    await addDoc(collection(db,'activities'), { type:'Remove Storage', details:s.name, createdAt: serverTimestamp() })
-    setActiveStorages(prev => prev.filter(x => x!==s.id))
+    });
+    batch.delete(doc(db,'storages', s.id));
+    await batch.commit();
+    await addDoc(collection(db,'activities'), { type:'Remove Storage', details:s.name, createdAt: serverTimestamp() });
+    setActiveStorages(prev => prev.filter(x => x!==s.id));
   }
 
   const dropUnplaced = async (e) => {
-    const payload = e.dataTransfer.getData('text/plain')
-    if (!payload) return
-    const data = JSON.parse(payload)
+    const payload = e.dataTransfer.getData('text/plain');
+    if (!payload) return;
+    const data = JSON.parse(payload);
     await updateDoc(doc(db,'items', data.id), {
       location: { storage: UNPLACED, drawer: null, slot: null },
       updatedAt: serverTimestamp()
-    })
+    });
     await addDoc(collection(db,'activities'),{
       type:'Move Item', details:`${data.name} → Unplaced`, createdAt: serverTimestamp()
-    })
-  }
+    });
+  };
+
+  /* Mobile detection (<=900px) for responsive rendering */
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches
+  );
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(max-width: 900px)');
+    const onChange = () => setIsMobile(mq.matches);
+    mq.addEventListener?.('change', onChange);
+    mq.addListener?.(onChange); // Safari fallback
+    return () => {
+      mq.removeEventListener?.('change', onChange);
+      mq.removeListener?.(onChange);
+    };
+  }, []);
 
   return (
-    <div className="tri-wrap" style={{ ['--leftW']: leftW+'px', ['--midW']: midW+'px' }}>
+    <div
+      className={`tri-wrap ${isMobile ? 'mobile' : 'desktop'}`}
+      style={{ '--leftW': `${leftW}px`, '--midW': `${midW}px` }}
+    >
       <LocationsPanel
         rooms={rooms}
         storages={storages}
@@ -510,11 +530,22 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
         onRemoveStorage={onRemoveStorage}
       />
 
-      <div className="v-sizer" onMouseDown={e=>{ dragRef.current={dragging:'left', startX:e.clientX, orig:leftW} }} />
+      {/* hide resizers on mobile */}
+      {!isMobile && (
+        <div
+          className="v-sizer"
+          onMouseDown={e=>{ dragRef.current={dragging:'left', startX:e.clientX, orig:leftW}; }}
+        />
+      )}
 
       <UnplacedColumn items={items} query={unplacedQ} setQuery={setUnplacedQ} onDropHere={dropUnplaced} />
 
-      <div className="v-sizer" onMouseDown={e=>{ dragRef.current={dragging:'mid', startX:e.clientX, orig:midW} }} />
+      {!isMobile && (
+        <div
+          className="v-sizer"
+          onMouseDown={e=>{ dragRef.current={dragging:'mid', startX:e.clientX, orig:midW}; }}
+        />
+      )}
 
       <StoragesPanel
         storages={storages}
@@ -525,5 +556,5 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
         setPartCfg={setPartCfg}
       />
     </div>
-  )
+  );
 }

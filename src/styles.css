@@ -365,29 +365,34 @@ section.panel.active{ display:block }
 .sheet-title{ font-weight:900; font-size:18px }
 .sheet-sub{ color:#475569; font-size:12px }
 .sheet-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:12px }
-/* Hide bottom bar by default (desktop), show sidebar */
+
+/* ======== BOTTOM NAV (desktop hidden) ======== */
 .bottom-nav { display: none; }
 
-/* Mobile: hide sidebar, show sticky bottom nav */
+/* ======== MOBILE: collapse sidebar, show bottom nav ======== */
 @media (max-width: 900px) {
-  .side { display: none; }
+  /* Remove the 72px sidebar column and hide the sidebar */
+  .app { grid-template-columns: 1fr !important; min-height:100vh; }
+  .side { display: none !important; }
 
+  /* Sticky bottom bar */
   .bottom-nav {
     position: fixed;
     left: 0; right: 0; bottom: 0;
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* will wrap; see note below */
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
     gap: 2px;
     background: #fff;
     border-top: 1px solid var(--border, #e5e7eb);
     box-shadow: 0 -6px 18px rgba(0,0,0,.06);
     padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
     z-index: 1000;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
-  /* If you want 7 tabs to scroll horizontally on very small phones: */
-  .bottom-nav { overflow-x: auto; grid-auto-flow: column; grid-auto-columns: 1fr; }
-
+  /* Icon-first, compact items for bottom bar */
   .bottom-item {
     display: grid;
     place-items: center;
@@ -397,14 +402,18 @@ section.panel.active{ display:block }
     background: transparent;
     color: #64748b;
     border: none;
+    min-width: 64px;
   }
-  .bottom-item.active { color: #111827; background: #f3f4f6; }
-
   .bottom-item .bi-icon svg { width: 22px; height: 22px; }
   .bottom-item .bi-text    { font-size: 10px; line-height: 1; }
 
-  /* Make sure content isn't hidden behind the bar */
-  main, .page, .app, body {
-    padding-bottom: 84px; /* space for the bar */
+  .bottom-item.active { color: #111827; background: #f3f4f6; }
+
+  /* Keep page content clear of the bar */
+  body, .app, main, .page { padding-bottom: 84px !important; }
+
+  /* Optional: hide labels on tiny screens */
+  @media (max-width: 380px) {
+    .bottom-item .bi-text { display: none; }
   }
 }

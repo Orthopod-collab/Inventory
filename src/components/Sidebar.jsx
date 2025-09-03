@@ -1,21 +1,24 @@
 // Sidebar.jsx
 import React from 'react'
 
-/* Same icon set used for desktop — kept inline so the bottom bar reuses them 1:1 */
+/** Icon set (same visuals for desktop + mobile) */
 const icons = {
   register: (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M3 17.25V21h3.75L18.81 8.94l-3.75-3.75L3 17.25Z" stroke="currentColor" strokeWidth="1.6"/>
-      <path d="M20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.59 1.59 3.75 3.75 1.59-1.59Z" fill="currentColor"/>
+      {/* document */}
+      <path d="M7 3h6l4 4v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"
+            stroke="currentColor" strokeWidth="1.6" fill="none"/>
+      <path d="M13 3v5h5" stroke="currentColor" strokeWidth="1.6" fill="none"/>
+      {/* plus badge */}
+      <circle cx="17.5" cy="17.5" r="3.25" fill="currentColor" />
+      <path d="M17.5 15.7v3.6M15.7 17.5h3.6"
+            stroke="#0b1224" strokeWidth="1.6" strokeLinecap="round"/>
     </svg>
   ),
   inventory: (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M4 19V5" stroke="currentColor" strokeWidth="1.6"/>
-      <path d="M8 19v-7" stroke="currentColor" strokeWidth="1.6"/>
-      <path d="M12 19V8" stroke="currentColor" strokeWidth="1.6"/>
-      <path d="M16 19V4" stroke="currentColor" strokeWidth="1.6"/>
-      <path d="M20 19V11" stroke="currentColor" strokeWidth="1.6"/>
+      <path d="M4 19V5M8 19v-7M12 19V8M16 19V4M20 19V11"
+            stroke="currentColor" strokeWidth="1.6"/>
     </svg>
   ),
   storage: (
@@ -68,7 +71,7 @@ export default function Sidebar({ active, setActive }) {
 
   return (
     <>
-      {/* ===== Desktop sidebar (unchanged) ===== */}
+      {/* Desktop left rail (unchanged) */}
       <aside className="side">
         <div className="logo">RLH</div>
         {tabs.map(([key, label]) => (
@@ -86,16 +89,8 @@ export default function Sidebar({ active, setActive }) {
         <div className="spacer" />
       </aside>
 
-      {/* ===== Mobile bottom bar (icons only, same gradient bg as sidebar) ===== */}
-      <nav
-        className="bottom-nav"
-        /* inline style guarantees the same gradient even if CSS hasn't been updated yet */
-        style={{
-          background: 'linear-gradient(180deg,#0b1224,#0f1933)',
-          borderTop: '1px solid rgba(255,255,255,.08)',
-          boxShadow: '0 -6px 18px rgba(0,0,0,.35)'
-        }}
-      >
+      {/* Mobile bottom bar — icons only, same dark bg as sidebar */}
+      <nav className="bottom-nav">
         {tabs.map(([key, label]) => (
           <button
             key={key}
@@ -103,11 +98,8 @@ export default function Sidebar({ active, setActive }) {
             onClick={() => setActive(key)}
             aria-label={label}
             title={label}
-            /* make icons inherit the same light color as desktop sidebar */
-            style={{ color: active===key ? '#ffffff' : '#e3ecff' }}
           >
             {icons[key]}
-            {/* No text labels on mobile bottom bar */}
           </button>
         ))}
       </nav>

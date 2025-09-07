@@ -307,7 +307,8 @@ function LocationsPanel({
   rooms, storages, items,
   expandedRooms, setExpandedRooms,
   activeStorages, setActiveStorages,
-  onCreateRoom, onCreateStorage, onRemoveStorage
+  onCreateRoom, onCreateStorage, onRemoveStorage,
+  onRemoveRoom, onMoveStorageToRoom
 }) {
   const counts = useMemo(()=>{
     const m = new Map();
@@ -358,12 +359,29 @@ function LocationsPanel({
         const inRoom = storages.filter(s => s.location === r.name);
         return (
           <div key={r.name} className={`room ${isOpen?'active':''}`}>
-            <header onClick={()=>toggleExpand(r.name)}>
+            <header
+              onClick={()=>toggleExpand(r.name)}
+              onDragOver={(e)=>{ e.preventDefault(); }}
+              onDrop={(e)=>{
+                e.preventDefault();
+                try{
+                  const raw = e.dataTransfer.getData('application/json') || e.dataTransfer.getData('text/plain');
+                  const data = raw ? JSON.parse(raw) : null;
+                  if (data?.kind === 'storage' && data?.id) {
+                    onMoveStorageToRoom?.(data.id, r.name);
+                  }
+                }catch{/* noop */}
+              }}
+            >
               <div className="bar">
                 <div className="title">{r.name}</div>
               </div>
               <div className="actions">
                 <span className="count">{inRoom.length} storage</span>
+                <button
+                  className="mini danger"
+                  onClick={(e)=>{ e.stopPropagation(); onRemoveRoom?.(r); }}
+                >Remove</button>
               </div>
             </header>
 
@@ -377,6 +395,12 @@ function LocationsPanel({
                     return (
                       <div key={s.id || s.name}
                            className={`storage-tile ${active?'active':''}`}
+                           draggable
+                           onDragStart={(e)=>{
+                             const payload = JSON.stringify({ kind:'storage', id:s.id, name:s.name });
+                             e.dataTransfer.setData('application/json', payload);
+                             e.dataTransfer.setData('text/plain', payload);
+                           }}
                            onClick={()=>toggleActiveStorage(s.id)}
                       >
                         <div className="name">{s.name}</div>
@@ -559,6 +583,59 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
     setActiveStorages(prev => prev.filter(x => x!==s.id));
   }
 
+  // NEW: remove a room/location (cascade storages->delete, items->Unplaced)
+  async function onRemoveRoom(room){
+    const roomName = room?.name || '';
+    if (!roomName) return;
+    if (!confirm(`Remove location "${roomName}"?\nAll its storages will be deleted and items moved to Unplaced.`)) return;
+
+    const roomId = room.id || (rooms.find(r => r?.name === roomName)?.id);
+
+    const batch = writeBatch(db);
+
+    // For each storage under this room: move items to Unplaced, delete storage
+    storages
+      .filter(s => s?.location === roomName)
+      .forEach(s => {
+        items
+          .filter(it => it?.location?.storage === s.id)
+          .forEach(it => {
+            batch.update(doc(db, 'items', it.id), {
+              location: { storage: UNPLACED, drawer: null, slot: null },
+              updatedAt: serverTimestamp(),
+            });
+          });
+        batch.delete(doc(db, 'storages', s.id));
+      });
+
+    if (roomId) {
+      batch.delete(doc(db, 'rooms', roomId));
+    }
+
+    await batch.commit();
+
+    await addDoc(collection(db, 'activities'), {
+      type: 'Remove Room',
+      details: roomName,
+      createdAt: serverTimestamp(),
+    });
+
+    // Hide any active storages that belonged to this room
+    setActiveStorages(prev => prev.filter(id => !storages.find(s => s.id === id && s.location === roomName)));
+  }
+
+  // NEW: move a storage between rooms
+  async function onMoveStorageToRoom(storageId, targetRoomName){
+    const s = storages.find(x => x.id === storageId);
+    if (!s || !targetRoomName || s.location === targetRoomName) return;
+    await updateDoc(doc(db,'storages', storageId), { location: targetRoomName });
+    await addDoc(collection(db,'activities'), {
+      type:'Move Storage',
+      details:`${s.name} → ${targetRoomName}`,
+      createdAt: serverTimestamp()
+    });
+  }
+
   const dropUnplaced = async (e) => {
     const payload = e.dataTransfer.getData('text/plain');
     if (!payload) return;
@@ -629,6 +706,8 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
             onCreateRoom={onCreateRoom}
             onCreateStorage={onCreateStorage}
             onRemoveStorage={onRemoveStorage}
+            onRemoveRoom={onRemoveRoom}                      {/* NEW */}
+            onMoveStorageToRoom={onMoveStorageToRoom}        {/* NEW */}
           />
           {!isMobile && (
             <div className="v-sizer"

@@ -138,6 +138,9 @@ function DrawerRow({ storage, label, list, partCount, setPartCount, isMobile, on
     });
   };
 
+  // TSX-safe CSS var:
+  const partStyle = { ['--cols']: partCount } as unknown as React.CSSProperties;
+
   return (
     <div className="drawer-section">
       <div className="drawer-row">
@@ -150,7 +153,7 @@ function DrawerRow({ storage, label, list, partCount, setPartCount, isMobile, on
           </div>
         </div>
 
-        <div className="partitions" style={{ ['--cols']: partCount }}>
+        <div className="partitions" style={partStyle}>
           {Array.from({length:partCount}).map((_,i)=>(
             <div key={i} className="part-col">
               <div className="part-cap">{i+1}</div>
@@ -513,6 +516,12 @@ function MoveSheet({ open, onClose, item, storages, partCfg, onAssign }) {
 
 /* ====================== MAIN ====================== */
 export default function StorageMap({ items=[], rooms=[], storages=[] }) {
+  // TSX-safe CSS vars for root
+  const rootVars = {
+    ['--leftW']: `${(typeof window !== 'undefined' ? Number(localStorage.getItem('sm.leftW') || 300) : 300)}px`,
+    ['--midW'] : `${(typeof window !== 'undefined' ? Number(localStorage.getItem('sm.midW')  || 520) : 520)}px`,
+  } as unknown as React.CSSProperties;
+
   const [leftW, setLeftW] = useState(() =>
     (typeof window !== 'undefined' ? Number(localStorage.getItem('sm.leftW') || 300) : 300)
   );
@@ -596,7 +605,6 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
     setActiveStorages(prev => prev.filter(x => x!==s.id));
   }
 
-  // Remove a room/location (cascade storages->delete, items->Unplaced)
   async function onRemoveRoom(room){
     const roomName = room?.name || '';
     if (!roomName) return;
@@ -606,7 +614,6 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
 
     const batch = writeBatch(db);
 
-    // For each storage under this room: move items to Unplaced, delete storage
     storages
       .filter(s => s?.location === roomName)
       .forEach(s => {
@@ -633,11 +640,9 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
       createdAt: serverTimestamp(),
     });
 
-    // Hide any active storages that belonged to this room
     setActiveStorages(prev => prev.filter(id => !storages.find(s => s.id === id && s.location === roomName)));
   }
 
-  // Move a storage between rooms
   async function onMoveStorageToRoom(storageId, targetRoomName){
     const s = storages.find(x => x.id === storageId);
     if (!s || !targetRoomName || s.location === targetRoomName) return;
@@ -678,8 +683,8 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
     };
   }, []);
 
-  /* Mobile tabs: which panel is visible */
-  const [mobileView, setMobileView] = useState('mid'); // 'left' | 'mid' | 'right'
+  /* Mobile tabs */
+  const [mobileView, setMobileView] = useState('mid');
 
   /* Tap-to-assign sheet */
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -699,10 +704,16 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
     setSheetItem(null);
   };
 
+  // recompute root CSS vars when widths change (TSX-safe cast)
+  const rootStyle = {
+    ['--leftW']: `${leftW}px`,
+    ['--midW']: `${midW}px`,
+  } as unknown as React.CSSProperties;
+
   return (
     <div
       className={`tri-wrap ${isMobile ? 'mobile' : 'desktop'}`}
-      style={{ '--leftW': `${leftW}px`, '--midW': `${midW}px` }}
+      style={rootStyle}
     >
       {isMobile && <MobileTabs view={mobileView} setView={setMobileView} />}
 
@@ -719,8 +730,8 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
             onCreateRoom={onCreateRoom}
             onCreateStorage={onCreateStorage}
             onRemoveStorage={onRemoveStorage}
-            onRemoveRoom={onRemoveRoom}                      {/* NEW */}
-            onMoveStorageToRoom={onMoveStorageToRoom}        {/* NEW */}
+            onRemoveRoom={onRemoveRoom}
+            onMoveStorageToRoom={onMoveStorageToRoom}
           />
           {!isMobile && (
             <div className="v-sizer"

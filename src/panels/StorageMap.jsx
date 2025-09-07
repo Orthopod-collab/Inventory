@@ -1,5 +1,3 @@
-"use client";
-
 import React, {
   useEffect, useMemo, useRef, useState, useLayoutEffect
 } from 'react';

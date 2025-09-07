@@ -1,3 +1,5 @@
+"use client";
+
 import React, {
   useEffect, useMemo, useRef, useState, useLayoutEffect
 } from 'react';
@@ -511,21 +513,28 @@ function MoveSheet({ open, onClose, item, storages, partCfg, onAssign }) {
 
 /* ====================== MAIN ====================== */
 export default function StorageMap({ items=[], rooms=[], storages=[] }) {
-  const [leftW, setLeftW] = useState(()=> Number(localStorage.getItem('sm.leftW')||300));
-  const [midW,  setMidW]  = useState(()=> Number(localStorage.getItem('sm.midW') ||520));
+  const [leftW, setLeftW] = useState(() =>
+    (typeof window !== 'undefined' ? Number(localStorage.getItem('sm.leftW') || 300) : 300)
+  );
+  const [midW,  setMidW]  = useState(() =>
+    (typeof window !== 'undefined' ? Number(localStorage.getItem('sm.midW')  || 520) : 520)
+  );
 
-  const [expandedRooms, setExpandedRooms] = useState(()=>{
-    try{ return JSON.parse(localStorage.getItem('sm.expandedRooms')||'[]'); }catch{return [];}
+  const [expandedRooms, setExpandedRooms] = useState(() => {
+    if (typeof window === 'undefined') return [];
+    try { return JSON.parse(localStorage.getItem('sm.expandedRooms') || '[]'); } catch { return []; }
   });
-  const [activeStorages, setActiveStorages] = useState(()=>{
-    try{ return JSON.parse(localStorage.getItem('sm.activeStorages')||'[]'); }catch{return [];}
+  const [activeStorages, setActiveStorages] = useState(() => {
+    if (typeof window === 'undefined') return [];
+    try { return JSON.parse(localStorage.getItem('sm.activeStorages') || '[]'); } catch { return []; }
   });
 
-  const [partCfg, setPartCfg] = useState(()=>{
-    try{
-      const raw = JSON.parse(localStorage.getItem('sm.partitionCounts')||'[]');
+  const [partCfg, setPartCfg] = useState(() => {
+    if (typeof window === 'undefined') return new Map();
+    try {
+      const raw = JSON.parse(localStorage.getItem('sm.partitionCounts') || '[]');
       return new Map(Array.isArray(raw) ? raw : []);
-    }catch{ return new Map(); }
+    } catch { return new Map(); }
   });
 
   const [unplacedQ, setUnplacedQ] = useState('');
@@ -537,16 +546,20 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
       if (!d.dragging) return;
       const dx = e.clientX - d.startX;
       if (d.dragging==='left'){
-        const w = Math.max(240, Math.min(520, d.orig + dx)); setLeftW(w); localStorage.setItem('sm.leftW', w);
+        const w = Math.max(240, Math.min(520, d.orig + dx)); setLeftW(w);
+        try{ localStorage.setItem('sm.leftW', String(w)); }catch{}
       }
       if (d.dragging==='mid'){
-        const w = Math.max(380, Math.min(780, d.orig + dx)); setMidW(w);  localStorage.setItem('sm.midW',  w);
+        const w = Math.max(380, Math.min(780, d.orig + dx)); setMidW(w);
+        try{ localStorage.setItem('sm.midW', String(w)); }catch{}
       }
     };
     const onUp = ()=>{ dragRef.current.dragging=null; };
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    return ()=>{ window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+      return ()=>{ window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+    }
   },[]);
 
   async function onCreateRoom(){
@@ -583,7 +596,7 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
     setActiveStorages(prev => prev.filter(x => x!==s.id));
   }
 
-  // NEW: remove a room/location (cascade storages->delete, items->Unplaced)
+  // Remove a room/location (cascade storages->delete, items->Unplaced)
   async function onRemoveRoom(room){
     const roomName = room?.name || '';
     if (!roomName) return;
@@ -624,7 +637,7 @@ export default function StorageMap({ items=[], rooms=[], storages=[] }) {
     setActiveStorages(prev => prev.filter(id => !storages.find(s => s.id === id && s.location === roomName)));
   }
 
-  // NEW: move a storage between rooms
+  // Move a storage between rooms
   async function onMoveStorageToRoom(storageId, targetRoomName){
     const s = storages.find(x => x.id === storageId);
     if (!s || !targetRoomName || s.location === targetRoomName) return;
